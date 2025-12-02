@@ -13,7 +13,7 @@ from ciftools.models.writer import (
 )
 from ciftools.binary.writer import EncodedCIFData
 from ciftools.binary.decoder import ByteArrayEncoding, DataType
-from ciftools.binary.encoder import BinaryCIFEncoder, DataTypeEnum
+from ciftools.binary.encoder import BinaryCIFEncoder, DataTypeEnum, BYTE_ARRAY
 
 from volsegtools.abc import Serializer
 from volsegtools.model import (
@@ -58,7 +58,7 @@ class VolumeData3DInfoDesc(CategoryDesc):
 
     @staticmethod
     def get_field_descriptors(data: VolumeDataBatch) -> Collection[Field]:
-        volume_server_encoder = lambda _: DUMMY_VOLUME_SERVER
+        volume_server_encoder = lambda _: BYTE_ARRAY
         return [
             Field.strings(
                 name = "name",
@@ -266,7 +266,7 @@ class VolumeData3DDesc(CategoryDesc):
 
     @staticmethod
     def get_field_descriptors(data: np.ndarray) -> Collection[Field]:
-        volume_server_encoder = lambda _: DUMMY_VOLUME_SERVER
+        volume_server_encoder = lambda _: BYTE_ARRAY
         return [
             Field.number_array(
                 name="values",
