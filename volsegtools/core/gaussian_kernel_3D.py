@@ -2,6 +2,7 @@ import numpy as np
 
 from volsegtools.abc import ConvolutionKernel
 
+
 class Gaussian3DKernel(ConvolutionKernel):
     """Generate a 3D Gaussian kernel."""
 

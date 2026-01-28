@@ -1,6 +1,6 @@
+import abc
 from typing import Any
 
-import abc
 
 class Preprocessor(abc.ABC):
     """Processes"""
@@ -29,6 +29,9 @@ class Preprocessor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def preprocess(self):
+    async def preprocess(self):
         pass
 
+    @abc.abstractmethod
+    def sync_preprocess(self):
+        pass

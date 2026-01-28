@@ -1,6 +1,7 @@
 import abc
-import dask.array as da
-from typing import Any
+from typing import Any, List
+
+from volsegtools.abc import DataHandle
 
 
 class Downsampler(abc.ABC):
@@ -10,9 +11,7 @@ class Downsampler(abc.ABC):
         ...
 
     @abc.abstractmethod
-    # TODO: this needs a bit of refactoring, it seems that there is some kind
-    # of information leakage
-    async def downsample_lattice(self, name, lattice: da.Array, kind) -> da.Array:
+    async def downsample_lattice(self, data: DataHandle) -> List[DataHandle]:
         """Downsamples the provided lattice.
 
         The lattice is changed in place and only a reference to the same data
@@ -25,23 +24,5 @@ class Downsampler(abc.ABC):
 
         Returns
         -------
-        """
-        ...
-
-    @abc.abstractmethod
-    def downsample(self, data: Any) -> Any:
-        """Downsamples the provided data.
-
-        The downsampling is applied both to the volumetric and segmentation
-        data.
-
-        Parameters
-        ----------
-        data: volseg.Data
-
-        Returns
-        -------
-        data: volseg.Data
-            Reference to the input data, but at this point it is downsampled.
         """
         ...

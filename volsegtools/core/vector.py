@@ -1,5 +1,6 @@
 import dataclasses
 
+
 # TODO: rather use pydantic
 @dataclasses.dataclass
 class Vector3:

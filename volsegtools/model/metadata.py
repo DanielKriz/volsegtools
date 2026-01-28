@@ -1,7 +1,8 @@
 import dataclasses
 from typing import List
 
-from volsegtools.core import Vector3
+from volsegtools.core import LatticeKind, Vector3
+
 
 @dataclasses.dataclass
 class DescriptiveStatistics:
@@ -20,8 +21,12 @@ class ChannelMetadata:
 
 @dataclasses.dataclass
 class TimeFrameMetadata:
+    # TODO: rename to 'name'
+    axis_order: Vector3 = dataclasses.field(default_factory=Vector3)
     lattice_id: str = "unknown"
+    kind: LatticeKind = dataclasses.field(default=LatticeKind.VOLUME)
     id: int = -1
+    axis_order: Vector3 = dataclasses.field(default_factory=Vector3)
     resolution: int = -1
     origin: Vector3 = dataclasses.field(default_factory=Vector3)
     lattice_dimensions: Vector3 = dataclasses.field(default_factory=Vector3)
@@ -37,51 +42,3 @@ class OriginalTimeFrameMetadata(TimeFrameMetadata):
 class Metadata:
     original_time_frame: OriginalTimeFrameMetadata = dataclasses.field(default_factory=OriginalTimeFrameMetadata)
     time_frames: List[TimeFrameMetadata] = dataclasses.field(default_factory=list)
-
-def fake_metadata() -> Metadata:
-    metadata = Metadata(
-        OriginalTimeFrameMetadata(
-            "unknown",
-            0,
-            0,
-            Vector3(4, 5, 6),
-            Vector3(4, 5, 6),
-            Vector3(4, 5, 6),
-            [
-                ChannelMetadata(0, DescriptiveStatistics(1, 2, 3, 4)),
-                ChannelMetadata(1, DescriptiveStatistics(1, 2, 3, 4)),
-                ChannelMetadata(2, DescriptiveStatistics(1, 2, 3, 4)),
-            ],
-            Vector3(4, 5, 6),
-        ),
-        [
-            TimeFrameMetadata(
-                "unknown",
-                0,
-                0,
-                Vector3(4, 5, 6),
-                Vector3(4, 5, 6),
-                Vector3(4, 5, 6),
-                [
-                    ChannelMetadata(0, DescriptiveStatistics(1, 2, 3, 4)),
-                    ChannelMetadata(1, DescriptiveStatistics(1, 2, 3, 4)),
-                    ChannelMetadata(2, DescriptiveStatistics(1, 2, 3, 4)),
-                ]
-            ),
-            TimeFrameMetadata(
-                "unknown",
-                1,
-                0,
-                Vector3(4, 5, 6),
-                Vector3(4, 5, 6),
-                Vector3(4, 5, 6),
-                [
-                    ChannelMetadata(0, DescriptiveStatistics(1, 2, 3, 4)),
-                    ChannelMetadata(1, DescriptiveStatistics(1, 2, 3, 4)),
-                    ChannelMetadata(2, DescriptiveStatistics(1, 2, 3, 4)),
-                ]
-            ),
-        ],
-    )
-
-    return metadata

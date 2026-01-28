@@ -1,60 +1,34 @@
+import dataclasses
+from pathlib import Path
+from typing import Tuple
+
+import dask.array as da
+import numpy as np
 import zarr
 import zarr.storage
 
-import numpy as np
-import dask.array as da
-import dataclasses
-from pathlib import Path
-
-from typing import Tuple
-from volsegtools.model.storing_parameters import StoringParameters
-from volsegtools.model.lattice_kind import LatticeKind
+from volsegtools.core import LatticeKind
 from volsegtools.model.chunking_mode import ChunkingMode
 from volsegtools.model.metadata import Metadata
-
-class TimeFrameIterator():
-    ...
-
-class ResolutionIterator():
-    ...
-
-class ChannelIterator():
-    ...
-
-@dataclasses.dataclass
-class ChannelInfo():
-    resolution: str
-    time: str
-    channel: str
-    data: zarr.Array
-
-class FlatChannelIterator():
-    def __init__(self, group):
-        self.group = group
-        self._iter = self._group_iter()
+from volsegtools.model.opaque_data_handle import OpaqueDataHandle
+from volsegtools.model.storing_parameters import StoringParameters
 
 
-    def _group_iter(self):
-        for resolution, resolution_group in self.group.groups():
-            for time, time_group in resolution_group.groups():
-                for channel, channel_arr in time_group.arrays():
-                    yield ChannelInfo(
-                        resolution,
-                        time,
-                        channel,
-                        channel_arr
-                    )
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+    @property
+    def instance(cls):
+        return cls._instances[cls]
 
 
-    def __iter__(self):
-        return self
-
-
-    def __next__(self) -> ChannelInfo:
-        return next(self._iter)
-
-
-class Data():
+class WorkingStore(metaclass=Singleton):
     def __init__(self, store_path: Path):
         self.data_store = zarr.storage.LocalStore(root=store_path)
         self.root_group = zarr.create_group(store=self.data_store)
@@ -93,8 +67,8 @@ class Data():
         return self._segmentation_data_group
 
 
-    def get_data_array(self, lattice_id, resolution, time_frame, channel):
-        kind_group = self.get_data_group(LatticeKind.VOLUME)
+    def get_data_array(self, lattice_id, resolution, time_frame, channel, kind=LatticeKind.VOLUME):
+        kind_group = self.get_data_group(kind)
         lattice_group = kind_group.require_group(lattice_id)
         resolution_group: zarr.Group = lattice_group.require_group(
             f"resolution_{resolution}"
@@ -102,6 +76,7 @@ class Data():
         time_frame_group: zarr.Group = resolution_group.require_group(
             f"time_frame_{time_frame}"
         )
+        # FIX: this is unsafe, there should be some check!
         return list(time_frame_group.arrays())[channel][1][:]
 
 
@@ -117,7 +92,6 @@ class Data():
     def _resolve_chunking_method(mode: ChunkingMode, data_shape: Tuple[int, ...]):
         match mode:
             case ChunkingMode.AUTO:
-                print("CHUNKING WITH ATOU")
                 return "auto"
             case ChunkingMode.NONE:
                 return (0, 0)
@@ -142,7 +116,7 @@ class Data():
         params: StoringParameters,
         data: da.Array,
         lattice_id: str,
-    ) -> None:
+    ) -> OpaqueDataHandle:
         kind_group = self.get_data_group(params.lattice_kind)
         lattice_group = kind_group.require_group(lattice_id)
         resolution_group: zarr.Group = lattice_group.require_group(
@@ -156,11 +130,9 @@ class Data():
         if params.is_compression_enabled:
             used_compressor = params.compressor
 
-        print(params)
-
         zarr_repr: zarr.Array = time_frame_group.create_array(
             name=str(params.channel),
-            chunks=Data._resolve_chunking_method(
+            chunks=WorkingStore._resolve_chunking_method(
                 params.chunking_mode,
                 data.shape
             ),
@@ -170,7 +142,7 @@ class Data():
             overwrite=True,
         )
 
-        print(data)
-        print(zarr_repr)
-
         da.to_zarr(arr=data, url=zarr_repr, overwrite=True, compute=True)
+        ref = OpaqueDataHandle(zarr_repr)
+        ref.metadata.lattice_id = lattice_id
+        return ref

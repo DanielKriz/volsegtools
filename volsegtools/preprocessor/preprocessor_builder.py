@@ -1,9 +1,11 @@
-import logging
+from pathlib import Path
+from typing import List
+
 from typing_extensions import Self
+
 from volsegtools.abc import Converter, Downsampler
 from volsegtools.preprocessor import Preprocessor
-from typing import List, Optional
-from pathlib import Path
+
 
 class PreprocessorBuilder():
     """Allows fine-grained specification of the preprocessor."""
@@ -21,7 +23,6 @@ class PreprocessorBuilder():
         # Currently, we only support a single preprocessor, after that we
         # could add support for generic preprocessor
         # self._preprocessor_type: Optional[Preprocessor] = None
-
 
     def set_converter(self, converter: Converter) -> Self:
         """Sets a converter that is going to be used by the resulting

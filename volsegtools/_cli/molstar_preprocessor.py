@@ -1,26 +1,20 @@
-import os
-import sys
-import typer
-import shutil
-import logging
 
+import logging
+import os
+import shutil
+import sys
 from pathlib import Path
 from typing import List
+
+import typer
 from typing_extensions import Annotated
 
 from volsegtools.converter import MapConverter
-from volsegtools.preprocessor import (
-    PreprocessorBuilder,
-    Preprocessor,
-)
+from volsegtools.core import DownsamplingParameters, LatticeKind
 # TODO: parameters should (and can be) moved to the downsampler package
-from volsegtools.downsampler import (
-    HierarchyDownsampler, 
-)
-from volsegtools.core import (
-    DownsamplingParameters,
-)
-
+from volsegtools.downsampler import HierarchyDownsampler
+from volsegtools.model.working_store import WorkingStore
+from volsegtools.preprocessor import Preprocessor, PreprocessorBuilder
 
 app = typer.Typer()
 
@@ -48,9 +42,14 @@ def run(
 
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
-    local_store_path = workdir / "volsegtools_tmp"
+    # TODO: this could be stored in the /tmp directory...
+    local_store_path = workdir / "volsegtools_workdir"
     if overwrite_tmp and local_store_path.exists():
         shutil.rmtree(local_store_path)
+
+    # Initialization of the singleton working store
+    # FIX: This shouldn't be necessarry
+    working_store = WorkingStore(local_store_path)
 
     builder = PreprocessorBuilder()
     builder.set_converter(MapConverter())
@@ -69,7 +68,6 @@ def run(
     try:
         preprocessor: Preprocessor = builder.build()
         preprocessor.sync_preprocess()
-        preprocessor.serialize()
     finally:
         if rm_tmp and local_store_path.exists():
             shutil.rmtree(local_store_path)

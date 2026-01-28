@@ -1,9 +1,8 @@
 import pytest
 
-
-from volsegtools.downsampler import BaseDownsampler
 # TODO: it can be moved into downsampler
 from volsegtools.core import DownsamplingParameters
+from volsegtools.downsampler import BaseDownsampler
 
 
 def test_base_downsampler_init():

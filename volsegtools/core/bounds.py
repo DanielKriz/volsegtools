@@ -1,5 +1,6 @@
-import pydantic
 from typing import Optional
+
+import pydantic
 
 
 # TODO: rather use base model...

@@ -1,11 +1,12 @@
 import numpy as np
-import pydantic
 import numpy.typing
+import pydantic
 from zarr.abc.codec import BytesBytesCodec
 from zarr.codecs import BloscCodec
 
+from volsegtools.core import LatticeKind
 from volsegtools.model.chunking_mode import ChunkingMode
-from volsegtools.model.lattice_kind import LatticeKind
+
 
 class StoringParameters(pydantic.BaseModel):
     """Parameters used for storing a volume or a segmentation.

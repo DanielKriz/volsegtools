@@ -1,5 +1,6 @@
-import volsegtools.model
 import pytest
+
+import volsegtools.model
 
 
 def test_descriptive_statistics_construction():
