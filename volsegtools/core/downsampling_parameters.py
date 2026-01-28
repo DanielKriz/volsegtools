@@ -12,9 +12,8 @@ def _minimal_size_bounds_factory():
     return Bounds(5.0, None)
 
 
-
 @dataclass(config=ConfigDict(arbitrary_types_allowed=True))
-class DownsamplingParameters():
+class DownsamplingParameters:
     downsampling_level_bounds: Optional[Bounds] = None
     should_remove_original_resolution: bool = False
     is_mask: bool = False

@@ -16,46 +16,41 @@ except ImportError:
     # Define the array type as something inacessible
     ...
 
-class TimeFrameIterator():
-    ...
 
-class ResolutionIterator():
-    ...
+class TimeFrameIterator: ...
 
-class ChannelIterator():
-    ...
+
+class ResolutionIterator: ...
+
+
+class ChannelIterator: ...
+
 
 @dataclasses.dataclass
-class ChannelInfo():
+class ChannelInfo:
     resolution: str
     time: str
     channel: str
     data: zarr.Array
 
-class FlatChannelIterator():
+
+class FlatChannelIterator:
     def __init__(self, group):
         self.group = group
         self._iter = self._group_iter()
-
 
     def _group_iter(self):
         for resolution, resolution_group in self.group.groups():
             for time, time_group in resolution_group.groups():
                 for channel, channel_arr in time_group.arrays():
-                    yield ChannelInfo(
-                        resolution,
-                        time,
-                        channel,
-                        channel_arr
-                    )
-
+                    yield ChannelInfo(resolution, time, channel, channel_arr)
 
     def __iter__(self):
         return self
 
-
     def __next__(self) -> ChannelInfo:
         return next(self._iter)
+
 
 class OpaqueDataHandle(DataHandle):
     """Wrapper around basic volseg-tools data model.

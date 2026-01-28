@@ -9,24 +9,32 @@ import dask.array as da
 import dask_image.ndfilters as dask_filter
 import numpy as np
 
-from volsegtools.core import (Bounds, DownsamplingParameters, LatticeKind,
-                              Vector3, to_bytes)
+from volsegtools.core import (
+    Bounds,
+    DownsamplingParameters,
+    LatticeKind,
+    Vector3,
+    to_bytes,
+)
 from volsegtools.downsampler import BaseDownsampler
-from volsegtools.model import (ChannelMetadata, DescriptiveStatistics,
-                               FlatChannelIterator, OpaqueDataHandle,
-                               StoringParameters, TimeFrameMetadata)
+from volsegtools.model import (
+    ChannelMetadata,
+    DescriptiveStatistics,
+    FlatChannelIterator,
+    OpaqueDataHandle,
+    StoringParameters,
+    TimeFrameMetadata,
+)
 from volsegtools.model.working_store import WorkingStore
 
-MIN_GRID_SIZE = 100 ** 1
+MIN_GRID_SIZE = 100**1
 
 
 class HierarchyDownsampler(BaseDownsampler):
-    """
-    """
+    """ """
 
     # This value was used in the previous version of the preprocessor.
     KERNEL_PARAMETERS: Tuple[int, int, int] = (1, 4, 6)
-
 
     def __init__(self):
         _parameters = DownsamplingParameters()
@@ -37,7 +45,9 @@ class HierarchyDownsampler(BaseDownsampler):
         super().__init__(params)
     """
 
-    async def downsample_lattice(self, data: OpaqueDataHandle) -> List[OpaqueDataHandle]:
+    async def downsample_lattice(
+        self, data: OpaqueDataHandle
+    ) -> List[OpaqueDataHandle]:
         # We have to get the actual data from the zarr store.
         store = WorkingStore.instance
         channel_iter = FlatChannelIterator(
@@ -82,11 +92,13 @@ class HierarchyDownsampler(BaseDownsampler):
             for step in range(downsampling_steps):
                 # TODO use step to compute the voxel size
                 current_ratio = 2 ** (step + 1)
-                logging.info(f"Currently downsampling r{current_ratio}, {channel_info.time} and ch{channel_info.channel}")
+                logging.info(
+                    f"Currently downsampling r{current_ratio}, {channel_info.time} and ch{channel_info.channel}"
+                )
                 downsampled_data = dask_filter.convolve(
                     current_level_data,
                     self.parameters.kernel.as_ndarray(),
-                    mode='mirror',
+                    mode="mirror",
                     cval=0.0,
                 )
                 # TODO: find out what this does, removes the neighbor?
@@ -106,9 +118,7 @@ class HierarchyDownsampler(BaseDownsampler):
                     # acceptance threshold check
                     logging.info("Converting to Mask")
                     downsampled_data = da.where(
-                        downsampled_data > self.parameters.acceptance_threshold,
-                        1,
-                        0
+                        downsampled_data > self.parameters.acceptance_threshold, 1, 0
                     )
 
                 stats = dask.compute(
@@ -123,7 +133,7 @@ class HierarchyDownsampler(BaseDownsampler):
                 data_ref.metadata = data.metadata
 
                 # Only change things that are really different.
-                data_ref.metadata.id = int(channel_info.time.split('_')[-1])
+                data_ref.metadata.id = int(channel_info.time.split("_")[-1])
                 data_ref.metadata.resolution = current_ratio
                 data_ref.metadata.lattice_dimensions = Vector3(
                     downsampled_data.shape[0],
@@ -138,9 +148,11 @@ class HierarchyDownsampler(BaseDownsampler):
 
                 params = StoringParameters(
                     resolution_level=current_ratio,
-                    time_frame=int(channel_info.time.split('_')[-1]),
+                    time_frame=int(channel_info.time.split("_")[-1]),
                     channel=int(channel_info.channel),
-                    storage_dtype=np.byte if self.parameters.is_mask else downsampled_data.dtype,
+                    storage_dtype=np.byte
+                    if self.parameters.is_mask
+                    else downsampled_data.dtype,
                     lattice_kind=data.metadata.kind,
                 )
                 WorkingStore.instance.store_lattice_time_frame(
@@ -150,7 +162,6 @@ class HierarchyDownsampler(BaseDownsampler):
                 )
                 current_level_data = downsampled_data
         return ret_value
-
 
     def _calculate_downsampling_steps_count(
         self,
@@ -175,7 +186,7 @@ class HierarchyDownsampler(BaseDownsampler):
 
         steps_count: int = 0
 
-        # Steps are calculated either from bounds provided as downsampling 
+        # Steps are calculated either from bounds provided as downsampling
         # parameters, if any. In that case the maximal bound has priority over
         # the minimal bound as it is the user's decision.
         # Otherwise we have to compute them manually.
@@ -192,17 +203,12 @@ class HierarchyDownsampler(BaseDownsampler):
                 return 1
 
             file_size_in_bytes = data.dtype.itemsize * input_grid_size
-            size_per_downsampling = (
-                file_size_in_bytes /
-                to_bytes(self.parameters.size_per_level_bounds_in_mb.min)
+            size_per_downsampling = file_size_in_bytes / to_bytes(
+                self.parameters.size_per_level_bounds_in_mb.min
             )
-            steps_count = int(math.log(
-                size_per_downsampling,
-                downsampling_factor
-            ))
+            steps_count = int(math.log(size_per_downsampling, downsampling_factor))
 
         return steps_count
-
 
     def _calculate_downsampling_levels(
         self,
@@ -241,7 +247,7 @@ class HierarchyDownsampler(BaseDownsampler):
 
         if len(levels) == 0:
             raise RuntimeError(
-                'No downsamplings could be saved because the max size per'
-                f'channel ({size_per_level}) is too low'
+                "No downsamplings could be saved because the max size per"
+                f"channel ({size_per_level}) is too low"
             )
         return levels

@@ -6,7 +6,7 @@ from volsegtools.abc import DataHandle
 
 
 class Converter(abc.ABC):
-    """Converts the contents of some file format into the internal data 
+    """Converts the contents of some file format into the internal data
     structure that is then going to be used further in the processing.
     """
 
@@ -37,7 +37,6 @@ class Converter(abc.ABC):
             Path to the transformation target.
         """
         ...
-
 
     @staticmethod
     @abc.abstractmethod

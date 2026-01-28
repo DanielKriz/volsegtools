@@ -41,9 +41,9 @@ class WorkingStore(metaclass=Singleton):
         self.segmentation_dtype = np.float64
         self.is_segmentation_dtype_set = False
 
-        self._volume_data_group = self.root_group.require_group('volume_data')
+        self._volume_data_group = self.root_group.require_group("volume_data")
         self._segmentation_data_group = self.root_group.require_group(
-            'segmentation_data'
+            "segmentation_data"
         )
 
     @property
@@ -56,18 +56,17 @@ class WorkingStore(metaclass=Singleton):
         # TODO: it should return a dictionary
         # self.root_group.attrs.put(dataclasses.asdict(self._metadata))
 
-
     @property
     def volume_data_group(self):
         return self._volume_data_group
-
 
     @property
     def segmentation_data_group(self):
         return self._segmentation_data_group
 
-
-    def get_data_array(self, lattice_id, resolution, time_frame, channel, kind=LatticeKind.VOLUME):
+    def get_data_array(
+        self, lattice_id, resolution, time_frame, channel, kind=LatticeKind.VOLUME
+    ):
         kind_group = self.get_data_group(kind)
         lattice_group = kind_group.require_group(lattice_id)
         resolution_group: zarr.Group = lattice_group.require_group(
@@ -79,14 +78,12 @@ class WorkingStore(metaclass=Singleton):
         # FIX: this is unsafe, there should be some check!
         return list(time_frame_group.arrays())[channel][1][:]
 
-
     @staticmethod
     def _compute_chunk_size_based_on_data(
-        data_shape: Tuple[int, ...]
+        data_shape: Tuple[int, ...],
     ) -> Tuple[int, ...]:
         chunks = tuple([int(i / 4) if i > 4 else i for i in data_shape])
         return chunks
-
 
     @staticmethod
     def _resolve_chunking_method(mode: ChunkingMode, data_shape: Tuple[int, ...]):
@@ -100,7 +97,6 @@ class WorkingStore(metaclass=Singleton):
             case _:
                 raise RuntimeError("Unsupported chunking method!")
 
-
     def get_data_group(self, lattice_kind: LatticeKind):
         match lattice_kind:
             case LatticeKind.VOLUME:
@@ -109,7 +105,6 @@ class WorkingStore(metaclass=Singleton):
                 return self.segmentation_data_group
             case _:
                 raise RuntimeError("Unknown lattice kind encountered.")
-
 
     def store_lattice_time_frame(
         self,
@@ -133,8 +128,7 @@ class WorkingStore(metaclass=Singleton):
         zarr_repr: zarr.Array = time_frame_group.create_array(
             name=str(params.channel),
             chunks=WorkingStore._resolve_chunking_method(
-                params.chunking_mode,
-                data.shape
+                params.chunking_mode, data.shape
             ),
             dtype=params.storage_dtype,
             compressors=[used_compressor] if used_compressor is not None else None,

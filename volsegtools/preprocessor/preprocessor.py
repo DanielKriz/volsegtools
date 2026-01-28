@@ -9,10 +9,7 @@ from volsegtools.serialization import BCIFSerializer
 
 
 class Preprocessor:
-
-    state = {
-        "downsampling_status" : 0.0
-    }
+    state = {"downsampling_status": 0.0}
 
     def __init__(
         self,
@@ -38,22 +35,17 @@ class Preprocessor:
     async def transform_volume(self):
         raise NotImplementedError()
 
-
     async def collect_metadata(self):
         raise NotImplementedError()
-
 
     def create_converter_from_format(self):
         raise NotImplementedError()
 
-
     async def transform_segmentation(self):
         raise NotImplementedError()
 
-
     async def preprocess(self):
         raise NotImplementedError()
-    
 
     def sync_preprocess(self):
         data = []
@@ -78,7 +70,6 @@ class Preprocessor:
         # 4. Serialization Phase
         for ref in downsampled_data:
             asyncio.run(BCIFSerializer.serialize(ref, self._output_dir))
-
 
     def downsample(self):
         pass

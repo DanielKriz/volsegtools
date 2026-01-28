@@ -9,5 +9,4 @@ class Serializer(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    async def serialize(data: DataHandle, output_path: Path) -> None:
-        ...
+    async def serialize(data: DataHandle, output_path: Path) -> None: ...

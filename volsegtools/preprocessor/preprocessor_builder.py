@@ -7,9 +7,8 @@ from volsegtools.abc import Converter, Downsampler
 from volsegtools.preprocessor import Preprocessor
 
 
-class PreprocessorBuilder():
+class PreprocessorBuilder:
     """Allows fine-grained specification of the preprocessor."""
-
 
     def __init__(self) -> None:
         self._work_dir: Path | None = None
@@ -34,7 +33,6 @@ class PreprocessorBuilder():
         self._converter = converter
         return self
 
-
     def set_downsampler(self, downsampler: Downsampler) -> Self:
         """Sets a downsampler that is going to be used by the resulting
         preprocessor.
@@ -45,7 +43,6 @@ class PreprocessorBuilder():
         self._downsampler = downsampler
         return self
 
-
     def add_volume_src_file(self, file_path: Path) -> Self:
         """Adds the source file for volumetric data.
 
@@ -54,7 +51,6 @@ class PreprocessorBuilder():
         """
         self._volume_sources.append(file_path)
         return self
-
 
     def add_segmentation_src_file(self, file_path: Path) -> Self:
         """Sets the source file for annotations.
@@ -65,7 +61,6 @@ class PreprocessorBuilder():
         self._segmentation_sources.append(file_path)
         return self
 
-
     def add_metadata_src_file(self, file_path: Path) -> Self:
         """Adds the source file for metadata.
 
@@ -74,7 +69,6 @@ class PreprocessorBuilder():
         """
         return self
 
-
     def add_annotations_src_file(self, file_path: Path) -> Self:
         """Adds the source file for annotations.
 
@@ -82,7 +76,6 @@ class PreprocessorBuilder():
         set_input_file cannot be used.
         """
         return self
-
 
     def set_work_dir(self, file_path: Path) -> Self:
         """Sets the working directory of the processor.
@@ -93,19 +86,17 @@ class PreprocessorBuilder():
         """
         return self
 
-
     def set_output_dir(self, file_path: Path) -> Self:
         self._output_dir = file_path
         return self
 
-
     def build(self) -> Preprocessor:
         """Builds the resulting preprocessor."""
         if self._downsampler is None:
-            raise RuntimeError('Downsampler was not set')
+            raise RuntimeError("Downsampler was not set")
 
         if self._converter is None:
-            raise RuntimeError('Converter was not set')
+            raise RuntimeError("Converter was not set")
 
         return Preprocessor(
             self._downsampler,

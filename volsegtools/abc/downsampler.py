@@ -5,10 +5,8 @@ from volsegtools.abc import DataHandle
 
 
 class Downsampler(abc.ABC):
-
     @property
-    def parameters(self) -> Any:
-        ...
+    def parameters(self) -> Any: ...
 
     @abc.abstractmethod
     async def downsample_lattice(self, data: DataHandle) -> List[DataHandle]:

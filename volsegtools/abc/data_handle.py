@@ -16,9 +16,9 @@ class DataHandle(abc.ABC):
     @property
     @abc.abstractmethod
     def metadata(self) -> Any:
-        raise NotImplementedError();
+        raise NotImplementedError()
 
     @metadata.setter
     @abc.abstractmethod
     def metadata(self, new_metadata: Any) -> None:
-        raise NotImplementedError();
+        raise NotImplementedError()

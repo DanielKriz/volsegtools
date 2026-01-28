@@ -12,7 +12,6 @@ from volsegtools.model.working_store import WorkingStore
 
 
 class MapConverter(Converter):
-
     @staticmethod
     def _normalize_axis_order(data: da.Array, header: np.recarray) -> da.Array:
         """Normalizes the order of axes in the data to (x, y, z).
@@ -41,18 +40,16 @@ class MapConverter(Converter):
 
         if tuple(current_order) != CORRECT_ORDER:
             da.moveaxis(data, current_order, CORRECT_ORDER)
-        
 
         data.transpose()
 
         return data
 
-    
     @staticmethod
     async def transform_volume(input_path: Path) -> OpaqueDataHandle:
         with mrcfile.mmap(input_path, "r+") as mrc:
             if mrc.data is None or mrc.header is None:
-                raise RuntimeError('Failed to read data from MAP file')
+                raise RuntimeError("Failed to read data from MAP file")
 
             array = da.from_array(mrc.data)
             array = MapConverter._normalize_axis_order(array, mrc.header)
@@ -61,17 +58,14 @@ class MapConverter(Converter):
             internal_data.is_volume_dtype_set = True
             volume_id: str = input_path.stem
             return internal_data.store_lattice_time_frame(
-                StoringParameters(), 
-                array, 
-                volume_id
+                StoringParameters(), array, volume_id
             )
-
 
     @staticmethod
     async def transform_segmentation(input_path: Path) -> OpaqueDataHandle:
         with mrcfile.open(input_path, "r+") as mrc:
             if mrc.data is None or mrc.header is None:
-                raise RuntimeError('Failed to read data from MAP file')
+                raise RuntimeError("Failed to read data from MAP file")
 
             data = da.from_array(mrc.data)
             data = MapConverter._normalize_axis_order(data, mrc.header)
@@ -90,22 +84,18 @@ class MapConverter(Converter):
             storing_params.storage_dtype = data.dtype
             storing_params.lattice_kind = LatticeKind.SEGMENTATION
             return internal_data.store_lattice_time_frame(
-                storing_params,
-                data,
-                segmentation_id
+                storing_params, data, segmentation_id
             )
 
-    
     @staticmethod
     async def collect_annotations(input_path) -> None:
         pass
-
 
     @staticmethod
     async def collect_metadata(input_path) -> TimeFrameMetadata:
         with mrcfile.open(input_path, "r+") as mrc:
             if mrc.data is None or mrc.header is None:
-                raise RuntimeError('Failed to read data from MAP file')
+                raise RuntimeError("Failed to read data from MAP file")
             lattice_shape = Vector3(
                 int(mrc.header.nx),
                 int(mrc.header.ny),
@@ -114,9 +104,9 @@ class MapConverter(Converter):
             header = mrc.header
 
         axis_order_map = {
-            header.mapc - 1 : 0,
-            header.mapr - 1 : 1,
-            header.maps - 1 : 2,
+            header.mapc - 1: 0,
+            header.mapr - 1: 1,
+            header.maps - 1: 2,
         }
 
         axis_order = Vector3(0, 1, 2)

@@ -28,6 +28,7 @@ class StoringParameters(pydantic.BaseModel):
     compressor: Codec, default: Blosc()
         Which compression codec is going to be used.
     """
+
     is_compression_enabled: bool = False
     chunking_mode: ChunkingMode = ChunkingMode.AUTO
     storage_dtype: numpy.typing.DTypeLike = np.float64

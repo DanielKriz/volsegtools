@@ -10,6 +10,7 @@ class ChunkingMode(enum.Enum):
         sdasda
 
     """
+
     AUTO = 1
     NONE = 2
     CUSTOM = 3
