@@ -1,8 +1,7 @@
-import volsegtools.core as vst
-
+from volsegtools.core import Vector3
 
 def test_vector():
-    vec = vst.Vector3()
+    vec = Vector3()
     assert hasattr(vec, 'x')
     assert hasattr(vec, 'y')
     assert hasattr(vec, 'z')

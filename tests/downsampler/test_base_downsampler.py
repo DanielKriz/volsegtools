@@ -1,6 +1,5 @@
 import pytest
 
-# TODO: it can be moved into downsampler
 from volsegtools.core import DownsamplingParameters
 from volsegtools.downsampler import BaseDownsampler
 

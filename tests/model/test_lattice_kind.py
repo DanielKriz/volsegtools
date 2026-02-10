@@ -1,6 +1,6 @@
 import pytest
 
-from volsegtools.model import LatticeKind
+from volsegtools.core import LatticeKind
 
 
 @pytest.mark.parametrize("kind, value", [
