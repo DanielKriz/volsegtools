@@ -31,7 +31,7 @@ class ChannelInfo:
     resolution: str
     time: str
     channel: str
-    data: zarr.Array
+    data: ZarrArray
 
 
 class FlatChannelIterator:
