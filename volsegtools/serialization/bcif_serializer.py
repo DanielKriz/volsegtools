@@ -292,7 +292,7 @@ class BCIFSerializer(Serializer):
             writer.write_category(VolumeData3DInfoDesc, [data_batch])
 
             # TODO: prepend with WorkingStore path
-            metadata_file_name = Path(
+            metadata_file_name = WorkingStore.instance.data_store.root / Path(
                 "{}_r{}_tf{}_metadata.json".format(
                     data.metadata.lattice_id,
                     data.metadata.resolution,
@@ -307,11 +307,8 @@ class BCIFSerializer(Serializer):
                 data.metadata.id,
                 int(channel.id),
             )
+
             # We have to make the array 1D
-
-            print("COUNT BEFORE STORE:", np.count_nonzero(np.ravel(lattice)))
-            np.savetxt("data.csv", np.ravel(lattice), delimiter=",")
-
             writer.write_category(VolumeData3DDesc, [np.ravel(lattice, "F")])
 
             file_name = f"{data.metadata.lattice_id}_r{data.metadata.resolution}_tf{data.metadata.id}.bcif"
