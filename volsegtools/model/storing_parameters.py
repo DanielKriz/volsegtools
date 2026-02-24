@@ -7,6 +7,8 @@ from zarr.codecs import BloscCodec
 from volsegtools.core import LatticeKind
 from volsegtools.model.chunking_mode import ChunkingMode
 
+from typing import Any
+
 
 class StoringParameters(pydantic.BaseModel):
     """Parameters used for storing a volume or a segmentation.
@@ -31,7 +33,7 @@ class StoringParameters(pydantic.BaseModel):
 
     is_compression_enabled: bool = False
     chunking_mode: ChunkingMode = ChunkingMode.AUTO
-    storage_dtype: numpy.typing.DTypeLike = np.float64
+    storage_dtype: Any = pydantic.Field(default_factory=lambda: np.float64)
     resolution_level: pydantic.NonNegativeInt = 0
     time_frame: pydantic.NonNegativeInt = 0
     channel: pydantic.NonNegativeInt = 0
@@ -48,5 +50,3 @@ class StoringParameters(pydantic.BaseModel):
         channel {self.channel}
         compressor {self.compressor}"""
 
-    class Config:
-        arbitrary_types_allowed = True
