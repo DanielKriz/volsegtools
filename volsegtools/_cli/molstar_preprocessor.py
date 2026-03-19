@@ -8,7 +8,8 @@ from typing import List
 import typer
 from typing_extensions import Annotated
 
-from volsegtools.converter import MapConverter
+from volsegtools.converter import MapConverter, MeshConverter
+from volsegtools.converter.ome_tiff_converter import OMETiFFConverter
 from volsegtools.core import DownsamplingParameters, LatticeKind
 
 # TODO: parameters should (and can be) moved to the downsampler package
@@ -18,6 +19,13 @@ from volsegtools.preprocessor import Preprocessor, PreprocessorBuilder
 
 app = typer.Typer()
 
+def create_converter_from_extensions(file_path: Path):
+    remove_trailing_dot = lambda x: x[1:]
+    match remove_trailing_dot(file_path.suffix):
+        case "mrc":
+            return MapConverter()
+        case "tiff" | "ometiff":
+            return OMETiFFConverter()
 
 @app.command()
 def run(
@@ -54,7 +62,8 @@ def run(
     working_store = WorkingStore(local_store_path)
 
     builder = PreprocessorBuilder()
-    builder.set_converter(MapConverter())
+    # builder.set_converter(MapConverter())
+    builder.set_converter(create_converter_from_extensions(volume_source[0]))
     builder.set_downsampler(HierarchyDownsampler())
 
     for file in volume_source:

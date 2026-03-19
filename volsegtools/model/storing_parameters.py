@@ -50,3 +50,5 @@ class StoringParameters(pydantic.BaseModel):
         channel {self.channel}
         compressor {self.compressor}"""
 
+    # class Config:
+    #     arbitrary_types_allowed = True
