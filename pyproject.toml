@@ -37,3 +37,8 @@ molstar-preprocessor = 'volsegtools._cli:app'
 # Enable the "src" layout of the project
 [tool.hatch.build.targets.wheel]
 packages = ["src/volsegtools"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+]
