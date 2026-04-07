@@ -1,8 +1,8 @@
 from typing import List
 
 from volsegtools.abc.downsampler import Downsampler
-from volsegtools.core.downsampling_parameters import DownsamplingParameters
-from volsegtools.model.opaque_data_handle import OpaqueDataHandle
+from volsegtools._core.downsampling_parameters import DownsamplingParameters
+from volsegtools._model.opaque_data_handle import OpaqueDataHandle
 
 
 class BaseDownsampler(Downsampler):

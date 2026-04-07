@@ -1,2 +1,0 @@
-from .base_downsampler import BaseDownsampler
-from .hierarchy_downsampler import HierarchyDownsampler

@@ -5,10 +5,10 @@ import mrcfile
 import numpy as np
 
 from volsegtools.abc import Converter
-from volsegtools.core import LatticeKind, Vector3
-from volsegtools.model import StoringParameters, TimeFrameMetadata
-from volsegtools.model.opaque_data_handle import OpaqueDataHandle
-from volsegtools.model.working_store import WorkingStore
+from volsegtools._core import LatticeKind, Vector3
+from volsegtools._model import StoringParameters, TimeFrameMetadata
+from volsegtools._model.opaque_data_handle import OpaqueDataHandle
+from volsegtools._model.working_store import WorkingStore
 
 
 class MapConverter(Converter):

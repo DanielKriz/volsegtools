@@ -4,7 +4,7 @@ from typing import List
 from typing_extensions import Self
 
 from volsegtools.abc import Converter, Downsampler
-from volsegtools.preprocessor import Preprocessor
+from volsegtools._preprocessor import Preprocessor
 
 
 class PreprocessorBuilder:

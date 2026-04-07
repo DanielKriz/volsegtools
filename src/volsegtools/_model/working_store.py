@@ -1,4 +1,3 @@
-import dataclasses
 from pathlib import Path
 from typing import Tuple
 
@@ -7,11 +6,11 @@ import numpy as np
 import zarr
 import zarr.storage
 
-from volsegtools.core import LatticeKind
-from volsegtools.model.chunking_mode import ChunkingMode
-from volsegtools.model.metadata import Metadata
-from volsegtools.model.opaque_data_handle import OpaqueDataHandle
-from volsegtools.model.storing_parameters import StoringParameters
+from volsegtools._core import LatticeKind
+from volsegtools._model.chunking_mode import ChunkingMode
+from volsegtools._model.metadata import Metadata
+from volsegtools._model.opaque_data_handle import OpaqueDataHandle
+from volsegtools._model.storing_parameters import StoringParameters
 
 
 class Singleton(type):
@@ -93,7 +92,7 @@ class WorkingStore(metaclass=Singleton):
             case ChunkingMode.NONE:
                 return (0, 0)
             case ChunkingMode.CUSTOM:
-                return Data._compute_chunk_size_based_on_data(data_shape)
+                return WorkingStore._compute_chunk_size_based_on_data(data_shape)
             case _:
                 raise RuntimeError("Unsupported chunking method!")
 
