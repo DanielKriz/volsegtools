@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import List, Optional
 
 from volsegtools.abc import Converter, Downsampler
-from volsegtools.core.lattice_kind import LatticeKind
-from volsegtools.model.working_store import WorkingStore
-from volsegtools.serialization import BCIFSerializer
+from volsegtools._core.lattice_kind import LatticeKind
+from volsegtools._model.working_store import WorkingStore
+from volsegtools._serialization import BCIFSerializer
 
 
 class Preprocessor:

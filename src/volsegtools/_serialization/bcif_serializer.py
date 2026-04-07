@@ -13,13 +13,13 @@ from ciftools.models.writer import CIFCategoryDesc as CategoryDesc
 from ciftools.models.writer import CIFFieldDesc as Field
 
 from volsegtools.abc import Serializer
-from volsegtools.model import (
+from volsegtools._model import (
     ChannelMetadata,
     OpaqueDataHandle,
     OriginalTimeFrameMetadata,
     TimeFrameMetadata,
 )
-from volsegtools.model.working_store import WorkingStore
+from volsegtools._model.working_store import WorkingStore
 
 
 @dataclasses.dataclass
@@ -57,7 +57,9 @@ class VolumeData3DInfoDesc(CategoryDesc):
 
     @staticmethod
     def get_field_descriptors(data: VolumeDataBatch) -> Collection[Field]:
-        volume_server_encoder = lambda _: BYTE_ARRAY
+        def volume_server_encoder(_):
+            return BYTE_ARRAY
+
         return [
             Field.strings(
                 name="name",
@@ -257,7 +259,9 @@ class VolumeData3DDesc(CategoryDesc):
 
     @staticmethod
     def get_field_descriptors(data: np.ndarray) -> Collection[Field]:
-        volume_server_encoder = lambda _: BYTE_ARRAY
+        def volume_server_encoder(_):
+            return BYTE_ARRAY
+
         return [
             Field.number_array(
                 name="values",

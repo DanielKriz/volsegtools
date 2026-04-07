@@ -5,7 +5,7 @@ from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
 from volsegtools.abc.kernel import ConvolutionKernel
-from volsegtools.core import Bounds, Gaussian3DKernel
+from volsegtools._core import Bounds, Gaussian3DKernel
 
 
 def _minimal_size_bounds_factory():

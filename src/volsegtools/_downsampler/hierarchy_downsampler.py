@@ -1,5 +1,3 @@
-import asyncio
-import collections
 import logging
 import math
 from typing import List, Tuple
@@ -9,23 +7,21 @@ import dask.array as da
 import dask_image.ndfilters as dask_filter
 import numpy as np
 
-from volsegtools.core import (
+from volsegtools._core import (
     Bounds,
     DownsamplingParameters,
-    LatticeKind,
     Vector3,
     to_bytes,
 )
-from volsegtools.downsampler import BaseDownsampler
-from volsegtools.model import (
+from volsegtools._downsampler import BaseDownsampler
+from volsegtools._model import (
     ChannelMetadata,
     DescriptiveStatistics,
     FlatChannelIterator,
     OpaqueDataHandle,
     StoringParameters,
-    TimeFrameMetadata,
+    WorkingStore,
 )
-from volsegtools.model.working_store import WorkingStore
 
 MIN_GRID_SIZE = 100**1
 
@@ -107,7 +103,7 @@ class HierarchyDownsampler(BaseDownsampler):
                 if current_ratio not in downsampling_levels:
                     continue
 
-                if self.parameters.acceptance_threshold != None:
+                if self.parameters.acceptance_threshold is not None:
                     logging.info("Using the acceptance threshold")
                     downsampled_data[
                         downsampled_data >= self.parameters.acceptance_threshold
@@ -221,10 +217,16 @@ class HierarchyDownsampler(BaseDownsampler):
         if self.parameters.downsampling_level_bounds:
             level_bounds: Bounds = self.parameters.downsampling_level_bounds
             if level_bounds.max:
-                predicate = lambda x: x <= level_bounds.max
+
+                def predicate(x):
+                    return x <= level_bounds.max
+
                 levels = [x for x in levels if predicate(x)]
             if level_bounds.min:
-                predicate = lambda x: x >= level_bounds.min
+
+                def predicate(x):
+                    return x >= level_bounds.min
+
                 levels = [x for x in levels if predicate(x)]
 
         size_per_level: int = self.parameters.size_per_level_bounds_in_mb.max

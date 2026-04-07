@@ -4,8 +4,8 @@ import pydantic
 from zarr.abc.codec import BytesBytesCodec
 from zarr.codecs import BloscCodec
 
-from volsegtools.core import LatticeKind
-from volsegtools.model.chunking_mode import ChunkingMode
+from volsegtools._core import LatticeKind
+from volsegtools._model.chunking_mode import ChunkingMode
 
 from typing import Any
 
@@ -49,4 +49,3 @@ class StoringParameters(pydantic.BaseModel):
         time_frame {self.time_frame}
         channel {self.channel}
         compressor {self.compressor}"""
-

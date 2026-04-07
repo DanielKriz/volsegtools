@@ -1,5 +1,4 @@
 import logging
-import os
 import shutil
 import sys
 from pathlib import Path
@@ -8,13 +7,13 @@ from typing import List
 import typer
 from typing_extensions import Annotated
 
-from volsegtools.converter import MapConverter
-from volsegtools.core import DownsamplingParameters, LatticeKind
-
-# TODO: parameters should (and can be) moved to the downsampler package
-from volsegtools.downsampler import HierarchyDownsampler
-from volsegtools.model.working_store import WorkingStore
-from volsegtools.preprocessor import Preprocessor, PreprocessorBuilder
+from volsegtools import (
+    MapConverter,
+    HierarchyDownsampler,
+    WorkingStore,
+    Preprocessor,
+    PreprocessorBuilder,
+)
 
 app = typer.Typer()
 
@@ -51,7 +50,7 @@ def run(
 
     # Initialization of the singleton working store
     # FIX: This shouldn't be necessarry
-    working_store = WorkingStore(local_store_path)
+    WorkingStore(local_store_path)
 
     builder = PreprocessorBuilder()
     builder.set_converter(MapConverter())

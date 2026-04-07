@@ -1,7 +1,7 @@
 import dataclasses
 from typing import List
 
-from volsegtools.core import LatticeKind, Vector3
+from volsegtools._core import LatticeKind, Vector3
 
 
 @dataclasses.dataclass

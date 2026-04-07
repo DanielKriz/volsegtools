@@ -1,20 +1,19 @@
 import dataclasses
 
-import dask.array as da
 import numpy as np
 from numpy.typing import ArrayLike
 from zarr.core.array import Array as ZarrArray
 
 from volsegtools.abc.data_handle import DataHandle
-from volsegtools.model.metadata import TimeFrameMetadata
+from volsegtools._model.metadata import TimeFrameMetadata
 
 # cuPy is an optional import to the volseg-tools (as CUDA may not be available
 # everywhere)
-try:
-    import cupy as cp
-except ImportError:
-    # Define the array type as something inacessible
-    ...
+# try:
+#     import cupy as cp
+# except ImportError:
+#     # Define the array type as something inacessible
+#     ...
 
 
 class TimeFrameIterator: ...
