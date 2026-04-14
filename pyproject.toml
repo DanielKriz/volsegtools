@@ -24,6 +24,11 @@ dependencies = [
     "pydantic",
     "typer",
     "ciftools",
+    "molviewspec>=1.8.1",
+    "trimesh>=4.11.5",
+    "tifffile>=2024.8.30",
+    "h5py>=3.14.0",
+    "isort>=6.1.0",
 ]
 
 [project.optional-dependencies]
