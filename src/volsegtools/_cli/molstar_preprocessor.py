@@ -7,13 +7,7 @@ from typing import List
 import typer
 from typing_extensions import Annotated
 
-from volsegtools import (
-    MapConverter,
-    HierarchyDownsampler,
-    WorkingStore,
-    Preprocessor,
-    PreprocessorBuilder,
-)
+import volsegtools as vst
 
 app = typer.Typer()
 
@@ -43,32 +37,28 @@ def run(
 
     logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
-    # TODO: this could be stored in the /tmp directory...
     local_store_path = workdir / "volsegtools_workdir"
     if overwrite_tmp and local_store_path.exists():
         shutil.rmtree(local_store_path)
 
-    # Initialization of the singleton working store
-    # FIX: This shouldn't be necessarry
-    WorkingStore(local_store_path)
-
-    builder = PreprocessorBuilder()
-    builder.set_converter(MapConverter())
-    builder.set_downsampler(HierarchyDownsampler())
-
-    for file in volume_source:
-        logging.debug(f"Adding file: '{file}' as a volume source.")
-        builder.add_volume_src_file(file)
-
-    for file in segmentation_source:
-        logging.debug(f"Adding file: '{file}' as a segmentation source.")
-        builder.add_segmentation_src_file(file)
-
-    builder.set_output_dir(local_store_path)
+    builder = vst.create_builder()
+    (
+        builder.set_volume_converter(vst.MapConverter())
+        .set_segmentation_converter(vst.MapConverter())
+        # .set_downsampler(vst.HierarchyDownsampler())
+        # .set_downsampling_strategy(vst.NullDownsamplingStrategy())
+        .set_downsampling_strategy(vst.HierarchyDownsamplingStrategy())
+        .set_serializer(vst.BCIFSerializer())
+        .set_output_dir(local_store_path)
+        .set_work_dir(local_store_path)
+    )
 
     try:
-        preprocessor: Preprocessor = builder.build()
-        preprocessor.sync_preprocess()
+        pipeline: vst.ProcessingPipeline = builder.build()
+        pipeline.sync_process(
+            volumes=volume_source,
+            segmentations=segmentation_source,
+        )
     finally:
         if rm_tmp and local_store_path.exists():
             shutil.rmtree(local_store_path)

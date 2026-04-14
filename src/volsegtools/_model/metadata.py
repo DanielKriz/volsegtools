@@ -10,10 +10,10 @@ class DescriptiveStatistics:
     it to be representable in CIF.
     """
 
-    mean: float
-    std: float
-    max: float
-    min: float
+    mean: float = 0.0
+    std: float = 0.0
+    max: float = 0.0
+    min: float = 0.0
 
 
 @dataclasses.dataclass

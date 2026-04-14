@@ -7,8 +7,14 @@ import from the `volsegtools` namespace.
 
 from .base_downsampler import BaseDownsampler
 from .hierarchy_downsampler import HierarchyDownsampler
+from .hierarchy_downsampling_strategy import (
+    HierarchyDownsamplingStrategy,
+    NullDownsamplingStrategy,
+)
 
 __all__ = [
     "BaseDownsampler",
     "HierarchyDownsampler",
+    "HierarchyDownsamplingStrategy",
+    "NullDownsamplingStrategy",
 ]

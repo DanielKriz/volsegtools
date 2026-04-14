@@ -126,9 +126,7 @@ class WorkingStore(metaclass=Singleton):
 
         zarr_repr: zarr.Array = time_frame_group.create_array(
             name=str(params.channel),
-            chunks=WorkingStore._resolve_chunking_method(
-                params.chunking_mode, data.shape
-            ),
+            chunks=data.chunksize,
             dtype=params.storage_dtype,
             compressors=[used_compressor] if used_compressor is not None else None,
             shape=data.shape,
