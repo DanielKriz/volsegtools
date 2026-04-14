@@ -17,6 +17,8 @@ from ._core import (
 from ._downsampler import (
     BaseDownsampler,
     HierarchyDownsampler,
+    HierarchyDownsamplingStrategy,
+    NullDownsamplingStrategy,
 )
 from ._model import (
     ChunkingMode,
@@ -34,14 +36,20 @@ from ._model import (
 from ._preprocessor import (
     Preprocessor,
     PreprocessorBuilder,
+    ProcessingPipeline,
+    ProcessingPipelineBuilder,
+    create_builder,
 )
 from ._serialization import BCIFSerializer
 
+# this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
+from . import abc
 
 __version__ = "0.0.0"
 
 
 __all__ = [
+    # From subpackages
     "MapConverter",
     "LatticeKind",
     "Vector3",
@@ -51,6 +59,8 @@ __all__ = [
     "to_bytes",
     "BaseDownsampler",
     "HierarchyDownsampler",
+    "HierarchyDownsamplingStrategy",
+    "NullDownsamplingStrategy",
     "ChunkingMode",
     "ChannelMetadata",
     "DescriptiveStatistics",
@@ -64,6 +74,12 @@ __all__ = [
     "WorkingStore",
     "Preprocessor",
     "PreprocessorBuilder",
+    "ProcessingPipeline",
+    "ProcessingPipelineBuilder",
+    "create_builder",
     "BCIFSerializer",
+    # Built-in
     "__version__",
+    # Namespace Shortcuts
+    "abc",
 ]

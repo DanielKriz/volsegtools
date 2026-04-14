@@ -1,11 +1,13 @@
 import dataclasses
 
 import numpy as np
+import dask.array as da
+import dask
 from numpy.typing import ArrayLike
 from zarr.core.array import Array as ZarrArray
 
 from volsegtools.abc.data_handle import DataHandle
-from volsegtools._model.metadata import TimeFrameMetadata
+from volsegtools._model.metadata import TimeFrameMetadata, DescriptiveStatistics
 
 # cuPy is an optional import to the volseg-tools (as CUDA may not be available
 # everywhere)
@@ -109,3 +111,17 @@ class OpaqueDataHandle(DataHandle):
 
     def _repr_to_cupy_arr(self):
         return None
+
+    def calculate_statistics(self):
+        data = da.from_zarr(
+            url=self._internal_repr,
+            chunks=self._internal_repr.chunks,
+        )
+
+        stats = dask.compute(
+            da.mean(data),
+            da.std(data),
+            data.max(),
+            data.min(),
+        )
+        return DescriptiveStatistics(*stats)

@@ -17,6 +17,16 @@ from .metadata import (
 from .opaque_data_handle import ChannelInfo, FlatChannelIterator, OpaqueDataHandle
 from .storing_parameters import StoringParameters
 from .working_store import WorkingStore
+from .data_set import (
+    DataSet,
+    DataSetInfo,
+    Channel,
+    ChannelInfoV2,
+    TimeFrame,
+    TimeFrameInfo,
+    create_file_name,
+    info_from_file_path,
+)
 
 __all__ = [
     "ChunkingMode",
@@ -30,4 +40,12 @@ __all__ = [
     "OpaqueDataHandle",
     "StoringParameters",
     "WorkingStore",
+    "DataSet",
+    "DataSetInfo",
+    "TimeFrame",
+    "TimeFrameInfo",
+    "Channel",
+    "ChannelInfoV2",
+    "create_file_name",
+    "info_from_file_path",
 ]
