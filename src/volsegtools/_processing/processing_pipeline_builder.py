@@ -3,6 +3,7 @@ from typing import List
 
 from typing_extensions import Self
 
+from volsegtools._converter.converter_map import ConverterMap
 from volsegtools._downsampler.hierarchy_downsampling_strategy import (
     NullDownsamplingStrategy,
 )
@@ -24,25 +25,43 @@ class ProcessingPipelineBuilder:
         self._output_dir: Path | None = None
         self._volume_converter: Converter | None = None
         self._segmentation_converter: Converter | None = None
-        # self._downsampler: Downsampler | None = None
         self._downsampling_strategy: DownsamplingStrategy = NullDownsamplingStrategy
         self._post_processing_steps: List[PostProcessingStep] = []
         self._post_conversion_steps: List[PostConversionStep] = []
         self._serializer = None
+        self._volume_converter_map = ConverterMap()
+        self._segmentation_converter_map = ConverterMap()
 
-    def set_segmentation_converter(self, converter: Converter) -> Self:
-        self._segmentation_converter = converter
+    def _mend_suffixes(self, converter, suffixes=None, preserve_builtin=False):
+        if preserve_builtin:
+            suffixes = suffixes + converter.supported_suffixes
+
+        if suffixes is None:
+            suffixes = converter.supported_suffixes
+        return suffixes
+
+
+    def add_segmentation_converter(
+        self,
+        converter: Converter, 
+        suffixes=None, 
+        preserve_builtin=False
+    ) -> Self:
+        suffixes = self._mend_suffixes(converter, suffixes, preserve_builtin)
+        self._segmentation_converter_map.set_converter(converter, suffixes)
         return self
 
-    def set_volume_converter(self, converter: Converter) -> Self:
-        """Sets a converter that is going to be used by the resulting
-        preprocessor.
 
-        If this method is going to be called multimple times, it is going
-        to override the previously set converter.
-        """
-        self._volume_converter = converter
+    def add_volume_converter(
+        self,
+        converter: Converter, 
+        suffixes=None, 
+        preserve_builtin=False
+    ) -> Self:
+        suffixes = self._mend_suffixes(converter, suffixes, preserve_builtin)
+        self._volume_converter_map.set_converter(converter, suffixes)
         return self
+
 
     def set_downsampling_strategy(self, strategy: DownsamplingStrategy) -> Self:
         """Sets a downsampler that is going to be used by the resulting
@@ -54,6 +73,7 @@ class ProcessingPipelineBuilder:
         self._downsampling_strategy = strategy
         return self
 
+
     def set_downsampler(self, downsampler: Downsampler) -> Self:
         """Sets a downsampler that is going to be used by the resulting
         preprocessor.
@@ -64,17 +84,21 @@ class ProcessingPipelineBuilder:
         self._downsampler = downsampler
         return self
 
+
     def set_add_post_conversion_step(self, step: PostConversionStep) -> Self:
         self._post_conversion_steps.append(step)
         return self
+
 
     def set_add_post_process_step(self, step: PostProcessingStep) -> Self:
         self._post_processing_steps.append(step)
         return self
 
+
     def set_serializer(self, serializer: Serializer) -> Self:
         self._serializer = serializer
         return self
+
 
     def set_work_dir(self, file_path: Path) -> Self:
         """Sets the working directory of the processor.
@@ -88,14 +112,14 @@ class ProcessingPipelineBuilder:
         self._work_dir = file_path
         return self
 
+
     def set_output_dir(self, file_path: Path) -> Self:
         self._output_dir = file_path
         return self
 
+
     def build(self) -> ProcessingPipeline:
         """Builds the resulting preprocessor."""
-        # if self._downsampler is None:
-        #     raise RuntimeError("Downsampler was not set")
 
         if self._volume_converter is None and self._segmentation_converter is None:
             raise RuntimeError("Atleast one convertor has to be set")
@@ -105,8 +129,8 @@ class ProcessingPipelineBuilder:
 
         return ProcessingPipeline(
             downsampling_strategy=self._downsampling_strategy,
-            volume_converter=self._volume_converter,
-            segmentation_converter=self._segmentation_converter,
+            volume_converter_map=self._volume_converter_map,
+            segmentation_converter_map=self._segmentation_converter_map,
             post_processing_steps=self._post_processing_steps,
             post_conversion_steps=self._post_conversion_steps,
             serializer=self._serializer,

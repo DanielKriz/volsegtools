@@ -6,13 +6,13 @@ import collections
 import logging
 
 import volsegtools as vst
+from volsegtools._converter.converter_map import ConverterMap
 from volsegtools._core.vector import Vector3
 from volsegtools._downsampler.hierarchy_downsampling_strategy import (
     NullDownsamplingStrategy,
 )
 from volsegtools._model.data_set import DataSet
 from volsegtools._model.opaque_data_handle import OpaqueDataHandle
-from volsegtools.abc import Converter
 from volsegtools._model.working_store import WorkingStore
 from volsegtools.abc import (
     PostProcessingStep,
@@ -32,21 +32,18 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
     def __init__(
         self,
         downsampling_strategy=NullDownsamplingStrategy(),
-        volume_converter: Optional[Converter] = None,
-        segmentation_converter: Optional[Converter] = None,
+        volume_converter_map: Optional[ConverterMap] = None,
+        segmentation_converter_map: Optional[ConverterMap] = None,
         serializer: Optional[Serializer] = None,
         post_processing_steps: List[PostProcessingStep] = [],
         post_conversion_steps: List[PostConversionStep] = [],
         work_dir: Optional[Path] = None,
         output_dir: Optional[Path] = None,
     ):
-        if volume_converter is None and segmentation_converter is None:
-            raise RuntimeError("Atleast one converter has to be set")
-
         self._downsampling_strategy = downsampling_strategy
 
-        self._volume_converter = volume_converter
-        self._segmentation_converter = segmentation_converter
+        self._volume_converter_map = volume_converter_map
+        self._segmentation_converter_map = segmentation_converter_map
 
         self._output_dir = output_dir if output_dir is not None else Path()
         self._data = WorkingStore.instance
@@ -123,27 +120,38 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         return serialized_files
 
+
     async def convert_volumes(self, paths: List[Path]) -> List[DataSet]:
         volumes = []
 
-        if self._volume_converter is None:
-            return volumes
+        if self._volume_converter_map is None:
+            raise RuntimeError("No volume converter map was set!")
 
-        for volume_path in paths:
-            volumes += await self._volume_converter.convert_volume(volume_path)
+        if self._volume_converter_map.is_empty():
+            raise RuntimeError("There are no valid volume conveters!")
+
+        for path in paths:
+            converter = self._volume_converter_map[path.suffix]
+            volumes += await converter.convert_volume(path)
+
         return volumes
+
 
     async def convert_segmentations(self, paths: List[Path]) -> List[DataSet]:
         segmentations = []
 
-        if self._segmentation_converter is None:
-            return segmentations
+        if self._segmentation_converter_map is None:
+            raise RuntimeError("No volume converter map was set!")
 
-        for segmentation_path in paths:
-            segmentations += await self._segmentation_converter.convert_segmentation(
-                segmentation_path
-            )
+        if self._segmentation_converter_map.is_empty():
+            raise RuntimeError("There are no valid volume conveters!")
+
+        for path in paths:
+            converter = self._segmentation_converter_map[path.suffix]
+            segmentations += await converter.convert_volume(path)
+
         return segmentations
+
 
     async def collect_metadata(self, paths: List[Path]):
         return []

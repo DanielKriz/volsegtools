@@ -5,7 +5,10 @@ The user should always include this modules instead of importing other
 internal (private) modules.
 """
 
-from ._converter import MapConverter
+from ._converter import (
+    ConverterMap,
+    MapConverter,
+)
 from ._core import (
     LatticeKind,
     Vector3,
@@ -48,7 +51,8 @@ __version__ = "0.0.0"
 
 __all__ = [
     # From subpackages
-    "MapConverter",
+    "ConverterMap",
+    "MRCConverter",
     "LatticeKind",
     "Vector3",
     "Bounds",
