@@ -1,4 +1,5 @@
 from typing import List
+import logging
 
 import dask.array as da
 import dask_image.ndfilters as dask_filter
@@ -38,7 +39,10 @@ class HierarchyDownsamplingStrategy(vst.abc.DownsamplingStrategy):
         if 1 in channel.data.access().shape:
             yield from []
 
-        for _ in range(self.calculate_steps(channel)):
+        steps = self.calculate_steps(channel)
+        logging.info(f"Calculated downsampling steps: {steps}")
+        for step in range(steps):
+            logging.info(f"Downsampling step {step + 1}/{steps}")
             downsampled_data = dask_filter.convolve(
                 current_data,
                 Gaussian3DKernel(5, 1.0).as_ndarray(),
@@ -48,6 +52,7 @@ class HierarchyDownsamplingStrategy(vst.abc.DownsamplingStrategy):
             downsampled_data = downsampled_data[::2, ::2, ::2]
             downsampled_data = downsampled_data.rechunk((256, 256, 256))
             current_data = downsampled_data
+            logging.info(f"Downsampling step {step + 1}/{steps} - DONE")
             yield current_data
 
 
