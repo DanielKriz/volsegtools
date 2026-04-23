@@ -40,7 +40,7 @@ from ._preprocessor import (
     ProcessingPipelineBuilder,
     create_builder,
 )
-from ._serialization import BCIFSerializer
+from ._serialization import BCIFSerializer, MRCSerializer
 
 # this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
 from . import abc
@@ -78,6 +78,7 @@ __all__ = [
     "ProcessingPipelineBuilder",
     "create_builder",
     "BCIFSerializer",
+    "MRCSerializer",
     # Built-in
     "__version__",
     # Namespace Shortcuts
