@@ -7,8 +7,9 @@ from volsegtools._downsampler.hierarchy_downsampling_strategy import (
     NullDownsamplingStrategy,
 )
 from volsegtools._model.working_store import WorkingStore
+from volsegtools._processing.processing_pipeline import ProcessingPipeline
+
 from volsegtools.abc import Converter, Downsampler
-from volsegtools._preprocessor.processing_pipeline import ProcessingPipeline
 from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
 from volsegtools.abc.post_conversion_step import PostConversionStep
 from volsegtools.abc.post_processing_step import PostProcessingStep
