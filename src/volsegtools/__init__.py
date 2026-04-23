@@ -7,7 +7,7 @@ internal (private) modules.
 
 from ._converter import (
     ConverterMap,
-    MapConverter,
+    MRCConverter,
 )
 from ._core import (
     LatticeKind,
