@@ -11,6 +11,7 @@ from ._converter import (
 )
 from ._core import (
     LatticeKind,
+    DataKind,
     Vector3,
     Bounds,
     Gaussian3DKernel,
@@ -54,6 +55,7 @@ __all__ = [
     "ConverterMap",
     "MRCConverter",
     "LatticeKind",
+    "DataKind",
     "Vector3",
     "Bounds",
     "Gaussian3DKernel",
