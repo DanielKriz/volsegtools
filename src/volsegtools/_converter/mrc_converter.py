@@ -17,16 +17,23 @@ from volsegtools._model import (
 )
 
 
-class MapConverter(Converter):
+class MRCConverter(Converter):
+    @property
+    def supported_suffixes(self):
+        return ["mrc", "map", "cpp4"]
+
+    def is_suffix_supported(self, suffix: str):
+        return suffix in self.supported_suffixes
+
     async def convert_volume(self, input_path: Path) -> List[DataSet]:
         with mrcfile.mmap(input_path, "r+") as mrc:
             if mrc.data is None or mrc.header is None:
                 raise RuntimeError("Failed to read data from MAP file")
 
             array = da.from_array(mrc.data)
-            array = MapConverter._normalize_axis_order(array, mrc.header)
+            array = MRCConverter._normalize_axis_order(array, mrc.header)
 
-            data_set_info = MapConverter._collect_data_set_metadata(
+            data_set_info = MRCConverter._collect_data_set_metadata(
                 input_path,
                 mrc.header,
                 LatticeKind.VOLUME,
@@ -62,7 +69,7 @@ class MapConverter(Converter):
                 raise RuntimeError("Failed to read data from MAP file")
 
             data = da.from_array(mrc.data)
-            data = MapConverter._normalize_axis_order(data, mrc.header)
+            data = MRCConverter._normalize_axis_order(data, mrc.header)
 
             if isinstance(data.dtype, np.floating):
                 data = data.astype(np.byte)

@@ -41,14 +41,13 @@ def run(
     if overwrite_tmp and local_store_path.exists():
         shutil.rmtree(local_store_path)
 
-    map_converter = vst.MapConverter()
+    map_converter = vst.MRCConverter()
     builder = vst.create_builder()
     (
-        builder
-        .add_volume_converter(map_converter)
+        builder.add_volume_converter(map_converter)
         .add_segmentation_converter(map_converter)
         .set_downsampling_strategy(vst.HierarchyDownsamplingStrategy())
-        .set_serializer(vst.BCIFSerializer())
+        .set_serializer(vst.MRCSerializer())
         .set_output_dir(local_store_path)
         .set_work_dir(local_store_path)
     )

@@ -1,7 +1,7 @@
-from .map_converter import MapConverter
 from .converter_map import ConverterMap
+from .mrc_converter import MRCConverter
 
 __all__ = [
-    "MapConverter",
     "ConverterMap",
+    "MRCConverter",
 ]
