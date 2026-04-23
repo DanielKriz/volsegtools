@@ -33,9 +33,7 @@ from ._model import (
     StoringParameters,
     WorkingStore,
 )
-from ._preprocessor import (
-    Preprocessor,
-    PreprocessorBuilder,
+from ._processing import (
     ProcessingPipeline,
     ProcessingPipelineBuilder,
     create_builder,
@@ -72,8 +70,6 @@ __all__ = [
     "OpaqueDataHandle",
     "StoringParameters",
     "WorkingStore",
-    "Preprocessor",
-    "PreprocessorBuilder",
     "ProcessingPipeline",
     "ProcessingPipelineBuilder",
     "create_builder",
