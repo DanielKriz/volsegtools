@@ -26,7 +26,7 @@ class ProcessingPipelineBuilder:
         self._output_dir: Path | None = None
         self._volume_converter: Converter | None = None
         self._segmentation_converter: Converter | None = None
-        self._downsampling_strategy: DownsamplingStrategy = NullDownsamplingStrategy
+        self._downsampling_strategy: DownsamplingStrategy = NullDownsamplingStrategy()
         self._post_processing_steps: List[PostProcessingStep] = []
         self._post_conversion_steps: List[PostConversionStep] = []
         self._serializer = None
@@ -42,28 +42,19 @@ class ProcessingPipelineBuilder:
             suffixes = converter.supported_suffixes
         return suffixes
 
-
     def add_segmentation_converter(
-        self,
-        converter: Converter, 
-        suffixes=None, 
-        preserve_builtin=False
+        self, converter: Converter, suffixes=None, preserve_builtin=False
     ) -> Self:
         suffixes = self._mend_suffixes(converter, suffixes, preserve_builtin)
         self._segmentation_converter_map.set_converter(converter, suffixes)
         return self
 
-
     def add_volume_converter(
-        self,
-        converter: Converter, 
-        suffixes=None, 
-        preserve_builtin=False
+        self, converter: Converter, suffixes=None, preserve_builtin=False
     ) -> Self:
         suffixes = self._mend_suffixes(converter, suffixes, preserve_builtin)
         self._volume_converter_map.set_converter(converter, suffixes)
         return self
-
 
     def set_downsampling_strategy(self, strategy: DownsamplingStrategy) -> Self:
         """Sets a downsampler that is going to be used by the resulting
@@ -75,7 +66,6 @@ class ProcessingPipelineBuilder:
         self._downsampling_strategy = strategy
         return self
 
-
     def set_downsampler(self, downsampler: Downsampler) -> Self:
         """Sets a downsampler that is going to be used by the resulting
         preprocessor.
@@ -86,11 +76,9 @@ class ProcessingPipelineBuilder:
         self._downsampler = downsampler
         return self
 
-
     def set_add_post_conversion_step(self, step: PostConversionStep) -> Self:
         self._post_conversion_steps.append(step)
         return self
-
 
     def set_add_post_process_step(self, step: PostProcessingStep) -> Self:
         self._post_processing_steps.append(step)
@@ -104,7 +92,6 @@ class ProcessingPipelineBuilder:
         self._serializer = serializer
         return self
 
-
     def set_work_dir(self, file_path: Path) -> Self:
         """Sets the working directory of the processor.
 
@@ -117,17 +104,12 @@ class ProcessingPipelineBuilder:
         self._work_dir = file_path
         return self
 
-
     def set_output_dir(self, file_path: Path) -> Self:
         self._output_dir = file_path
         return self
 
-
     def build(self) -> ProcessingPipeline:
         """Builds the resulting preprocessor."""
-
-        if self._volume_converter is None and self._segmentation_converter is None:
-            raise RuntimeError("Atleast one convertor has to be set")
 
         if self._serializer is None:
             raise RuntimeError("Serializer must be provided!")
