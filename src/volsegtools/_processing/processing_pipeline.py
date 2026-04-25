@@ -49,7 +49,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         self._output_dir = output_dir if output_dir is not None else Path()
         self._data = WorkingStore.instance
-        # self._downsampler = downsampler
         self._serializer = serializer
         self._work_dir = work_dir
 

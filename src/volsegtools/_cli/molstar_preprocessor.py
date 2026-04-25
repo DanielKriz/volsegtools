@@ -35,7 +35,7 @@ def run(
     if len(sys.argv) < 2:
         raise RuntimeError("Not enough arguments!")
 
-    logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
+    logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
     local_store_path = workdir / "volsegtools_workdir"
     if overwrite_tmp and local_store_path.exists():
