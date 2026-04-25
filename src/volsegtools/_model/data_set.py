@@ -165,9 +165,10 @@ def create_file_name(channel: Channel, suffix: str = ".bcif"):
     )
 
 
+# TODO: make this pydantic
 FileNameInfo = collections.namedtuple(
     "FileNameInfo",
-    ["data_set", "resolution", "time_frame", "channel", "suffix"],
+    ["data_set", "resolution", "time_frame", "channel", "suffix", "file_path"],
 )
 
 
@@ -188,4 +189,5 @@ def info_from_file_path(file_path: Path):
         int(match.group("time_frame")),
         int(match.group("channel")),
         match.group("suffix"),
+        file_path,
     )
