@@ -11,6 +11,7 @@ from volsegtools._model.working_store import WorkingStore
 from volsegtools._processing.processing_pipeline import ProcessingPipeline
 
 from volsegtools.abc import Converter, Downsampler
+from volsegtools.abc.bundler import Bundler
 from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
 from volsegtools.abc.post_conversion_step import PostConversionStep
 from volsegtools.abc.post_processing_step import PostProcessingStep
@@ -31,6 +32,7 @@ class ProcessingPipelineBuilder:
         self._serializer = None
         self._volume_converter_map = ConverterMap()
         self._segmentation_converter_map = ConverterMap()
+        self._bundler = None
 
     def _mend_suffixes(self, converter, suffixes=None, preserve_builtin=False):
         if preserve_builtin:
@@ -94,6 +96,9 @@ class ProcessingPipelineBuilder:
         self._post_processing_steps.append(step)
         return self
 
+    def set_bundler(self, bundler: Bundler) -> Self:
+        self._bundler = bundler
+        return self
 
     def set_serializer(self, serializer: Serializer) -> Self:
         self._serializer = serializer
@@ -134,6 +139,7 @@ class ProcessingPipelineBuilder:
             post_processing_steps=self._post_processing_steps,
             post_conversion_steps=self._post_conversion_steps,
             serializer=self._serializer,
+            bundler=self._bundler,
             work_dir=self._work_dir,
             output_dir=self._output_dir,
         )

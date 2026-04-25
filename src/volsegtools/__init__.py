@@ -5,6 +5,9 @@ The user should always include this modules instead of importing other
 internal (private) modules.
 """
 
+from._bundling import (
+    MVSXBundler,
+)
 from ._converter import (
     ConverterMap,
     MRCConverter,
@@ -52,6 +55,7 @@ __version__ = "0.0.0"
 
 __all__ = [
     # From subpackages
+    "MVSXBundler",
     "ConverterMap",
     "MRCConverter",
     "LatticeKind",
