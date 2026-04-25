@@ -48,6 +48,7 @@ def run(
         .add_segmentation_converter(map_converter)
         .set_downsampling_strategy(vst.HierarchyDownsamplingStrategy())
         .set_serializer(vst.MRCSerializer())
+        .set_bundler(vst.MVSXBundler())
         .set_output_dir(local_store_path)
         .set_work_dir(local_store_path)
     )

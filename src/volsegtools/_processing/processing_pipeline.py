@@ -18,6 +18,7 @@ from volsegtools.abc import (
     PostProcessingStep,
     PostConversionStep,
 )
+from volsegtools.abc.bundler import Bundler
 from volsegtools.abc.serializer import Serializer
 
 
@@ -37,6 +38,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         serializer: Optional[Serializer] = None,
         post_processing_steps: List[PostProcessingStep] = [],
         post_conversion_steps: List[PostConversionStep] = [],
+        bundler: Optional[Bundler] = None,
         work_dir: Optional[Path] = None,
         output_dir: Optional[Path] = None,
     ):
@@ -53,6 +55,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         self._post_processing_steps = post_processing_steps
         self._post_conversion_steps = post_conversion_steps
+        self._bundler = bundler
 
     def sync_process(
         self,
@@ -118,8 +121,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         serialized_files = _flatten(serialized_files)
         logging.info("Serializing Volumes and Segmentations - DONE")
 
-        return serialized_files
+        if self._bundler is not None:
+            serialized_files = await self.bundle(serialized_files)
 
+        return serialized_files
 
     async def convert_volumes(self, paths: List[Path]) -> List[DataSet]:
         volumes = []
@@ -136,7 +141,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         return volumes
 
-
     async def convert_segmentations(self, paths: List[Path]) -> List[DataSet]:
         segmentations = []
 
@@ -151,7 +155,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             segmentations += await converter.convert_volume(path)
 
         return segmentations
-
 
     async def collect_metadata(self, paths: List[Path]):
         return []
@@ -208,6 +211,9 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             data = step(data)
 
         return data
+
+    async def bundle(self, files: List[Path]):
+        return self._bundler.bundle(files, self._output_dir)
 
     async def get_progress(self):
         pass
