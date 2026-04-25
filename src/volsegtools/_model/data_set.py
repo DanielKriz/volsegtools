@@ -1,4 +1,3 @@
-import collections
 import re
 from pathlib import Path
 from typing import Optional, Self
@@ -165,11 +164,13 @@ def create_file_name(channel: Channel, suffix: str = ".bcif"):
     )
 
 
-# TODO: make this pydantic
-FileNameInfo = collections.namedtuple(
-    "FileNameInfo",
-    ["data_set", "resolution", "time_frame", "channel", "suffix", "file_path"],
-)
+class FileNameInfo(pydantic.BaseModel):
+    data_set: str
+    resolution: int
+    time_frame: int
+    channel: int
+    suffix: str
+    file_path: Path
 
 
 def info_from_file_path(file_path: Path):
@@ -184,10 +185,10 @@ def info_from_file_path(file_path: Path):
         raise RuntimeError("File name does not satisfy format!")
 
     return FileNameInfo(
-        match.group("set_id"),
-        int(match.group("resolution")),
-        int(match.group("time_frame")),
-        int(match.group("channel")),
-        match.group("suffix"),
-        file_path,
+        data_set=match.group("set_id"),
+        resolution=int(match.group("resolution")),
+        time_frame=int(match.group("time_frame")),
+        channel=int(match.group("channel")),
+        suffix=match.group("suffix"),
+        file_path=file_path,
     )
