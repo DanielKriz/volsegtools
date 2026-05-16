@@ -40,7 +40,9 @@ class MRCSerializer(Serializer):
                 mrc.header.nzstart = (
                     data_set.metadata.origin.z / data_set.metadata.voxel_size.z
                 )
-                mrc.set_data(channel.data.access())
+                data = channel.handle.get_lattice(DaskBackend)
+                data = data.astype("float32")
+                mrc.set_data(data)
 
             output_files.append(output_file_path)
 
