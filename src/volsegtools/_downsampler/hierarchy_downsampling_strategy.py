@@ -4,24 +4,30 @@ import logging
 import dask.array as da
 import dask_image.ndfilters as dask_filter
 
+from volsegtools._model.dask_backend import DaskBackend
 from volsegtools._model.data_set import Channel
 from volsegtools._core.gaussian_kernel_3D import Gaussian3DKernel
 import volsegtools as vst
 
+vst_logger = logging.getLogger("volsegtools")
 
 # TODO: add support for Downsampling parameters!
 
 
 # This should return raw data
 class HierarchyDownsamplingStrategy(vst.abc.DownsamplingStrategy):
-    MIN_SIZE_THRESHOLD = 1_000_000  # 1 MB
+    # We have to choose some reasonable size of the chunks with which
+    # we will be working here. This has been chosen because for floats
+    # it has around 70MB, the chunk size should be somewhere between
+    # 50-150MB on modern processors.
+    CHUNKS = (256, 256, 256)
 
     def calculate_approx_downsampled_sizes(self, channel: Channel) -> List[float]:
-        bytes_count = channel.data.access().nbytes
+        bytes_count = channel.handle.nbytes
         sizes = []
-        while bytes_count > HierarchyDownsamplingStrategy.MIN_SIZE_THRESHOLD:
+        while bytes_count > super().MIN_SIZE_THRESHOLD:
             bytes_count /= 8
-            if bytes_count < HierarchyDownsamplingStrategy.MIN_SIZE_THRESHOLD:
+            if bytes_count < super().MIN_SIZE_THRESHOLD:
                 break
             sizes.append(bytes_count)
         return sizes
@@ -30,19 +36,17 @@ class HierarchyDownsamplingStrategy(vst.abc.DownsamplingStrategy):
         return len(self.calculate_approx_downsampled_sizes(channel))
 
     def execute(self, channel: Channel):
-        current_data = da.from_zarr(
-            url=channel.data.access(),
-            # chunks=channel.data.access().chunks,
-            chunks=(256, 256, 256),
-        )
+        vst_logger.info("Using the 'Smoothing' downsampling strategy")
 
-        if 1 in channel.data.access().shape:
+        if 1 in channel.handle.shape:
             yield from []
 
+        current_data = channel.handle.get_lattice(DaskBackend)
+
         steps = self.calculate_steps(channel)
-        logging.info(f"Calculated downsampling steps: {steps}")
+        vst_logger.info(f"Calculated downsampling steps: {steps}")
         for step in range(steps):
-            logging.info(f"Downsampling step {step + 1}/{steps}")
+            vst_logger.info(f"Downsampling step {step + 1}/{steps}")
             downsampled_data = dask_filter.convolve(
                 current_data,
                 Gaussian3DKernel(5, 1.0).as_ndarray(),
@@ -52,10 +56,6 @@ class HierarchyDownsamplingStrategy(vst.abc.DownsamplingStrategy):
             downsampled_data = downsampled_data[::2, ::2, ::2]
             downsampled_data = downsampled_data.rechunk((256, 256, 256))
             current_data = downsampled_data
-            logging.info(f"Downsampling step {step + 1}/{steps} - DONE")
+            vst_logger.info(f"Downsampling step {step + 1}/{steps} - DONE")
             yield current_data
 
-
-class NullDownsamplingStrategy(vst.abc.DownsamplingStrategy):
-    def execute(self, _):
-        yield from []
