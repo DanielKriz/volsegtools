@@ -1,6 +1,11 @@
 from typing import Union
 
 import numpy as np
+import dask.array as da
+
+ArrayType = Union[np.array, np.ndarray, da.Array]
+
+StorableType = Union[ArrayType]
 
 StorableDType = Union[
     np.uint8,
