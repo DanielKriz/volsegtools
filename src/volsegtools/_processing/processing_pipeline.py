@@ -6,6 +6,7 @@ import logging
 
 import volsegtools as vst
 from volsegtools._converter.converter_map import ConverterMap
+from volsegtools._core.data_kind import DataKind
 from volsegtools._core.timer import Timer
 from volsegtools._core.vector import Vector3
 from volsegtools._downsampler.null_downsampling_strategy import (
@@ -40,7 +41,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         downsampling_strategy=NullDownsamplingStrategy(),
         volume_converter_map: Optional[ConverterMap] = None,
         segmentation_converter_map: Optional[ConverterMap] = None,
-        serializer: Optional[Serializer] = None,
+        volume_serializer: Optional[Serializer] = None,
+        segmentation_mask_serializer: Optional[Serializer] = None,
+        segmentation_volume_serializer: Optional[Serializer] = None,
+        segmentation_mesh_serializer: Optional[Serializer] = None,
         post_processing_steps: List[PostProcessingStep] = [],
         post_conversion_steps: List[PostConversionStep] = [],
         bundler: Optional[Bundler] = None,
@@ -54,7 +58,14 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         self._output_dir = output_dir if output_dir is not None else Path()
         self._data = WorkingStore.instance
-        self._serializer = serializer
+
+        self._serializer_map = {
+            DataKind.VOLUME : volume_serializer,
+            DataKind.SEGMENTATION_MASK : segmentation_mask_serializer,
+            DataKind.SEGMENTATION_VOLUME : segmentation_volume_serializer,
+            DataKind.SEGMENTATION_MESH : segmentation_mesh_serializer,
+        }
+
         self._work_dir = work_dir
 
         self._post_processing_steps = post_processing_steps
@@ -231,11 +242,11 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         return processed_data
 
     async def serialize(self, data_set) -> List[Path]:
-        if self._serializer is None:
-            vst_logger.warning("There is not any serializer")
-            return []
-
-        return await self._serializer.serialize(data_set, self._output_dir)
+        kind = data_set.metadata.kind
+        return await self._serializer_map[kind].serialize(
+            data_set,
+            self._output_dir
+        )
 
     async def bundle(self, files: List[Path]):
         return self._bundler.bundle(files, self._output_dir)
