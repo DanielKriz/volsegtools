@@ -5,13 +5,13 @@ The user should always include this modules instead of importing other
 internal (private) modules.
 """
 
-from._bundling import (
+from ._bundling import (
     MVSXBundler,
 )
 from ._converter import (
     ConverterMap,
     MRCConverter,
-    TiffConverter,
+    TIFFConverter,
 )
 from ._core import (
     DataKind,
@@ -64,18 +64,18 @@ from ._processing import (
     ErrorEvaluationStep,
     ErrorEvaluationMultiStep,
     SizeEvaluationStep,
-    JSONSizeReporter, 
+    JSONSizeReporter,
     StdoutSizeReporter,
 )
 from ._serialization import BCIFSerializer, MRCSerializer
 
 # this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
 from . import abc
-from . import log
 
 __version__ = "0.0.0"
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 __all__ = [
@@ -83,7 +83,7 @@ __all__ = [
     "MVSXBundler",
     "ConverterMap",
     "MRCConverter",
-    "TiffConverter",
+    "TIFFConverter",
     "DataKind",
     "Vector3",
     "Bounds",

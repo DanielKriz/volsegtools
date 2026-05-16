@@ -1,4 +1,3 @@
-import numpy as np
 import scipy
 from typing import List
 import logging
@@ -9,6 +8,7 @@ import volsegtools as vst
 from volsegtools.abc.kernel import ConvolutionKernel
 
 vst_logger = logging.getLogger("volsegtools")
+
 
 class StridedSmoothing(vst.abc.DownsamplingStrategy):
     def __init__(self, kernel: ConvolutionKernel, stride=2):
@@ -35,12 +35,8 @@ class StridedSmoothing(vst.abc.DownsamplingStrategy):
         kernel_arr = self.kernel.as_ndarray()
 
         def conv_and_slice_block(block):
-            conv = scipy.ndimage.convolve(
-                block,
-                weights=kernel_arr,
-                mode='reflect'
-            )
-            return conv[::self.stride, ::self.stride, ::self.stride]
+            conv = scipy.ndimage.convolve(block, weights=kernel_arr, mode="reflect")
+            return conv[:: self.stride, :: self.stride, :: self.stride]
 
         current_data = data.handle.get_lattice(DaskBackend)
 
@@ -55,10 +51,10 @@ class StridedSmoothing(vst.abc.DownsamplingStrategy):
             downsampled_data = downsampled_data.map_overlap(
                 conv_and_slice_block,
                 depth=radius,
-                boundary='reflect',
+                boundary="reflect",
                 # TODO: research what this does...
-                drop_axis=[0,1,2],
-                new_axis=[0,1,2],
+                drop_axis=[0, 1, 2],
+                new_axis=[0, 1, 2],
                 chunks=new_chunks,
                 dtype=current_data.dtype,
             )
@@ -66,5 +62,3 @@ class StridedSmoothing(vst.abc.DownsamplingStrategy):
             current_data = downsampled_data
             vst_logger.info(f"Downsampling step {step + 1}/{steps} - DONE")
             yield current_data
-
-
