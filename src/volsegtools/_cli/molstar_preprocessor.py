@@ -11,6 +11,7 @@ import typer
 from typing_extensions import Annotated
 
 import volsegtools as vst
+from volsegtools._core.data_kind import DataKind
 
 vst_logger = logging.getLogger("volsegtools")
 
@@ -47,6 +48,29 @@ class BundlingKind(enum.StrEnum):
     MVXS = "mvsx"
     RESOLUTION_ZIP = "resolution_zip"
     ZIP = "zip"
+
+class SerializerKind(enum.StrEnum):
+    BCIF = "bcif"
+    MRC = "mrc"
+    OBJ = "obj"
+    PLY = "ply"
+    STL = "stl"
+
+
+def get_serializer(kind: SerializerKind):
+    match kind:
+        case SerializerKind.BCIF:
+            return vst.BCIFSerializer()
+        case SerializerKind.MRC:
+            return vst.MRCSerializer()
+        case SerializerKind.OBJ:
+            return vst.OBJSerializer()
+        case SerializerKind.PLY:
+            return vst.PLYSerializer()
+        case SerializerKind.STL:
+            return vst.STLSerializer()
+        case _:
+            raise RuntimeError("Unknown kind encountered")
 
 
 def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
@@ -173,6 +197,34 @@ def run(
             help="List available downsampling strategies and exit.",
         ),
     ] = False,
+    volume_serializer: Annotated[
+        SerializerKind,
+        typer.Option(
+            help="Serializer for the segmentation meshes.",
+            metavar="SERIALIZER",
+        ),
+    ] = SerializerKind.MRC,
+    segmentation_volume_serializer: Annotated[
+        SerializerKind,
+        typer.Option(
+            help="Serializer for the segmentation meshes.",
+            metavar="SERIALIZER",
+        ),
+    ] = SerializerKind.MRC,
+    segmentation_mask_serializer: Annotated[
+        SerializerKind,
+        typer.Option(
+            help="Serializer for the segmentation meshes.",
+            metavar="SERIALIZER",
+        ),
+    ] = SerializerKind.MRC,
+    segmentation_mesh_serializer: Annotated[
+        SerializerKind,
+        typer.Option(
+            help="Serializer for the segmentation meshes.",
+            metavar="SERIALIZER",
+        ),
+    ] = SerializerKind.PLY,
     bundling_approach: Annotated[
         BundlingKind,
         typer.Option(
@@ -209,8 +261,17 @@ def run(
         .add_segmentation_converter(vst.MeshConverter())
         .add_segmentation_converter(map_converter)
         .set_downsampling_strategy(get_downsampling_strategy(strategy))
-        .set_serializer(vst.MRCSerializer())
         # .set_bundler(vst.MVSXBundler())
+        .set_serializer(DataKind.VOLUME, get_serializer(volume_serializer))
+        .set_serializer(DataKind.SEGMENTATION_MASK, get_serializer(
+            segmentation_mask_serializer
+        ))
+        .set_serializer(DataKind.SEGMENTATION_VOLUME, get_serializer(
+            segmentation_volume_serializer
+        ))
+        .set_serializer(DataKind.SEGMENTATION_MESH, get_serializer(
+            segmentation_mesh_serializer
+        ))
         .set_output_dir(local_store_path)
         .set_work_dir(local_store_path)
     )

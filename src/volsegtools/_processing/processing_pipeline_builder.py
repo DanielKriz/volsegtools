@@ -1,9 +1,11 @@
+import collections
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from typing_extensions import Self
 
 from volsegtools._converter.converter_map import ConverterMap
+from volsegtools._core.data_kind import DataKind
 from volsegtools._downsampler.null_downsampling_strategy import (
     NullDownsamplingStrategy,
 )
@@ -29,7 +31,7 @@ class ProcessingPipelineBuilder:
         self._downsampling_strategy: DownsamplingStrategy = NullDownsamplingStrategy()
         self._post_processing_steps: List[PostProcessingStep] = []
         self._post_conversion_steps: List[PostConversionStep] = []
-        self._serializer = None
+        self._serializer_map = collections.defaultdict(None)
         self._volume_converter_map = ConverterMap()
         self._segmentation_converter_map = ConverterMap()
         self._bundler = None
@@ -78,8 +80,8 @@ class ProcessingPipelineBuilder:
         self._bundler = bundler
         return self
 
-    def set_serializer(self, serializer: Serializer) -> Self:
-        self._serializer = serializer
+    def set_serializer(self, kind: DataKind, serializer: Serializer) -> Self:
+        self._serializer_map[kind] = serializer
         return self
 
     def set_work_dir(self, file_path: Path) -> Self:
@@ -101,8 +103,8 @@ class ProcessingPipelineBuilder:
     def build(self) -> ProcessingPipeline:
         """Builds the resulting preprocessor."""
 
-        if self._serializer is None:
-            raise RuntimeError("Serializer must be provided!")
+        if all([x is None for x in self._serializer_map.values()]):
+            raise RuntimeError("Atleast one serializer must set")
 
         return ProcessingPipeline(
             downsampling_strategy=self._downsampling_strategy,
@@ -110,7 +112,16 @@ class ProcessingPipelineBuilder:
             segmentation_converter_map=self._segmentation_converter_map,
             post_processing_steps=self._post_processing_steps,
             post_conversion_steps=self._post_conversion_steps,
-            serializer=self._serializer,
+            volume_serializer=self._serializer_map[DataKind.VOLUME],
+            segmentation_mask_serializer=self._serializer_map[
+                DataKind.SEGMENTATION_MASK
+            ],
+            segmentation_volume_serializer=self._serializer_map[
+                DataKind.SEGMENTATION_VOLUME
+            ],
+            segmentation_mesh_serializer=self._serializer_map[
+                DataKind.SEGMENTATION_MESH
+            ],
             bundler=self._bundler,
             work_dir=self._work_dir,
             output_dir=self._output_dir,
