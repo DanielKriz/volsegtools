@@ -11,21 +11,33 @@ from._bundling import (
 from ._converter import (
     ConverterMap,
     MRCConverter,
+    TiffConverter,
 )
 from ._core import (
-    LatticeKind,
     DataKind,
     Vector3,
     Bounds,
     Gaussian3DKernel,
     DownsamplingParameters,
     to_bytes,
+    Timer,
+    TimerReporter,
+    JSONTimerReporter,
 )
 from ._downsampler import (
-    BaseDownsampler,
-    HierarchyDownsampler,
     HierarchyDownsamplingStrategy,
     NullDownsamplingStrategy,
+    NearestNeighborDownsamplingStrategy,
+    PoolingDownsamplingStrategy,
+    AveragePoolingStrategy,
+    MinPoolingStrategy,
+    MaxPoolingStrategy,
+    SeparableSmoothing,
+    StridedSmoothing,
+    InterpolationBased,
+    TrilinearInterpolation,
+    TricubicInterpolation,
+    TriquinticInterpolation,
 )
 from ._model import (
     ChunkingMode,
@@ -48,31 +60,52 @@ from ._processing import (
     ProcessingPipeline,
     ProcessingPipelineBuilder,
     create_builder,
+    SmoothingStep,
+    ErrorEvaluationStep,
+    ErrorEvaluationMultiStep,
+    SizeEvaluationStep,
+    JSONSizeReporter, 
+    StdoutSizeReporter,
 )
 from ._serialization import BCIFSerializer, MRCSerializer
 
 # this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
 from . import abc
+from . import log
 
 __version__ = "0.0.0"
 
+import logging
+logger = logging.getLogger(__name__)
 
 __all__ = [
     # From subpackages
     "MVSXBundler",
     "ConverterMap",
     "MRCConverter",
-    "LatticeKind",
+    "TiffConverter",
     "DataKind",
     "Vector3",
     "Bounds",
     "Gaussian3DKernel",
     "DownsamplingParameters",
     "to_bytes",
-    "BaseDownsampler",
-    "HierarchyDownsampler",
+    "Timer",
+    "TimerReporter",
+    "JSONTimerReporter",
     "HierarchyDownsamplingStrategy",
     "NullDownsamplingStrategy",
+    "NearestNeighborDownsamplingStrategy",
+    "PoolingDownsamplingStrategy",
+    "AveragePoolingStrategy",
+    "MinPoolingStrategy",
+    "MaxPoolingStrategy",
+    "SeparableSmoothing",
+    "StridedSmoothing",
+    "InterpolationBased",
+    "TrilinearInterpolation",
+    "TricubicInterpolation",
+    "TriquinticInterpolation",
     "ChunkingMode",
     "StoringParameters",
     "ComputationBackend",
@@ -91,10 +124,17 @@ __all__ = [
     "ProcessingPipeline",
     "ProcessingPipelineBuilder",
     "create_builder",
+    "SmoothingStep",
+    "ErrorEvaluationStep",
+    "ErrorEvaluationMultiStep",
+    "SizeEvaluationStep",
+    "JSONSizeReporter",
+    "StdoutSizeReporter",
     "BCIFSerializer",
     "MRCSerializer",
     # Built-in
     "__version__",
+    "logger",
     # Namespace Shortcuts
     "abc",
 ]
