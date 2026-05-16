@@ -290,7 +290,7 @@ def run(
 
     # TODO: make strategy part of data set metadata
 
-    if eval_size is not None:
+    if eval_size:
         if size_report_path is not None:
             reporter = vst.JSONSizeReporter(size_report_path)
         else:
