@@ -12,19 +12,19 @@ vst_logger = logging.getLogger("volsegtools")
 
 
 def serialize_to_obj(output_path, filename, mesh):
-    file_path = f"{output_path}.{filename}.obj"
+    file_path = f"{output_path}/{filename}.obj"
     mesh.export(file_path, "obj")
     return file_path
 
 
 def serialize_to_ply(output_path, filename, mesh):
-    file_path = f"{output_path}.{filename}.ply"
+    file_path = f"{output_path}/{filename}.ply"
     mesh.export(file_path, "ply")
     return file_path
 
 
 def serialize_to_stl(output_path, filename, mesh):
-    file_path = f"{output_path}.{filename}.stl"
+    file_path = f"{output_path}/{filename}.stl"
     mesh.export(file_path, "stl")
     return file_path
 
