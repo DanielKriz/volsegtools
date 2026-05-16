@@ -49,6 +49,7 @@ class BundlingKind(enum.StrEnum):
     RESOLUTION_ZIP = "resolution_zip"
     ZIP = "zip"
 
+
 class SerializerKind(enum.StrEnum):
     BCIF = "bcif"
     MRC = "mrc"
@@ -261,17 +262,16 @@ def run(
         .add_segmentation_converter(vst.MeshConverter())
         .add_segmentation_converter(map_converter)
         .set_downsampling_strategy(get_downsampling_strategy(strategy))
-        # .set_bundler(vst.MVSXBundler())
         .set_serializer(DataKind.VOLUME, get_serializer(volume_serializer))
-        .set_serializer(DataKind.SEGMENTATION_MASK, get_serializer(
-            segmentation_mask_serializer
-        ))
-        .set_serializer(DataKind.SEGMENTATION_VOLUME, get_serializer(
-            segmentation_volume_serializer
-        ))
-        .set_serializer(DataKind.SEGMENTATION_MESH, get_serializer(
-            segmentation_mesh_serializer
-        ))
+        .set_serializer(
+            DataKind.SEGMENTATION_MASK, get_serializer(segmentation_mask_serializer)
+        )
+        .set_serializer(
+            DataKind.SEGMENTATION_VOLUME, get_serializer(segmentation_volume_serializer)
+        )
+        .set_serializer(
+            DataKind.SEGMENTATION_MESH, get_serializer(segmentation_mesh_serializer)
+        )
         .set_output_dir(local_store_path)
         .set_work_dir(local_store_path)
     )
