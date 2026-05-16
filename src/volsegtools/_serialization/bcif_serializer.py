@@ -13,8 +13,7 @@ from volsegtools.abc import Serializer
 
 
 class BCIFSerializer(Serializer):
-    @staticmethod
-    async def serialize(data_set, output_path: Path) -> List[Path]:
+    async def serialize(self, data_set, output_path: Path) -> List[Path]:
         # This is currently working only for volumes!
         output_files = []
         for channel in data_set.flat_channel_iter():
