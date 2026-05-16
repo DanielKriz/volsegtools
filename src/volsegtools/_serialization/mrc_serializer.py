@@ -4,6 +4,9 @@ from volsegtools._model.dask_backend import DaskBackend
 from volsegtools.abc.serializer import Serializer
 
 import mrcfile
+import logging
+
+vst_logger = logging.getLogger("volsegtools")
 
 
 class MRCSerializer(Serializer):
@@ -18,6 +21,7 @@ class MRCSerializer(Serializer):
                 channel.metadata.id,
             )
             output_file_path = output_path / file_name
+            vst_logger.info(f"... serialized into {output_file_path}")
 
             with mrcfile.new(output_file_path) as mrc:
                 mrc.header.mapc = data_set.metadata.axis_order.x + 1
