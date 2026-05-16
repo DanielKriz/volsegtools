@@ -14,6 +14,7 @@ import volsegtools as vst
 
 app = typer.Typer()
 
+
 class DownsamplignAlgorithmKind(enum.StrEnum):
     NEAREST_NEIGHBOR = "nearest"
     MAX = "max"
@@ -27,6 +28,7 @@ class DownsamplignAlgorithmKind(enum.StrEnum):
     STRIDED_SMOOTHING = "strided_smoothing"
     SEPARATED_SMOOTHING = "separated_smoothing"
     NULL = "null"
+
 
 class ErrorFunctionKind(enum.StrEnum):
     MSE = "mse"
@@ -67,6 +69,7 @@ def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
         case _:
             return vst.NullDownsamplingStrategy()
 
+
 @app.command()
 def run(
     volume_source: Annotated[
@@ -75,7 +78,7 @@ def run(
             "--volume-source",
             "--vs",
             help="Specifies a path to volumetric data.",
-        )
+        ),
     ] = [],
     segmentation_source: Annotated[
         List[Path],
@@ -83,7 +86,7 @@ def run(
             "--segmentation-source",
             "--ss",
             help="Specifies a path to segmentation data.",
-        )
+        ),
     ] = [],
     verbose: Annotated[
         int,
@@ -92,7 +95,7 @@ def run(
             "-v",
             help="Verbose logging.",
             count=True,
-        )
+        ),
     ] = 0,
     workdir: Annotated[
         Path,
@@ -115,21 +118,16 @@ def run(
             case_sensitive=False,
         ),
     ] = None,
-    eval_size: Annotated[
-        bool, typer.Option(help="Report size measurements")
-    ] = False,
+    eval_size: Annotated[bool, typer.Option(help="Report size measurements")] = False,
     size_report_path: Annotated[
         Path | None, typer.Option(help="Where should we store size report")
     ] = None,
-    show_time: Annotated[
-        bool, typer.Option(help="Report time measurements")
-    ] = False,
+    show_time: Annotated[bool, typer.Option(help="Report time measurements")] = False,
     time_report_path: Annotated[
         Path | None, typer.Option(help="Where should we store time report")
     ] = None,
     strategy: Annotated[
-        DownsamplignAlgorithmKind,
-        typer.Option(help="Name of downsampling strategy")
+        DownsamplignAlgorithmKind, typer.Option(help="Name of downsampling strategy")
     ] = DownsamplignAlgorithmKind.NULL,
 ):
 
@@ -137,9 +135,7 @@ def run(
 
     console = rich.console.Console()
 
-    vst.logger.addHandler(
-        rich.logging.RichHandler(console=console, show_time=False)
-    )
+    vst.logger.addHandler(rich.logging.RichHandler(console=console, show_time=False))
     if verbose > 0:
         vst.logger.setLevel(level=logging.INFO)
 
@@ -151,7 +147,7 @@ def run(
     builder = vst.create_builder()
     (
         builder.add_volume_converter(map_converter)
-        .add_volume_converter(TiffConverter())
+        .add_volume_converter(vst.TIFFConverter())
         .add_segmentation_converter(map_converter)
         .set_downsampling_strategy(get_downsampling_strategy(strategy))
         .set_serializer(vst.MRCSerializer())
@@ -170,19 +166,23 @@ def run(
             reporter = vst.JSONSizeReporter(size_report_path)
         else:
             reporter = vst.StdoutSizeReporter()
-        builder.add_post_process_step(vst.SizeEvaluationStep(
-            reporter,
-            label=f"{strategy}",
-        ))
+        builder.add_post_process_step(
+            vst.SizeEvaluationStep(
+                reporter,
+                label=f"{strategy}",
+            )
+        )
 
     if error_func is not None:
-        builder.add_post_process_step(vst.ErrorEvaluationMultiStep(
-            [str(e) for e in error_func],
-            output_path=workdir/"errors.json",
-            label=f"{strategy}",
-        ))
+        builder.add_post_process_step(
+            vst.ErrorEvaluationMultiStep(
+                [str(e) for e in error_func],
+                output_path=workdir / "errors.json",
+                label=f"{strategy}",
+            )
+        )
 
-    with console.status("Processing...") as status:
+    with console.status("Processing..."):
         try:
             pipeline: vst.ProcessingPipeline = builder.build()
             pipeline.sync_process(
@@ -199,11 +199,13 @@ def run(
         vst.Timer.print_report(vst.TimerReporter())
     if time_report_path:
         # TODO: this has to be more sophisticated
-        vst.Timer.print_report(vst.JSONTimerReporter(
-            output_path=time_report_path,
-            label=volume_source[0].stem,
-            method=str(strategy),
-        ))
+        vst.Timer.print_report(
+            vst.JSONTimerReporter(
+                output_path=time_report_path,
+                label=volume_source[0].stem,
+                method=str(strategy),
+            )
+        )
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 from typing import List
 import logging
 
-import dask.array as da
 import dask_image.ndfilters as dask_filter
 
 from volsegtools._model.dask_backend import DaskBackend
@@ -58,4 +57,3 @@ class HierarchyDownsamplingStrategy(vst.abc.DownsamplingStrategy):
             current_data = downsampled_data
             vst_logger.info(f"Downsampling step {step + 1}/{steps} - DONE")
             yield current_data
-

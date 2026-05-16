@@ -27,25 +27,32 @@ class DataSetInfo(pydantic.BaseModel):
 class TimeFrameInfo(pydantic.BaseModel):
     id: int = -1
 
+
 @pydantic.dataclasses.dataclass
 class DescriptiveStatistics:
     """Represents statistics that should be collected for some data set for
     it to be representable in CIF.
     """
+
     mean: float = 0.0
     std: float = 0.0
     max: float = 0.0
     min: float = 0.0
 
+
 class ChannelInfo(pydantic.BaseModel):
     id: int = -1
     statistics: DescriptiveStatistics = Field(default_factory=DescriptiveStatistics)
 
+
 class MeshInfo(pydantic.BaseModel):
     id: int
 
+
 class DataSet:
-    def __init__(self, store: zarr.storage.StoreLike, metadata: Optional[DataSetInfo] = None):
+    def __init__(
+        self, store: zarr.storage.StoreLike, metadata: Optional[DataSetInfo] = None
+    ):
         self.store = store
         if metadata:
             self._metadata_is_set = True
@@ -136,16 +143,15 @@ class TimeFrame:
     def __repr__(self):
         return self.__str__()
 
+
 class Mesh:
-    def __init__(self, parent: TimeFrame, id:int):
+    def __init__(self, parent: TimeFrame, id: int):
         self.parent = parent
         self.metadata = MeshInfo(id=id)
 
     def set_data(self, mesh_data, backend):
         self.handle = DataHandle(
-            self.data_set.store,
-            self.zarr_path,
-            self.data_set.metadata.kind
+            self.data_set.store, self.zarr_path, self.data_set.metadata.kind
         )
         self.handle.store_data(mesh_data, backend)
 
@@ -167,6 +173,7 @@ class Mesh:
     def __repr__(self):
         return self.__str__()
 
+
 class Channel:
     def __init__(self, parent: TimeFrame, id: int):
         self.parent = parent
@@ -175,7 +182,7 @@ class Channel:
 
     @property
     def handle(self) -> DataHandle:
-        if self._handle == None:
+        if self._handle is None:
             raise RuntimeError("There are not data in the channel")
         return self._handle
 
@@ -185,9 +192,7 @@ class Channel:
 
     def set_data(self, data, backend: ComputationBackend):
         self.handle = DataHandle(
-            self.data_set.store,
-            self.zarr_path,
-            self.data_set.metadata.kind
+            self.data_set.store, self.zarr_path, self.data_set.metadata.kind
         )
         self.handle.store_data(data, backend)
         self.metadata.statistics = self.handle.calculate_statistics(backend)
