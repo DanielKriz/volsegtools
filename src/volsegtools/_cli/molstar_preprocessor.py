@@ -1,8 +1,11 @@
 import logging
 import shutil
-import sys
 from pathlib import Path
 from typing import List
+import enum
+import rich
+import rich.console
+import rich.logging
 
 import typer
 from typing_extensions import Annotated
@@ -11,15 +14,86 @@ import volsegtools as vst
 
 app = typer.Typer()
 
+class DownsamplignAlgorithmKind(enum.StrEnum):
+    NEAREST_NEIGHBOR = "nearest"
+    MAX = "max"
+    MIN = "min"
+    AVG = "avg"
+    TRILINEAR = "trilinear"
+    TRICUBIC = "tricubic"
+    TRIQUINTIC = "triquintic"
+    TRIQUINTIC_NO_SMOOTH = "triquintic_no_smooth"
+    SMOOTHING = "smoothing"
+    STRIDED_SMOOTHING = "strided_smoothing"
+    SEPARATED_SMOOTHING = "separated_smoothing"
+    NULL = "null"
+
+class ErrorFunctionKind(enum.StrEnum):
+    MSE = "mse"
+    MAE = "mae"
+    RMSE = "rmse"
+    PSNR = "psnr"
+    SSIM = "ssim"
+    VFM = "vfm"
+    HFEN = "hfen"
+
+
+def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
+    match kind:
+        case DownsamplignAlgorithmKind.NEAREST_NEIGHBOR:
+            return vst.NearestNeighborDownsamplingStrategy()
+        case DownsamplignAlgorithmKind.MAX:
+            return vst.MaxPoolingStrategy()
+        case DownsamplignAlgorithmKind.MIN:
+            return vst.MinPoolingStrategy()
+        case DownsamplignAlgorithmKind.AVG:
+            return vst.AveragePoolingStrategy()
+        case DownsamplignAlgorithmKind.TRILINEAR:
+            return vst.TrilinearInterpolation()
+        case DownsamplignAlgorithmKind.TRICUBIC:
+            return vst.TricubicInterpolation()
+        case DownsamplignAlgorithmKind.TRIQUINTIC:
+            return vst.TriquinticInterpolation()
+        case DownsamplignAlgorithmKind.TRIQUINTIC_NO_SMOOTH:
+            return vst.TriquinticInterpolation()
+        case DownsamplignAlgorithmKind.SMOOTHING:
+            return vst.HierarchyDownsamplingStrategy()
+        case DownsamplignAlgorithmKind.STRIDED_SMOOTHING:
+            return vst.StridedSmoothing(vst.Gaussian3DKernel(5, 1))
+        case DownsamplignAlgorithmKind.SEPARATED_SMOOTHING:
+            return vst.SeparableSmoothing(5, 1)
+        case DownsamplignAlgorithmKind.NULL:
+            return vst.NullDownsamplingStrategy()
+        case _:
+            return vst.NullDownsamplingStrategy()
 
 @app.command()
 def run(
     volume_source: Annotated[
-        List[Path], typer.Option(help="Specifies a path to volumetric data.")
+        List[Path],
+        typer.Option(
+            "--volume-source",
+            "--vs",
+            help="Specifies a path to volumetric data.",
+        )
     ] = [],
     segmentation_source: Annotated[
-        List[Path], typer.Option(help="Specifies a path to segmentation data.")
+        List[Path],
+        typer.Option(
+            "--segmentation-source",
+            "--ss",
+            help="Specifies a path to segmentation data.",
+        )
     ] = [],
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging.",
+            count=True,
+        )
+    ] = 0,
     workdir: Annotated[
         Path,
         typer.Option(help="Remove temporal Zarr store created during downsampling."),
@@ -31,11 +105,43 @@ def run(
     overwrite_tmp: Annotated[
         bool, typer.Option(help="Overwrite temporal Zarr store if present.")
     ] = False,
+    error_eval: Annotated[
+        bool, typer.Option(help="Calculate error value of downsampling")
+    ] = False,
+    error_func: Annotated[
+        List[ErrorFunctionKind] | None,
+        typer.Option(
+            help="Which error functions shall be used for evaluation",
+            case_sensitive=False,
+        ),
+    ] = None,
+    eval_size: Annotated[
+        bool, typer.Option(help="Report size measurements")
+    ] = False,
+    size_report_path: Annotated[
+        Path | None, typer.Option(help="Where should we store size report")
+    ] = None,
+    show_time: Annotated[
+        bool, typer.Option(help="Report time measurements")
+    ] = False,
+    time_report_path: Annotated[
+        Path | None, typer.Option(help="Where should we store time report")
+    ] = None,
+    strategy: Annotated[
+        DownsamplignAlgorithmKind,
+        typer.Option(help="Name of downsampling strategy")
+    ] = DownsamplignAlgorithmKind.NULL,
 ):
-    if len(sys.argv) < 2:
-        raise RuntimeError("Not enough arguments!")
 
-    logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+    # TODO: Add early check here, whether files exist
+
+    console = rich.console.Console()
+
+    vst.logger.addHandler(
+        rich.logging.RichHandler(console=console, show_time=False)
+    )
+    if verbose > 0:
+        vst.logger.setLevel(level=logging.INFO)
 
     local_store_path = workdir / "volsegtools_workdir"
     if overwrite_tmp and local_store_path.exists():
@@ -45,24 +151,61 @@ def run(
     builder = vst.create_builder()
     (
         builder.add_volume_converter(map_converter)
+        .add_volume_converter(TiffConverter())
         .add_segmentation_converter(map_converter)
-        .set_downsampling_strategy(vst.HierarchyDownsamplingStrategy())
+        .set_downsampling_strategy(get_downsampling_strategy(strategy))
         .set_serializer(vst.MRCSerializer())
-        .set_bundler(vst.MVSXBundler())
+        # .set_bundler(vst.MVSXBundler())
         .set_output_dir(local_store_path)
         .set_work_dir(local_store_path)
     )
 
-    try:
-        pipeline: vst.ProcessingPipeline = builder.build()
-        pipeline.sync_process(
-            volumes=volume_source,
-            segmentations=segmentation_source,
-        )
-    finally:
-        if rm_tmp and local_store_path.exists():
-            shutil.rmtree(local_store_path)
+    if strategy == DownsamplignAlgorithmKind.TRIQUINTIC:
+        builder.add_post_process_step(vst.SmoothingStep())
+
+    # TODO: make strategy part of data set metadata
+
+    if eval_size is not None:
+        if size_report_path is not None:
+            reporter = vst.JSONSizeReporter(size_report_path)
+        else:
+            reporter = vst.StdoutSizeReporter()
+        builder.add_post_process_step(vst.SizeEvaluationStep(
+            reporter,
+            label=f"{strategy}",
+        ))
+
+    if error_func is not None:
+        builder.add_post_process_step(vst.ErrorEvaluationMultiStep(
+            [str(e) for e in error_func],
+            output_path=workdir/"errors.json",
+            label=f"{strategy}",
+        ))
+
+    with console.status("Processing...") as status:
+        try:
+            pipeline: vst.ProcessingPipeline = builder.build()
+            pipeline.sync_process(
+                volumes=volume_source,
+                segmentations=segmentation_source,
+            )
+
+            vst.Timer.pop_stage()
+        finally:
+            if rm_tmp and local_store_path.exists():
+                shutil.rmtree(local_store_path)
+
+    if show_time:
+        vst.Timer.print_report(vst.TimerReporter())
+    if time_report_path:
+        # TODO: this has to be more sophisticated
+        vst.Timer.print_report(vst.JSONTimerReporter(
+            output_path=time_report_path,
+            label=volume_source[0].stem,
+            method=str(strategy),
+        ))
 
 
 if __name__ == "__main__":
     app()
+    typer.Exit(code=0)
