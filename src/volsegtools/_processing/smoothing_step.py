@@ -1,0 +1,63 @@
+from typing import Callable, List, Optional
+import numpy as np
+import scipy
+import logging
+
+from volsegtools._model.dask_backend import DaskBackend
+from volsegtools.abc.post_processing_step import PostProcessingStep
+from volsegtools._core.data_kind import DataKind
+from volsegtools._model.data_set import DataSet
+
+
+vst_logger = logging.getLogger("volsegtools")
+
+class SmoothingStep(PostProcessingStep):
+    def __init__(
+        self,
+        appliable_kinds: List[DataKind] = [],
+        filter_fn: Optional[Callable] = None
+    ):
+        self.appliable_kinds = appliable_kinds
+        self.filter_fn = filter_fn
+
+    def calculate_convolution_kernel(self):
+        x = np.arange(-5, 5 + 1)
+        kernel = np.exp(-(x**2) / (2 * 1**2))
+        kernel = kernel / kernel.sum()
+        return kernel
+
+    async def execute(self, data_sets: List[DataSet]) -> List[DataSet]:
+        vst_logger.info("Started 'Smoothing' post-processing step")
+
+        kernel = self.calculate_convolution_kernel()
+
+        def smooth_block(block, axis):
+            return scipy.ndimage.convolve1d(
+                block,
+                weights=kernel,
+                axis=axis,
+                mode='mirror'
+            )
+
+        results = []
+
+        for data_set in data_sets:
+            data_set_id = data_set.metadata.id
+            data_set_resolution = data_set.metadata.resolution
+            task_id = f"{data_set_id}-{data_set_resolution}"
+            for channel in data_set.flat_channel_iter():
+                id = channel.metadata.id
+                vst_logger.info(f"... smoothing '{task_id}-ch{id}'")
+                data = channel.handle.get_lattice(DaskBackend)
+                for axis in [0, 1, 2]:
+                    depth = { x: 5 if x == axis else 0 for x in range(3) }
+                    smooth_data = data.map_overlap(
+                        smooth_block,
+                        axis=axis,
+                        depth=depth,
+                        boundary='reflect',
+                        dtype=data.dtype,
+                    )
+                    channel.set_data(smooth_data, DaskBackend)
+            results.append(data_set)
+        return results
