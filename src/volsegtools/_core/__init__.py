@@ -10,6 +10,7 @@ from .vector import Vector3
 from .bounds import Bounds
 from .gaussian_kernel_3D import Gaussian3DKernel
 from .downsampling_parameters import DownsamplingParameters, to_bytes
+from .timer import Timer, TimerReporter, JSONTimerReporter
 
 __all__ = [
     "DataKind",
@@ -18,4 +19,7 @@ __all__ = [
     "Gaussian3DKernel",
     "DownsamplingParameters",
     "to_bytes",
+    "Timer",
+    "TimerReporter",
+    "JSONTimerReporter",
 ]
