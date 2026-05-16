@@ -9,9 +9,22 @@ import from the `volsegtools` namespace.
 
 from .processing_pipeline import ProcessingPipeline
 from .processing_pipeline_builder import ProcessingPipelineBuilder, create_builder
+from .smoothing_step import SmoothingStep
+from .error_evaluation_step import ErrorEvaluationStep, ErrorEvaluationMultiStep
+from .size_evaluation_step import (
+    SizeEvaluationStep,
+    JSONSizeReporter,
+    StdoutSizeReporter,
+)
 
 __all__ = [
     "ProcessingPipeline",
     "ProcessingPipelineBuilder",
     "create_builder",
+    "SmoothingStep",
+    "ErrorEvaluationStep",
+    "ErrorEvaluationMultiStep",
+    "SizeEvaluationStep",
+    "JSONSizeReporter",
+    "StdoutSizeReporter",
 ]
