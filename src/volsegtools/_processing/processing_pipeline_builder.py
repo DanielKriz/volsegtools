@@ -4,13 +4,13 @@ from typing import List
 from typing_extensions import Self
 
 from volsegtools._converter.converter_map import ConverterMap
-from volsegtools._downsampler.hierarchy_downsampling_strategy import (
+from volsegtools._downsampler.null_downsampling_strategy import (
     NullDownsamplingStrategy,
 )
 from volsegtools._model.working_store import WorkingStore
 from volsegtools._processing.processing_pipeline import ProcessingPipeline
 
-from volsegtools.abc import Converter, Downsampler
+from volsegtools.abc.converter import Converter
 from volsegtools.abc.bundler import Bundler
 from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
 from volsegtools.abc.post_conversion_step import PostConversionStep
@@ -66,21 +66,11 @@ class ProcessingPipelineBuilder:
         self._downsampling_strategy = strategy
         return self
 
-    def set_downsampler(self, downsampler: Downsampler) -> Self:
-        """Sets a downsampler that is going to be used by the resulting
-        preprocessor.
-
-        If this method is going to be called multimple times, it is going
-        to override the previously set downsampler.
-        """
-        self._downsampler = downsampler
-        return self
-
-    def set_add_post_conversion_step(self, step: PostConversionStep) -> Self:
+    def add_post_conversion_step(self, step: PostConversionStep) -> Self:
         self._post_conversion_steps.append(step)
         return self
 
-    def set_add_post_process_step(self, step: PostProcessingStep) -> Self:
+    def add_post_process_step(self, step: PostProcessingStep) -> Self:
         self._post_processing_steps.append(step)
         return self
 
