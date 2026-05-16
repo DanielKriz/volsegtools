@@ -12,6 +12,7 @@ from ._converter import (
     ConverterMap,
     MRCConverter,
     TIFFConverter,
+    MeshConverter,
 )
 from ._core import (
     DataKind,
@@ -67,7 +68,14 @@ from ._processing import (
     JSONSizeReporter,
     StdoutSizeReporter,
 )
-from ._serialization import BCIFSerializer, MRCSerializer
+from ._serialization import (
+    BCIFSerializer,
+    MRCSerializer,
+    MeshSerializer,
+    OBJSerializer,
+    PLYSerializer,
+    STLSerializer,
+)
 
 # this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
 from . import abc
@@ -84,6 +92,11 @@ __all__ = [
     "ConverterMap",
     "MRCConverter",
     "TIFFConverter",
+    "MeshConverter",
+    "MeshSerializer",
+    "OBJSerializer",
+    "PLYSerializer",
+    "STLSerializer",
     "DataKind",
     "Vector3",
     "Bounds",
