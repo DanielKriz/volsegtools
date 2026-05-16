@@ -1,18 +1,18 @@
 import asyncio
 from pathlib import Path
-from typing import List, Optional, DefaultDict
+from typing import List, Optional
 import itertools
-import collections
 import logging
 
 import volsegtools as vst
 from volsegtools._converter.converter_map import ConverterMap
+from volsegtools._core.timer import Timer
 from volsegtools._core.vector import Vector3
-from volsegtools._downsampler.hierarchy_downsampling_strategy import (
+from volsegtools._downsampler.null_downsampling_strategy import (
     NullDownsamplingStrategy,
 )
+from volsegtools._model.dask_backend import DaskBackend
 from volsegtools._model.data_set import DataSet
-from volsegtools._model.opaque_data_handle import OpaqueDataHandle
 from volsegtools._model.working_store import WorkingStore
 from volsegtools.abc import (
     PostProcessingStep,
@@ -21,6 +21,7 @@ from volsegtools.abc import (
 from volsegtools.abc.bundler import Bundler
 from volsegtools.abc.serializer import Serializer
 
+vst_logger = logging.getLogger("volsegtools")
 
 def _flatten(list_of_lists: List[List]) -> List:
     # Source - https://stackoverflow.com/a/952952
@@ -28,7 +29,10 @@ def _flatten(list_of_lists: List[List]) -> List:
 
 
 class ProcessingPipeline(vst.abc.ProcessingPipeline):
-    state = {"downsampling_status": 0.0}
+    state = {
+        "stage" : None,
+        "downsampling_status": 0.0,
+    }
 
     def __init__(
         self,
@@ -72,16 +76,22 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         metadata: List[Path] = [],
         annotations: List[Path] = [],
     ) -> List[Path]:
-        logging.info("Converting Volumes")
+        vst_logger.info("Converting Volumes")
+        Timer.push_stage("Volume Conversion")
         converted_volumes = await self.convert_volumes(volumes)
 
-        logging.info("Converting Segmentations")
+        vst_logger.info("Converting Segmentations")
+        Timer.push_stage("Segmentation Conversion")
         converted_segmentations = await self.convert_segmentations(segmentations)
 
+        Timer.push_stage("Metadata Collection")
         collected_metadata = await self.collect_metadata(metadata)
+
+        Timer.push_stage("Annotation Collection")
         collected_annotations = await self.collect_annotation(annotations)
 
-        logging.info("Applying post conversion steps")
+        vst_logger.info("Applying post conversion steps")
+        Timer.push_stage("Post Conversion Steps")
         if self._post_conversion_steps != []:
             await self.apply_post_conversion_steps(
                 converted_volumes,
@@ -90,7 +100,8 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 collected_annotations,
             )
 
-        logging.info("Downsampling Volumes and Segmentations")
+        vst_logger.info("Downsampling Volumes and Segmentations")
+        Timer.push_stage("Downsampling")
         downsampled_data = await asyncio.gather(
             *[
                 self.downsample(handle)
@@ -100,27 +111,32 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             ]
         )
         downsampled_data = _flatten(downsampled_data)
-        logging.info("Downsampling Volumes and Segmentations - DONE")
+        vst_logger.info("Downsampling Volumes and Segmentations - DONE")
 
-        logging.info("Applying Post Processing Steps")
+        vst_logger.info("Applying Post Processing Steps")
+        Timer.push_stage("Post Processing")
         if self._post_processing_steps != []:
-            downsampled_data = await asyncio.gather(
-                *[
-                    self.apply_post_processing_steps(handle)
-                    for handle in downsampled_data
-                ]
-            )
-            downsampled_data = _flatten(downsampled_data)
-        logging.info("Applying Post Processing Steps - DONE")
+            # downsampled_data = self.apply_post_processing_steps(downsampled_data)
+            downsampled_data = await self.apply_post_processing_steps(downsampled_data)
+            # downsampled_data = await asyncio.gather(
+            #     *[
+            #         self.apply_post_processing_steps(handle)
+            #         for handle in downsampled_data
+            #     ]
+            # )
+            # downsampled_data = _flatten(downsampled_data)
+        vst_logger.info("Applying Post Processing Steps - DONE")
 
-        logging.info("Serializing Volumes and Segmentations")
+        vst_logger.info("Serializing Volumes and Segmentations")
+        Timer.push_stage("Serialization")
         serialized_files = await asyncio.gather(
             *[self.serialize(handle) for handle in downsampled_data]
         )
         serialized_files = _flatten(serialized_files)
-        logging.info("Serializing Volumes and Segmentations - DONE")
+        vst_logger.info("Serializing Volumes and Segmentations - DONE")
 
         if self._bundler is not None:
+            Timer.push_stage("Bundling")
             serialized_files = await self.bundle(serialized_files)
 
         return serialized_files
@@ -137,6 +153,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         for path in paths:
             converter = self._volume_converter_map[path.suffix]
             volumes += await converter.convert_volume(path)
+            Timer.push_event(f"Finished converting {path}")
 
         return volumes
 
@@ -168,13 +185,13 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             step(volumes, segmentations, metadata, annotations)
 
     async def downsample(self, data_set: DataSet) -> List[DataSet]:
-        resulting_data_sets: DefaultDict[int, DataSet] = collections.defaultdict(
-            DataSet
-        )
+        resulting_data_sets: dict[int, DataSet] = {}
 
         # TODO: add check if we should include the original resolution
         if True:
             resulting_data_sets[0] = data_set
+
+        msg = "Finished downsampling '{}' of ch{} with r{}"
 
         for channel in data_set.flat_channel_iter():
             frame = channel.parent.metadata.id
@@ -182,34 +199,43 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 self._downsampling_strategy.execute(channel),
                 start=1,  # 0 is reserved for the original data resolution
             ):
-                resulting_data_sets[resolution].update_metadata(data_set)
-                resulting_data_sets[resolution].metadata.resolution = resolution
-                resulting_data_sets[resolution].metadata.lattice_shape = Vector3(
-                    downsampled_data.shape[0],
-                    downsampled_data.shape[1],
-                    downsampled_data.shape[2],
-                )
-
+                if resolution not in resulting_data_sets.keys():
+                    resulting_data_sets[resolution] = DataSet(
+                        WorkingStore.instance.data_store
+                    )
+                    resulting_data_sets[resolution].update_metadata(data_set)
+                    resulting_data_sets[resolution].metadata.resolution = resolution
+                    resulting_data_sets[resolution].metadata.lattice_shape = Vector3(
+                        downsampled_data.shape[0],
+                        downsampled_data.shape[1],
+                        downsampled_data.shape[2],
+                    )
                 resulting_data_sets[resolution].add_time_frame(frame)
-                resulting_data_sets[resolution].time_frames[frame].add_channel(
-                    downsampled_data, channel.metadata.id
+                channel = resulting_data_sets[resolution].time_frames[frame].add_channel(
+                    channel.metadata.id
                 )
+                # TODO: the backend should be store in the strategy...
+                channel.set_data(downsampled_data, DaskBackend)
+                Timer.push_event(msg.format(
+                    data_set.metadata.id,
+                    channel.metadata.id,
+                    resolution
+                ))
         return list(resulting_data_sets.values())
+
+    async def apply_post_processing_steps(
+        self, data
+    ) -> List[DataSet]:
+        processed_data = data
+        for step in self._post_processing_steps:
+            processed_data = await step.execute(processed_data)
+        return processed_data
 
     async def serialize(self, data_set) -> List[Path]:
         if self._serializer is None:
             return []
 
         return await self._serializer.serialize(data_set, self._output_dir)
-
-    async def apply_post_processing_steps(
-        self, data_handle: OpaqueDataHandle
-    ) -> List[OpaqueDataHandle]:
-        data = [data_handle]
-        for step in self._post_processing_steps:
-            data = step(data)
-
-        return data
 
     async def bundle(self, files: List[Path]):
         return self._bundler.bundle(files, self._output_dir)
