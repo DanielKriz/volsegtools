@@ -1,10 +1,9 @@
 import numpy as np
-import numpy.typing
 import pydantic
 from zarr.abc.codec import BytesBytesCodec
 from zarr.codecs import BloscCodec
 
-from volsegtools._core import LatticeKind
+from volsegtools._core.data_kind import DataKind
 from volsegtools._model.chunking_mode import ChunkingMode
 
 from typing import Any
@@ -38,7 +37,7 @@ class StoringParameters(pydantic.BaseModel):
     time_frame: pydantic.NonNegativeInt = 0
     channel: pydantic.NonNegativeInt = 0
     compressor: BytesBytesCodec = BloscCodec()
-    lattice_kind: LatticeKind = LatticeKind.VOLUME
+    lattice_kind: DataKind = DataKind.VOLUME
 
     def __str__(self) -> str:
         return f"""Storing Paramaters:
