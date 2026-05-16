@@ -19,7 +19,8 @@ class ProcessingPipeline(abc.ABC):
 
     @abc.abstractmethod
     async def convert_segmentations(self, paths: List[Path]) -> Any:
-        """Converts collection of segmentations into a standardized data handles."""
+        """Converts collection of segmentations into a standardized data
+        handles."""
         ...
 
     @abc.abstractmethod
@@ -38,16 +39,16 @@ class ProcessingPipeline(abc.ABC):
     ):
         """Does some processing of the converted data.
 
-        Some downsampling algorithms might need some additional processing or data collection.
-        There also could be some formats that store metadata externally in some other data
-        or serialization format.
+        Some downsampling algorithms might need some additional processing or
+        data collection. There also could be some formats that store metadata
+        externally in some other data or serialization format.
 
         For these cases it is possible to do additional processing steps.
         """
         ...
 
     @abc.abstractmethod
-    async def downsample(self, data_handle: DataHandle) -> List[DataHandle]:
+    async def downsample(self, data_handle: Any) -> List[Any]:
         """Downsamples given data."""
         ...
 
@@ -62,8 +63,9 @@ class ProcessingPipeline(abc.ABC):
     ) -> Sequence[DataHandle]:
         """Applies post processing steps on the downsampled data.
 
-        Some downsampling methods are known to produce some artifacts that can be mitigated by
-        additional processing steps. For these cases it is possible to use this method.
+        Some downsampling methods are known to produce some artifacts that can
+        be mitigated by additional processing steps. For these cases it is
+        possible to use this method.
         """
         ...
 

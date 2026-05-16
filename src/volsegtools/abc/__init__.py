@@ -8,7 +8,6 @@ from .converter import Converter
 from .downsampler import Downsampler
 from .downsampling_strategy import DownsamplingStrategy
 from .kernel import ConvolutionKernel
-from .preprocessor import Preprocessor
 from .serializer import Serializer
 from .processing_pipeline import ProcessingPipeline
 from .post_conversion_step import PostConversionStep
@@ -21,7 +20,6 @@ __all__ = [
     "Downsampler",
     "DownsamplingStrategy",
     "ConvolutionKernel",
-    "Preprocessor",
     "Serializer",
     "ProcessingPipeline",
     "PostProcessingStep",
