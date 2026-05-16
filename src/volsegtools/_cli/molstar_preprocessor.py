@@ -12,6 +12,8 @@ from typing_extensions import Annotated
 
 import volsegtools as vst
 
+vst_logger = logging.getLogger("volsegtools")
+
 app = typer.Typer()
 
 
@@ -38,6 +40,13 @@ class ErrorFunctionKind(enum.StrEnum):
     SSIM = "ssim"
     VFM = "vfm"
     HFEN = "hfen"
+
+
+class BundlingKind(enum.StrEnum):
+    NULL = "null"
+    MVXS = "mvsx"
+    RESOLUTION_ZIP = "resolution_zip"
+    ZIP = "zip"
 
 
 def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
@@ -70,6 +79,11 @@ def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
             return vst.NullDownsamplingStrategy()
 
 
+class CommandGroup(enum.StrEnum):
+    DEFAULT = "Default"
+    BENCHMARK_AND_DEBUG = "Benchmarking & Debugging"
+
+
 @app.command()
 def run(
     volume_source: Annotated[
@@ -94,6 +108,7 @@ def run(
             "--verbose",
             "-v",
             help="Verbose logging.",
+            rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
             count=True,
         ),
     ] = 0,
@@ -108,30 +123,73 @@ def run(
     overwrite_tmp: Annotated[
         bool, typer.Option(help="Overwrite temporal Zarr store if present.")
     ] = False,
-    error_eval: Annotated[
-        bool, typer.Option(help="Calculate error value of downsampling")
-    ] = False,
     error_func: Annotated[
         List[ErrorFunctionKind] | None,
         typer.Option(
             help="Which error functions shall be used for evaluation",
+            rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
             case_sensitive=False,
         ),
     ] = None,
-    eval_size: Annotated[bool, typer.Option(help="Report size measurements")] = False,
+    eval_size: Annotated[
+        bool,
+        typer.Option(
+            help="Report size measurements",
+            rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
+        ),
+    ] = False,
     size_report_path: Annotated[
-        Path | None, typer.Option(help="Where should we store size report")
+        Path | None,
+        typer.Option(
+            help="Where should we store size report",
+            rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
+        ),
     ] = None,
-    show_time: Annotated[bool, typer.Option(help="Report time measurements")] = False,
+    show_time: Annotated[
+        bool,
+        typer.Option(
+            help="Report time measurements",
+            rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
+        ),
+    ] = False,
     time_report_path: Annotated[
-        Path | None, typer.Option(help="Where should we store time report")
+        Path | None,
+        typer.Option(
+            help="Where should we store time report",
+            rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
+        ),
     ] = None,
     strategy: Annotated[
-        DownsamplignAlgorithmKind, typer.Option(help="Name of downsampling strategy")
+        DownsamplignAlgorithmKind,
+        typer.Option(
+            help="Name of downsampling strategy",
+            metavar="METHOD",
+            case_sensitive=False,
+        ),
     ] = DownsamplignAlgorithmKind.NULL,
+    list_strategies: Annotated[
+        bool,
+        typer.Option(
+            help="List available downsampling strategies and exit.",
+        ),
+    ] = False,
+    bundling_approach: Annotated[
+        BundlingKind,
+        typer.Option(
+            "--bundle",
+            "-b",
+            help="Type of bundling.",
+            case_sensitive=False,
+        ),
+    ] = BundlingKind.NULL,
 ):
 
     # TODO: Add early check here, whether files exist
+
+    if list_strategies:
+        for idx, strategy in enumerate(DownsamplignAlgorithmKind):
+            print(f"{idx}: {strategy}")
+        raise typer.Exit()
 
     console = rich.console.Console()
 
@@ -155,6 +213,15 @@ def run(
         .set_output_dir(local_store_path)
         .set_work_dir(local_store_path)
     )
+
+    match bundling_approach:
+        case BundlingKind.MVXS:
+            builder.set_bundler(vst.MVSXBundler())
+        case BundlingKind.RESOLUTION_ZIP:
+            ...
+        case BundlingKind.ZIP:
+            ...
+    vst_logger.info(f"Setting bundler to: {bundling_approach}")
 
     if strategy == DownsamplignAlgorithmKind.TRIQUINTIC:
         builder.add_post_process_step(vst.SmoothingStep())
