@@ -4,11 +4,11 @@ from typing import List
 import dask.array as da
 import mrcfile
 import numpy as np
+import logging
 
+from volsegtools._model.dask_backend import DaskBackend
 from volsegtools.abc import Converter
-from volsegtools._core import LatticeKind, Vector3
-from volsegtools._model import StoringParameters, TimeFrameMetadata
-from volsegtools._model.opaque_data_handle import OpaqueDataHandle
+from volsegtools._core import DataKind, Vector3
 from volsegtools._model.working_store import WorkingStore
 
 from volsegtools._model import (
@@ -16,6 +16,11 @@ from volsegtools._model import (
     DataSetInfo,
 )
 
+vst_logger = logging.getLogger("volsegtools")
+
+
+# TODO: Make this a template method, where most of the logging is going to be
+# handled by the base class.
 
 class MRCConverter(Converter):
     @property
@@ -26,6 +31,7 @@ class MRCConverter(Converter):
         return suffix in self.supported_suffixes
 
     async def convert_volume(self, input_path: Path) -> List[DataSet]:
+        vst_logger.info(f"... converting '{input_path}'")
         with mrcfile.mmap(input_path, "r+") as mrc:
             if mrc.data is None or mrc.header is None:
                 raise RuntimeError("Failed to read data from MAP file")
@@ -36,117 +42,25 @@ class MRCConverter(Converter):
             data_set_info = MRCConverter._collect_data_set_metadata(
                 input_path,
                 mrc.header,
-                LatticeKind.VOLUME,
+                DataKind.VOLUME,
             )
 
-            data_set = DataSet(data_set_info)
-            data_set.add_time_frame()
+            data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
+            frame = data_set.add_time_frame()
 
-            WorkingStore.instance.store_lattice_time_frame(
-                StoringParameters(
-                    lattice_kind=LatticeKind.VOLUME, storage_dtype=mrc.data.dtype
-                ),
-                array,
-                data_set.metadata.id,
-            )
-
-            frame = data_set.time_frames[0]
-            frame.add_channel(array, 0)
+            channel = frame.add_channel(0)
+            channel.set_data(array, DaskBackend)
 
             return [data_set]
 
-            # internal_data = WorkingStore.instance
-            # internal_data.volume_dtype = mrc.data.dtype
-            # internal_data.is_volume_dtype_set = True
-            # volume_id: str = input_path.stem
-            # return [internal_data.store_lattice_time_frame(
-            #     StoringParameters(), array, volume_id
-            # )]
-
-    async def convert_segmentation(self, input_path: Path) -> List[OpaqueDataHandle]:
-        with mrcfile.open(input_path, "r+") as mrc:
-            if mrc.data is None or mrc.header is None:
-                raise RuntimeError("Failed to read data from MAP file")
-
-            data = da.from_array(mrc.data)
-            data = MRCConverter._normalize_axis_order(data, mrc.header)
-
-            if isinstance(data.dtype, np.floating):
-                data = data.astype(np.byte)
-
-            internal_data = WorkingStore.instance
-
-            internal_data.volume_dtype = data.dtype
-            internal_data.is_volume_dtype_set = True
-
-            segmentation_id: str = input_path.stem
-
-            storing_params = StoringParameters()
-            storing_params.storage_dtype = data.dtype
-            storing_params.lattice_kind = LatticeKind.SEGMENTATION
-            return [
-                internal_data.store_lattice_time_frame(
-                    storing_params, data, segmentation_id
-                )
-            ]
+    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
+        raise NotImplementedError()
 
     async def collect_annotations(self, input_path) -> None:
         pass
 
-    async def collect_metadata(self, input_path) -> TimeFrameMetadata:
-        with mrcfile.open(input_path, "r+") as mrc:
-            if mrc.data is None or mrc.header is None:
-                raise RuntimeError("Failed to read data from MAP file")
-            lattice_shape = Vector3(
-                int(mrc.header.nx),
-                int(mrc.header.ny),
-                int(mrc.header.nz),
-            )
-            header = mrc.header
-
-        axis_order_map = {
-            header.mapc - 1: 0,
-            header.mapr - 1: 1,
-            header.maps - 1: 2,
-        }
-
-        axis_order = Vector3(0, 1, 2)
-
-        start = (header.nxstart, header.nystart, header.nzstart)
-        start = Vector3(
-            start[axis_order_map[0]],
-            start[axis_order_map[1]],
-            start[axis_order_map[2]],
-        )
-
-        original_voxel_size = Vector3(
-            header.cella.x,
-            header.cella.y,
-            header.cella.z,
-        )
-
-        origin = Vector3(
-            start.x * original_voxel_size.x,
-            start.y * original_voxel_size.y,
-            start.z * original_voxel_size.z,
-        )
-
-        original_time_frame_metadata = TimeFrameMetadata(
-            axis_order=axis_order,
-            lattice_id=input_path.stem,
-            id=0,
-            resolution=0,
-            origin=origin,
-            lattice_dimensions=lattice_shape,
-            voxel_size=original_voxel_size,
-            # As we are not converting the first resolution to BCIF, this can
-            # be left empty.
-            channels=[],
-        )
-
-        print("Original Metadata:", original_time_frame_metadata)
-
-        return original_time_frame_metadata
+    async def collect_metadata(self, input_path) -> None:
+        raise NotImplementedError
 
     @staticmethod
     def _collect_data_set_metadata(file, mrc_header, kind) -> DataSetInfo:
