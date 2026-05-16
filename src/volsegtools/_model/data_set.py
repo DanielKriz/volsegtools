@@ -138,7 +138,7 @@ class TimeFrame:
             yield channel
 
     def __str__(self):
-        return f"TimerFrame({self.metadata}, {self.channels})"
+        return f"TimerFrame({self.metadata}, {self.channels}, {self.meshes})"
 
     def __repr__(self):
         return self.__str__()
