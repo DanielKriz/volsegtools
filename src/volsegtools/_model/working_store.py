@@ -1,16 +1,12 @@
 from pathlib import Path
 from typing import Tuple
 
-import dask.array as da
 import numpy as np
 import zarr
 import zarr.storage
 
-from volsegtools._core import LatticeKind
+from volsegtools._core.data_kind import DataKind
 from volsegtools._model.chunking_mode import ChunkingMode
-from volsegtools._model.metadata import Metadata
-from volsegtools._model.opaque_data_handle import OpaqueDataHandle
-from volsegtools._model.storing_parameters import StoringParameters
 
 
 class Singleton(type):
@@ -27,12 +23,11 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+# TODO: There is huge chance, that we do not need this...
 class WorkingStore(metaclass=Singleton):
     def __init__(self, store_path: Path):
         self.data_store = zarr.storage.LocalStore(root=store_path)
         self.root_group = zarr.create_group(store=self.data_store)
-
-        self._metadata = Metadata()
 
         self.volume_dtype = np.float64
         self.is_volume_dtype_set = False
@@ -52,8 +47,6 @@ class WorkingStore(metaclass=Singleton):
     @metadata.setter
     def metadata(self, value):
         self._metadata = value
-        # TODO: it should return a dictionary
-        # self.root_group.attrs.put(dataclasses.asdict(self._metadata))
 
     @property
     def volume_data_group(self):
@@ -64,7 +57,7 @@ class WorkingStore(metaclass=Singleton):
         return self._segmentation_data_group
 
     def get_data_array(
-        self, lattice_id, resolution, time_frame, channel, kind=LatticeKind.VOLUME
+        self, lattice_id, resolution, time_frame, channel, kind=DataKind.VOLUME
     ):
         kind_group = self.get_data_group(kind)
         lattice_group = kind_group.require_group(lattice_id)
@@ -96,44 +89,11 @@ class WorkingStore(metaclass=Singleton):
             case _:
                 raise RuntimeError("Unsupported chunking method!")
 
-    def get_data_group(self, lattice_kind: LatticeKind):
+    def get_data_group(self, lattice_kind: DataKind):
         match lattice_kind:
-            case LatticeKind.VOLUME:
+            case DataKind.VOLUME:
                 return self.volume_data_group
-            case LatticeKind.SEGMENTATION:
+            case DataKind.SEGMENTATION_VOLUME:
                 return self.segmentation_data_group
             case _:
                 raise RuntimeError("Unknown lattice kind encountered.")
-
-    def store_lattice_time_frame(
-        self,
-        params: StoringParameters,
-        data: da.Array,
-        lattice_id: str,
-    ) -> OpaqueDataHandle:
-        kind_group = self.get_data_group(params.lattice_kind)
-        lattice_group = kind_group.require_group(lattice_id)
-        resolution_group: zarr.Group = lattice_group.require_group(
-            f"resolution_{params.resolution_level}"
-        )
-        time_frame_group: zarr.Group = resolution_group.require_group(
-            f"time_frame_{params.time_frame}"
-        )
-
-        used_compressor = None
-        if params.is_compression_enabled:
-            used_compressor = params.compressor
-
-        zarr_repr: zarr.Array = time_frame_group.create_array(
-            name=str(params.channel),
-            chunks=data.chunksize,
-            dtype=params.storage_dtype,
-            compressors=[used_compressor] if used_compressor is not None else None,
-            shape=data.shape,
-            overwrite=True,
-        )
-
-        da.to_zarr(arr=data, url=zarr_repr, overwrite=True, compute=True)
-        ref = OpaqueDataHandle(zarr_repr)
-        ref.metadata.lattice_id = lattice_id
-        return ref

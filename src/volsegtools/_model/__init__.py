@@ -7,21 +7,17 @@ import from the `volsegtools` namespace.
 """
 
 from .chunking_mode import ChunkingMode
-from .metadata import (
-    ChannelMetadata,
-    DescriptiveStatistics,
-    Metadata,
-    OriginalTimeFrameMetadata,
-    TimeFrameMetadata,
-)
-from .opaque_data_handle import ChannelInfo, FlatChannelIterator, OpaqueDataHandle
+from .computation_backend import ComputationBackend
 from .storing_parameters import StoringParameters
 from .working_store import WorkingStore
 from .data_set import (
     DataSet,
     DataSetInfo,
+    DescriptiveStatistics,
     Channel,
-    ChannelInfoV2,
+    ChannelInfo,
+    Mesh,
+    MeshInfo,
     TimeFrame,
     TimeFrameInfo,
     create_file_name,
@@ -30,22 +26,18 @@ from .data_set import (
 
 __all__ = [
     "ChunkingMode",
-    "ChannelMetadata",
-    "DescriptiveStatistics",
-    "Metadata",
-    "OriginalTimeFrameMetadata",
-    "TimeFrameMetadata",
-    "ChannelInfo",
-    "FlatChannelIterator",
-    "OpaqueDataHandle",
+    "ComputationBackend",
     "StoringParameters",
     "WorkingStore",
     "DataSet",
     "DataSetInfo",
+    "DescriptiveStatistics",
     "TimeFrame",
     "TimeFrameInfo",
     "Channel",
-    "ChannelInfoV2",
+    "ChannelInfo",
+    "Mesh",
+    "MeshInfo",
     "create_file_name",
     "info_from_file_path",
 ]

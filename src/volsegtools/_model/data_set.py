@@ -3,14 +3,14 @@ from pathlib import Path
 from typing import Optional, Self
 
 import pydantic
-from numpy.typing import ArrayLike
 from pydantic import Field
-from volsegtools._core.lattice_kind import LatticeKind
+import zarr
+import zarr.storage
+
+from volsegtools._core.data_kind import DataKind
 from volsegtools._core.vector import Vector3
-from volsegtools._model.metadata import DescriptiveStatistics
-from volsegtools._model.opaque_data_handle import OpaqueDataHandle
-from volsegtools._model.storing_parameters import StoringParameters
-from volsegtools._model.working_store import WorkingStore
+from volsegtools._model.data_handle import DataHandle
+from volsegtools._model.computation_backend import ComputationBackend
 
 
 class DataSetInfo(pydantic.BaseModel):
@@ -20,22 +20,33 @@ class DataSetInfo(pydantic.BaseModel):
     voxel_size: Vector3 = Field(default_factory=Vector3)
     origin: Vector3 = Field(default_factory=Vector3)
     id: str = "Unknown"
-    # kind: LatticeKind = Field(default_factory=LatticeKind)
-    kind: LatticeKind = LatticeKind.VOLUME
+    kind: DataKind = DataKind.VOLUME
     lattice_shape: Vector3 = Field(default_factory=Vector3)
 
 
 class TimeFrameInfo(pydantic.BaseModel):
     id: int = -1
 
+@pydantic.dataclasses.dataclass
+class DescriptiveStatistics:
+    """Represents statistics that should be collected for some data set for
+    it to be representable in CIF.
+    """
+    mean: float = 0.0
+    std: float = 0.0
+    max: float = 0.0
+    min: float = 0.0
 
-class ChannelInfoV2(pydantic.BaseModel):
+class ChannelInfo(pydantic.BaseModel):
     id: int = -1
     statistics: DescriptiveStatistics = Field(default_factory=DescriptiveStatistics)
 
+class MeshInfo(pydantic.BaseModel):
+    id: int
 
 class DataSet:
-    def __init__(self, metadata: Optional[DataSetInfo] = None):
+    def __init__(self, store: zarr.storage.StoreLike, metadata: Optional[DataSetInfo] = None):
+        self.store = store
         if metadata:
             self._metadata_is_set = True
             self.metadata = metadata
@@ -44,6 +55,14 @@ class DataSet:
             self.metadata = DataSetInfo()
         self.time_frames = []
         self._last_time_frame_num = 0
+
+    @property
+    def zarr_path(self):
+        if self.metadata.kind.is_segmentation():
+            root = Path("segmentation_data")
+        else:
+            root = Path("volume_data")
+        return root / self.metadata.id / f"resolution_{self.metadata.resolution}"
 
     def __iter__(self):
         for frame in self.time_frames:
@@ -88,10 +107,24 @@ class TimeFrame:
     def __init__(self, parent: DataSet, id):
         self.parent = parent
         self.channels = []
+        self.meshes = []
         self.metadata = TimeFrameInfo(id=id)
 
-    def add_channel(self, data, id):
-        self.channels.append(Channel(self, data, id))
+    @property
+    def data_set(self):
+        return self.parent
+
+    @property
+    def zarr_path(self):
+        return self.data_set.zarr_path / f"time_frame_{self.metadata.id}"
+
+    def add_channel(self, id):
+        self.channels.append(Channel(self, id))
+        return self.channels[-1]
+
+    def add_mesh(self, id):
+        self.meshes.append(Mesh(self, id))
+        return self.meshes[-1]
 
     def __iter__(self):
         for channel in self.channels:
@@ -103,37 +136,73 @@ class TimeFrame:
     def __repr__(self):
         return self.__str__()
 
-
-class Channel:
-    def __init__(self, parent: TimeFrame, data: ArrayLike, id: int):
+class Mesh:
+    def __init__(self, parent: TimeFrame, id:int):
         self.parent = parent
-        self.metadata = ChannelInfoV2(id=id)
+        self.metadata = MeshInfo(id=id)
 
-        self._data = None
-        self.data = data
+    def set_data(self, mesh_data, backend):
+        self.handle = DataHandle(
+            self.data_set.store,
+            self.zarr_path,
+            self.data_set.metadata.kind
+        )
+        self.handle.store_data(mesh_data, backend)
 
     @property
-    def data(self) -> OpaqueDataHandle:
-        return self._data
+    def zarr_path(self):
+        return self.time_frame.zarr_path / f"mesh_{self.metadata.id}"
 
-    @data.setter
-    def data(self, data_array: ArrayLike):
-        if isinstance(data_array, OpaqueDataHandle):
-            self._data = data_array
-            return
+    @property
+    def data_set(self):
+        return self.parent.parent
 
-        self._data = WorkingStore.instance.store_lattice_time_frame(
-            StoringParameters(
-                storage_dtype=data_array.dtype,
-                resolution_level=self.parent.parent.metadata.resolution,
-                time_frame=self.parent.metadata.id,
-                channel=self.metadata.id,
-                lattice_kind=self.parent.parent.metadata.kind,
-            ),
-            data_array,
-            self.parent.parent.metadata.id,
+    @property
+    def time_frame(self):
+        return self.parent
+
+    def __str__(self):
+        return f"Mesh({self.metadata})"
+
+    def __repr__(self):
+        return self.__str__()
+
+class Channel:
+    def __init__(self, parent: TimeFrame, id: int):
+        self.parent = parent
+        self.metadata = ChannelInfo(id=id)
+        self._handle: Optional[DataHandle] = None
+
+    @property
+    def handle(self) -> DataHandle:
+        if self._handle == None:
+            raise RuntimeError("There are not data in the channel")
+        return self._handle
+
+    @handle.setter
+    def handle(self, new_handle):
+        self._handle = new_handle
+
+    def set_data(self, data, backend: ComputationBackend):
+        self.handle = DataHandle(
+            self.data_set.store,
+            self.zarr_path,
+            self.data_set.metadata.kind
         )
-        self.metadata.statistics = self._data.calculate_statistics()
+        self.handle.store_data(data, backend)
+        self.metadata.statistics = self.handle.calculate_statistics(backend)
+
+    @property
+    def zarr_path(self):
+        return self.time_frame.zarr_path / f"channel_{self.metadata.id}"
+
+    @property
+    def data_set(self):
+        return self.parent.parent
+
+    @property
+    def time_frame(self):
+        return self.parent
 
     def __str__(self):
         return f"Channel({self.metadata})"
