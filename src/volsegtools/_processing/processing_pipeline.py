@@ -168,7 +168,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         for path in paths:
             converter = self._segmentation_converter_map[path.suffix]
-            segmentations += await converter.convert_volume(path)
+            segmentations += await converter.convert_segmentation(path)
 
         return segmentations
 
@@ -233,6 +233,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
     async def serialize(self, data_set) -> List[Path]:
         if self._serializer is None:
+            vst_logger.warning("There is not any serializer")
             return []
 
         return await self._serializer.serialize(data_set, self._output_dir)
