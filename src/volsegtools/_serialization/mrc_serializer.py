@@ -10,6 +10,7 @@ class MRCSerializer(Serializer):
     @staticmethod
     async def serialize(data_set, output_path: Path) -> List[Path]:
         output_files = []
+
         for channel in data_set.flat_channel_iter():
             file_name = "{}_r{}_tf{}_ch{}.mrc".format(
                 data_set.metadata.id,

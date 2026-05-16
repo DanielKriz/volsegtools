@@ -18,7 +18,7 @@ from volsegtools._model import (
 vst_logger = logging.getLogger("volsegtools")
 
 
-class TiffConverter(Converter):
+class TIFFConverter(Converter):
     @property
     def supported_suffixes(self):
         return ["ome.tiff", "tiff", "tif", "ome.tif"]
@@ -36,7 +36,7 @@ class TiffConverter(Converter):
 
         axis_order_map = {}
         for idx, axis in enumerate(
-            filter(lambda x: x in ['X', 'Y', 'Z'], metadata["DimOrder BF Array"])
+            filter(lambda x: x in ["X", "Y", "Z"], metadata["DimOrder BF Array"])
         ):
             axis_order_map[idx] = axis
 
@@ -46,7 +46,7 @@ class TiffConverter(Converter):
             axis_order_map[2],
         )
 
-        target_order ="XYZ"
+        target_order = "XYZ"
         permutation = tuple(current_order.find(axis) for axis in target_order)
 
         data_set_info = DataSetInfo(
@@ -58,7 +58,7 @@ class TiffConverter(Converter):
                 metadata["PhysicalSizeY"] * 100,
                 metadata["PhysicalSizeZ"] * 100,
             ),
-            origin=Vector3(0,0,0),
+            origin=Vector3(0, 0, 0),
             id=input_path.stem,
             kind=DataKind.VOLUME,
             lattice_shape=Vector3(
@@ -84,10 +84,7 @@ class TiffConverter(Converter):
             channel = frame.add_channel(0)
             channel.set_data(transposed, DaskBackend)
 
-
         return [data_set]
-
-
 
     async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
         raise NotImplementedError()
