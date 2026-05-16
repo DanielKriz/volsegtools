@@ -7,8 +7,18 @@ import from the `volsegtools` namespace.
 
 from .bcif_serializer import BCIFSerializer
 from .mrc_serializer import MRCSerializer
+from .mesh_serializer import (
+    MeshSerializer,
+    OBJSerializer,
+    PLYSerializer,
+    STLSerializer,
+)
 
 __all__ = [
     "BCIFSerializer",
     "MRCSerializer",
+    "MeshSerializer",
+    "OBJSerializer",
+    "PLYSerializer",
+    "STLSerializer",
 ]

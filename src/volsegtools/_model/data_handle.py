@@ -1,4 +1,3 @@
-import numpy as np
 from pathlib import Path
 from typing import Union, Self, Any, Optional
 import zarr
@@ -9,12 +8,13 @@ from volsegtools._core.data_kind import DataKind
 from volsegtools._model.working_store import WorkingStore
 from volsegtools._model.computation_backend import ComputationBackend
 
+
 class DataHandle:
     def __init__(
-        self, 
+        self,
         store: zarr.storage.StoreLike,
-        zarr_path: Path, 
-        data_kind: DataKind, 
+        zarr_path: Path,
+        data_kind: DataKind,
     ):
         self.store = store
         self.zarr_path: Path = zarr_path
@@ -31,40 +31,19 @@ class DataHandle:
     @property
     def zarr_object(self) -> Union[zarr.Array, zarr.Group]:
         if self._zarr_object is None:
-            self._zarr_object = zarr.open_group(
-                self.store,
-                path=str(self.zarr_path)
-            )
+            self._zarr_object = zarr.open_group(self.store, path=str(self.zarr_path))
         return self._zarr_object
 
-    def store_data(self, data, backend, compressor = None):
+    def store_data(self, data, backend, compressor=None):
         group = WorkingStore.instance.root_group.require_group(str(self.zarr_path))
         if isinstance(data, trimesh.Trimesh):
             self.require_kind(DataKind.SEGMENTATION_MESH)
-
-            # We have to store components of the mesh separately, with this we
-            # are then able to reconstruct it.
-
-            group.require_array(
-                name="vertices",
-                data=data.vertices,
-                dtype=float, # from trimesh documentation
-            )
-            group.require_array(
-                name="faces",
-                data=data.faces,
-                dtype=np.int64, # from trimesh documentation
-            )
-            group.require_array(
-                name="normals",
-                data=data.face_normals,
-                dtype=np.float64, # from trimesh documentation
-            )
+            backend.store_to_zarr(data, group)
         else:
             self.require_kind(
                 DataKind.SEGMENTATION_MASK,
                 DataKind.SEGMENTATION_VOLUME,
-                DataKind.VOLUME
+                DataKind.VOLUME,
             )
             chunks = data.chunksize if hasattr(data, "chunksize") else "auto"
             arr = group.require_array(
@@ -89,15 +68,12 @@ class DataHandle:
 
     def get_lattice(self, backend: ComputationBackend) -> Any:
         self.require_kind(
-            DataKind.VOLUME, 
-            DataKind.SEGMENTATION_MASK, 
-            DataKind.SEGMENTATION_VOLUME
+            DataKind.VOLUME, DataKind.SEGMENTATION_MASK, DataKind.SEGMENTATION_VOLUME
         )
 
         return backend.load_from_zarr(self.zarr_object["data"])
 
-
-    def get_mesh(self) -> trimesh.Trimesh:
+    def get_mesh(self, backend) -> trimesh.Trimesh:
         self.require_kind(DataKind.SEGMENTATION_MESH)
 
         if not isinstance(self.zarr_object, zarr.Group):
@@ -106,28 +82,7 @@ class DataHandle:
         if not ("vertices" in self.zarr_object and "faces" in self.zarr_object):
             raise ValueError("Zarr group does not contain mesh data")
 
-        vertices = self.zarr_object["vertices"][:]
-        faces = self.zarr_object["faces"][:]
-
-        normals = None
-        if "normals" in self.zarr_object:
-            normals = self.zarr_object["normals"][:]
-
-        if not isinstance(vertices, zarr.Array):
-            raise TypeError("Vertices are not saved in an array")
-
-        if not isinstance(faces, zarr.Array):
-            raise TypeError("Faces are not saved in an array")
-
-        if normals is not None and not isinstance(normals, zarr.Array):
-            raise TypeError("Normals are not saved in an array")
-
-        return trimesh.Trimesh(
-            vertices=vertices,
-            faces=faces,
-            normals=normals,
-            process=False,
-        )
+        return backend.load_from_zarr(self.zarr_object)
 
     def calculate_statistics(self, backend):
         return backend.calculate_statistics(self.zarr_object["data"])
