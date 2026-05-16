@@ -23,6 +23,7 @@ from volsegtools.abc.serializer import Serializer
 
 vst_logger = logging.getLogger("volsegtools")
 
+
 def _flatten(list_of_lists: List[List]) -> List:
     # Source - https://stackoverflow.com/a/952952
     return [x for xs in list_of_lists for x in xs]
@@ -30,7 +31,7 @@ def _flatten(list_of_lists: List[List]) -> List:
 
 class ProcessingPipeline(vst.abc.ProcessingPipeline):
     state = {
-        "stage" : None,
+        "stage": None,
         "downsampling_status": 0.0,
     }
 
@@ -211,21 +212,19 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                         downsampled_data.shape[2],
                     )
                 resulting_data_sets[resolution].add_time_frame(frame)
-                channel = resulting_data_sets[resolution].time_frames[frame].add_channel(
-                    channel.metadata.id
+                channel = (
+                    resulting_data_sets[resolution]
+                    .time_frames[frame]
+                    .add_channel(channel.metadata.id)
                 )
                 # TODO: the backend should be store in the strategy...
                 channel.set_data(downsampled_data, DaskBackend)
-                Timer.push_event(msg.format(
-                    data_set.metadata.id,
-                    channel.metadata.id,
-                    resolution
-                ))
+                Timer.push_event(
+                    msg.format(data_set.metadata.id, channel.metadata.id, resolution)
+                )
         return list(resulting_data_sets.values())
 
-    async def apply_post_processing_steps(
-        self, data
-    ) -> List[DataSet]:
+    async def apply_post_processing_steps(self, data) -> List[DataSet]:
         processed_data = data
         for step in self._post_processing_steps:
             processed_data = await step.execute(processed_data)
