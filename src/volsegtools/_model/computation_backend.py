@@ -1,5 +1,7 @@
-import zarr
 from typing import Any, Protocol
+
+from volsegtools.typing import ZarrObject
+
 
 class ComputationBackend(Protocol):
     """Provides access to the computation behind arrays."""
@@ -15,7 +17,7 @@ class ComputationBackend(Protocol):
         ...
 
     @staticmethod
-    def load_from_zarr(zarr_array: zarr.Array) -> Any:
+    def load_from_zarr(zarr_object: ZarrObject) -> Any:
         """Returns the backend's compatible representation of zarr array.
 
         Parameters
@@ -53,9 +55,9 @@ class ComputationBackend(Protocol):
         ...
 
     @staticmethod
-    def store_to_zarr(array: Any, target_zarr: zarr.Array) -> None: 
+    def store_to_zarr(array: Any, target_zarr: ZarrObject) -> None:
         """Stores given data into target zarr array.
-        
+
         Parameters
         ----------
         array: Any
