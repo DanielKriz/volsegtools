@@ -6,6 +6,7 @@ import enum
 import rich
 import rich.console
 import rich.logging
+import itertools
 
 import typer
 from typing_extensions import Annotated
@@ -238,6 +239,10 @@ def run(
 ):
 
     # TODO: Add early check here, whether files exist
+    for file_path in itertools.chain(volume_source, segmentation_source):
+        if not file_path.exists():
+            vst_logger.error(f"The file: {file_path} does not exists")
+            raise typer.Exit()
 
     if list_strategies:
         for idx, strategy in enumerate(DownsamplignAlgorithmKind):
