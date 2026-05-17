@@ -60,10 +60,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         self._data = WorkingStore.instance
 
         self._serializer_map = {
-            DataKind.VOLUME : volume_serializer,
-            DataKind.SEGMENTATION_MASK : segmentation_mask_serializer,
-            DataKind.SEGMENTATION_VOLUME : segmentation_volume_serializer,
-            DataKind.SEGMENTATION_MESH : segmentation_mesh_serializer,
+            DataKind.VOLUME: volume_serializer,
+            DataKind.SEGMENTATION_MASK: segmentation_mask_serializer,
+            DataKind.SEGMENTATION_VOLUME: segmentation_volume_serializer,
+            DataKind.SEGMENTATION_MESH: segmentation_mesh_serializer,
         }
 
         self._work_dir = work_dir
@@ -235,10 +235,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
     async def serialize(self, data_set) -> List[Path]:
         kind = data_set.metadata.kind
-        return await self._serializer_map[kind].serialize(
-            data_set,
-            self._work_dir
-        )
+        return await self._serializer_map[kind].serialize(data_set, self._work_dir)
 
     async def bundle(self, files: List[Path]):
         return self._bundler.bundle(files, self._output_dir)
