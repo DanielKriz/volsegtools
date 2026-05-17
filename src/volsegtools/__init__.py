@@ -15,6 +15,7 @@ from ._converter import (
     MeshConverter,
     NGFFConverter,
     ImarisConverter,
+    NiiConverter,
 )
 from ._core import (
     DataKind,
@@ -100,6 +101,7 @@ __all__ = [
     "TIFFConverter",
     "MeshConverter",
     "NGFFConverter",
+    "NiiConverter",
     "MeshSerializer",
     "OBJSerializer",
     "PLYSerializer",
