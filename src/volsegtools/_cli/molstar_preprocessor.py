@@ -269,6 +269,7 @@ def run(
         .add_segmentation_converter(vst.NiiConverter())
         .add_segmentation_converter(vst.MRCConverter())
         .add_segmentation_converter(vst.SFFConverter())
+        .add_segmentation_converter(vst.VRMLConverter())
         .set_downsampling_strategy(get_downsampling_strategy(strategy))
         .set_serializer(DataKind.VOLUME, get_serializer(volume_serializer))
         .set_serializer(

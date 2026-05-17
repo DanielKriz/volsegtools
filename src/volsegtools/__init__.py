@@ -17,6 +17,7 @@ from ._converter import (
     ImarisConverter,
     NiiConverter,
     SFFConverter,
+    VRMLConverter,
 )
 from ._core import (
     DataKind,
@@ -109,6 +110,7 @@ __all__ = [
     "PLYSerializer",
     "STLSerializer",
     "ImarisConverter",
+    "VRMLConverter",
     "DataKind",
     "Vector3",
     "Bounds",
