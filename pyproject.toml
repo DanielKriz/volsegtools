@@ -32,6 +32,7 @@ dependencies = [
     "pyometiff>=1.0.1",
     "scikit-image>=0.24.0",
     "ome-zarr>=0.10.2",
+    "sfftk-rw>=0.8.1",
 ]
 
 [project.optional-dependencies]

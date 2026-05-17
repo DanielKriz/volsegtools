@@ -5,6 +5,7 @@ from .mesh_converter import MeshConverter
 from .ngff_converter import NGFFConverter
 from .ims_converter import ImarisConverter
 from .nii_converter import NiiConverter
+from .sff_converter import SFFConverter
 
 __all__ = [
     "ConverterMap",
@@ -14,4 +15,5 @@ __all__ = [
     "NGFFConverter",
     "ImarisConverter",
     "NiiConverter",
+    "SFFConverter",
 ]
