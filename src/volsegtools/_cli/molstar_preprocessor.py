@@ -140,7 +140,9 @@ def run(
     ] = 0,
     workdir: Annotated[
         Path,
-        typer.Option(help="Remove temporal Zarr store created during downsampling."),
+        typer.Option(
+            help="Path to a directory used for working",
+        ),
     ] = Path.cwd(),
     rm_tmp: Annotated[
         bool,
@@ -202,21 +204,21 @@ def run(
     volume_serializer: Annotated[
         SerializerKind,
         typer.Option(
-            help="Serializer for the segmentation meshes.",
+            help="Serializer for the volumes.",
             metavar="SERIALIZER",
         ),
     ] = SerializerKind.MRC,
     segmentation_volume_serializer: Annotated[
         SerializerKind,
         typer.Option(
-            help="Serializer for the segmentation meshes.",
+            help="Serializer for the segmentation volumes.",
             metavar="SERIALIZER",
         ),
     ] = SerializerKind.MRC,
     segmentation_mask_serializer: Annotated[
         SerializerKind,
         typer.Option(
-            help="Serializer for the segmentation meshes.",
+            help="Serializer for the segmentation masks.",
             metavar="SERIALIZER",
         ),
     ] = SerializerKind.MRC,

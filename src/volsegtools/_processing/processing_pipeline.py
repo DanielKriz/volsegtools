@@ -128,15 +128,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         vst_logger.info("Applying Post Processing Steps")
         Timer.push_stage("Post Processing")
         if self._post_processing_steps != []:
-            # downsampled_data = self.apply_post_processing_steps(downsampled_data)
             downsampled_data = await self.apply_post_processing_steps(downsampled_data)
-            # downsampled_data = await asyncio.gather(
-            #     *[
-            #         self.apply_post_processing_steps(handle)
-            #         for handle in downsampled_data
-            #     ]
-            # )
-            # downsampled_data = _flatten(downsampled_data)
         vst_logger.info("Applying Post Processing Steps - DONE")
 
         vst_logger.info("Serializing Volumes and Segmentations")
