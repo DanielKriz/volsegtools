@@ -3,6 +3,7 @@ from .mrc_converter import MRCConverter
 from .tiff_converter import TIFFConverter
 from .mesh_converter import MeshConverter
 from .ngff_converter import NGFFConverter
+from .ims_converter import ImarisConverter
 
 __all__ = [
     "ConverterMap",
@@ -10,4 +11,5 @@ __all__ = [
     "TIFFConverter",
     "MeshConverter",
     "NGFFConverter",
+    "ImarisConverter",
 ]

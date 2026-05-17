@@ -14,6 +14,7 @@ from ._converter import (
     TIFFConverter,
     MeshConverter,
     NGFFConverter,
+    ImarisConverter,
 )
 from ._core import (
     DataKind,
@@ -103,6 +104,7 @@ __all__ = [
     "OBJSerializer",
     "PLYSerializer",
     "STLSerializer",
+    "ImarisConverter",
     "DataKind",
     "Vector3",
     "Bounds",
