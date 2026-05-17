@@ -25,6 +25,10 @@ from ._core import (
     Timer,
     TimerReporter,
     JSONTimerReporter,
+    UnitKind,
+    unit_from_str,
+    to_angstrom,
+    to_micrometer,
 )
 from ._downsampler import (
     HierarchyDownsamplingStrategy,
@@ -108,6 +112,10 @@ __all__ = [
     "Timer",
     "TimerReporter",
     "JSONTimerReporter",
+    "UnitKind",
+    "unit_from_str",
+    "to_angstrom",
+    "to_micrometer",
     "HierarchyDownsamplingStrategy",
     "NullDownsamplingStrategy",
     "NearestNeighborDownsamplingStrategy",
