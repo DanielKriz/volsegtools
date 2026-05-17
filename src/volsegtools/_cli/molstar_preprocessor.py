@@ -7,6 +7,7 @@ import rich
 import rich.console
 import rich.logging
 import itertools
+import os
 
 import typer
 from typing_extensions import Annotated
@@ -142,8 +143,16 @@ def run(
         Path,
         typer.Option(
             help="Path to a directory used for working",
+            file_okay=False,
         ),
     ] = Path.cwd(),
+    output_path: Annotated[
+        Path,
+        typer.Option(
+            help="Path to store outputs.",
+            file_okay=False,
+        ),
+    ] = Path.cwd() / "volsegtools_workdir",
     rm_tmp: Annotated[
         bool,
         typer.Option(help="Remove temporal Zarr store created during downsampling."),
@@ -190,6 +199,8 @@ def run(
     strategy: Annotated[
         DownsamplignAlgorithmKind,
         typer.Option(
+            "--strategy",
+            "-s",
             help="Name of downsampling strategy",
             metavar="METHOD",
             case_sensitive=False,
@@ -251,6 +262,9 @@ def run(
             print(f"{idx}: {strategy}")
         raise typer.Exit()
 
+    if not output_path.exists():
+        os.makedirs(output_path, exist_ok=True)
+
     console = rich.console.Console()
 
     vst.logger.addHandler(rich.logging.RichHandler(console=console, show_time=False))
@@ -283,7 +297,7 @@ def run(
         .set_serializer(
             DataKind.SEGMENTATION_MESH, get_serializer(segmentation_mesh_serializer)
         )
-        .set_output_dir(local_store_path)
+        .set_output_dir(output_path)
         .set_work_dir(local_store_path)
     )
 
