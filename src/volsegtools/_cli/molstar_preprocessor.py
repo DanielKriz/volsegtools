@@ -259,6 +259,7 @@ def run(
     (
         builder.add_volume_converter(map_converter)
         .add_volume_converter(vst.TIFFConverter())
+        .add_volume_converter(vst.NGFFConverter())
         .add_segmentation_converter(vst.MeshConverter())
         .add_segmentation_converter(map_converter)
         .set_downsampling_strategy(get_downsampling_strategy(strategy))

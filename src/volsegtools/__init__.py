@@ -13,6 +13,7 @@ from ._converter import (
     MRCConverter,
     TIFFConverter,
     MeshConverter,
+    NGFFConverter,
 )
 from ._core import (
     DataKind,
@@ -93,6 +94,7 @@ __all__ = [
     "MRCConverter",
     "TIFFConverter",
     "MeshConverter",
+    "NGFFConverter",
     "MeshSerializer",
     "OBJSerializer",
     "PLYSerializer",
