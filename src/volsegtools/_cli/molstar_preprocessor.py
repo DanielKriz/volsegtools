@@ -289,7 +289,7 @@ def run(
             ...
         case BundlingKind.ZIP:
             ...
-    vst_logger.info(f"Setting bundler to: {bundling_approach}")
+    vst_logger.info(f"Setting bundler to: '{bundling_approach}'")
 
     if strategy == DownsamplignAlgorithmKind.TRIQUINTIC:
         builder.add_post_process_step(vst.SmoothingStep())
