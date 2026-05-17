@@ -7,6 +7,8 @@ internal (private) modules.
 
 from ._bundling import (
     MVSXBundler,
+    ResolutionZipBundler,
+    ZipBundler,
 )
 from ._converter import (
     ConverterMap,
@@ -98,6 +100,8 @@ logger = logging.getLogger(__name__)
 __all__ = [
     # From subpackages
     "MVSXBundler",
+    "ResolutionZipBundler",
+    "ZipBundler",
     "ConverterMap",
     "MRCConverter",
     "TIFFConverter",

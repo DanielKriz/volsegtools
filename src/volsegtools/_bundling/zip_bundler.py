@@ -1,15 +1,24 @@
 from typing import List
 from pathlib import Path
 import zipfile
+import logging
 
 from volsegtools.abc.bundler import Bundler
+from volsegtools._model.data_set import info_from_file_path
+
+vst_logger = logging.getLogger("volsegtools")
 
 
 class ZipBundler(Bundler):
-    def bundle(self, data: List[Path], output_path: Path) -> List[Path]:
-        zip_file = output_path / "vst_output.zip"
-        with zipfile.ZipFile(zip_file, "w") as zip:
-            for path in data:
-                zip.write(path)
+    def bundle(self, data_paths: List[Path], output_path: Path) -> List[Path]:
+        parsed_paths = [info_from_file_path(x) for x in data_paths]
 
-        return [zip_file]
+        archive_path = output_path / "vst_output.zip"
+        with zipfile.ZipFile(archive_path, "w") as zip:
+            for file_info in parsed_paths:
+                vst_logger.info(f"... Adding {file_info.file_path.name}")
+                zip.write(file_info.file_path, file_info.file_path.name)
+
+        vst_logger.info(f"Created ZIP archive at: {archive_path}")
+
+        return [archive_path]

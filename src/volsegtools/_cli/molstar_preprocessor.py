@@ -289,9 +289,10 @@ def run(
         case BundlingKind.MVXS:
             builder.set_bundler(vst.MVSXBundler())
         case BundlingKind.RESOLUTION_ZIP:
-            ...
+            builder.set_bundler(vst.ResolutionZipBundler())
         case BundlingKind.ZIP:
-            ...
+            builder.set_bundler(vst.ZipBundler())
+
     vst_logger.info(f"Setting bundler to: '{bundling_approach}'")
 
     if strategy == DownsamplignAlgorithmKind.TRIQUINTIC:
