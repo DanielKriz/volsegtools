@@ -33,6 +33,7 @@ X11_COLOR_NAMES = [
     "brown",
 ]
 
+
 class MVSXBundler(Bundler):
     """Bundler for the MVSX format."""
 
@@ -55,18 +56,25 @@ class MVSXBundler(Bundler):
 
             for idx, info in enumerate(data_per_resolution[resolution]):
                 vst_logger.info(f"... Adding {info.file_path.name}")
+
+                match info.suffix:
+                    case "mrc":
+                        format = "map"
+                    case "bcif":
+                        format = "bcif"
+                    case _:
+                        raise RuntimeError("Unsuported volume format")
+
                 volume = (
                     builder.download(url=str(info.file_path))
-                    .parse(format="map")
+                    .parse(format=format)
                     .volume()
                 )
                 volume.representation(
                     type="isosurface", relative_isovalue=2, show_wireframe=False
                 ).color(color=X11_COLOR_NAMES[idx % len(X11_COLOR_NAMES)])
 
-            archive_path = output_path / Path(
-                f"{data_set_id}_r{resolution}.mvsx"
-            )
+            archive_path = output_path / Path(f"{data_set_id}_r{resolution}.mvsx")
 
             # At the moment we have to create a temporary file to use the mvs
             # API for creation of MVSX
