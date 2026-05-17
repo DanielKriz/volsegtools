@@ -281,11 +281,13 @@ def run(
         .add_volume_converter(vst.TIFFConverter())
         .add_volume_converter(vst.NGFFConverter())
         .add_volume_converter(vst.ImarisConverter())
+        .add_volume_converter(vst.CIFConverter())
         .add_segmentation_converter(vst.MeshConverter())
         .add_segmentation_converter(vst.NiiConverter())
         .add_segmentation_converter(vst.MRCConverter())
         .add_segmentation_converter(vst.SFFConverter())
         .add_segmentation_converter(vst.VRMLConverter())
+        .add_segmentation_converter(vst.CIFConverter())
         .set_downsampling_strategy(get_downsampling_strategy(strategy))
         .set_serializer(DataKind.VOLUME, get_serializer(volume_serializer))
         .set_serializer(

@@ -7,6 +7,7 @@ from .ims_converter import ImarisConverter
 from .nii_converter import NiiConverter
 from .sff_converter import SFFConverter
 from .vrml_converter import VRMLConverter
+from .cif_converter import CIFConverter
 
 __all__ = [
     "ConverterMap",
@@ -18,4 +19,5 @@ __all__ = [
     "NiiConverter",
     "SFFConverter",
     "VRMLConverter",
+    "CIFConverter",
 ]

@@ -20,6 +20,7 @@ from ._converter import (
     NiiConverter,
     SFFConverter,
     VRMLConverter,
+    CIFConverter,
 )
 from ._core import (
     DataKind,
@@ -109,6 +110,7 @@ __all__ = [
     "NGFFConverter",
     "NiiConverter",
     "SFFConverter",
+    "CIFConverter",
     "MeshSerializer",
     "OBJSerializer",
     "PLYSerializer",
