@@ -11,6 +11,7 @@ from .bounds import Bounds
 from .gaussian_kernel_3D import Gaussian3DKernel
 from .downsampling_parameters import DownsamplingParameters, to_bytes
 from .timer import Timer, TimerReporter, JSONTimerReporter
+from .unit_kind import UnitKind, unit_from_str, to_micrometer, to_angstrom
 
 __all__ = [
     "DataKind",
@@ -22,4 +23,8 @@ __all__ = [
     "Timer",
     "TimerReporter",
     "JSONTimerReporter",
+    "UnitKind",
+    "unit_from_str",
+    "to_micrometer",
+    "to_angstrom",
 ]
