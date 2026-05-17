@@ -259,16 +259,15 @@ def run(
     if overwrite_tmp and local_store_path.exists():
         shutil.rmtree(local_store_path)
 
-    map_converter = vst.MRCConverter()
     builder = vst.create_builder()
     (
-        builder.add_volume_converter(map_converter)
+        builder.add_volume_converter(vst.MRCConverter())
         .add_volume_converter(vst.TIFFConverter())
         .add_volume_converter(vst.NGFFConverter())
         .add_volume_converter(vst.ImarisConverter())
         .add_segmentation_converter(vst.MeshConverter())
-        .add_segmentation_converter(map_converter)
         .add_segmentation_converter(vst.NiiConverter())
+        .add_segmentation_converter(vst.MRCConverter())
         .set_downsampling_strategy(get_downsampling_strategy(strategy))
         .set_serializer(DataKind.VOLUME, get_serializer(volume_serializer))
         .set_serializer(
