@@ -237,7 +237,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         kind = data_set.metadata.kind
         return await self._serializer_map[kind].serialize(
             data_set,
-            self._output_dir
+            self._work_dir
         )
 
     async def bundle(self, files: List[Path]):
