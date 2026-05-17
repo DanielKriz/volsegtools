@@ -6,6 +6,7 @@ from .ngff_converter import NGFFConverter
 from .ims_converter import ImarisConverter
 from .nii_converter import NiiConverter
 from .sff_converter import SFFConverter
+from .vrml_converter import VRMLConverter
 
 __all__ = [
     "ConverterMap",
@@ -16,4 +17,5 @@ __all__ = [
     "ImarisConverter",
     "NiiConverter",
     "SFFConverter",
+    "VRMLConverter",
 ]
