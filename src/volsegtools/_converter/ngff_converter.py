@@ -1,0 +1,85 @@
+import ome_zarr.reader
+import ome_zarr.io
+
+from typing import List
+from pathlib import Path
+
+from volsegtools._model.dask_backend import DaskBackend
+from volsegtools.abc import Converter
+from volsegtools._core import DataKind, Vector3
+from volsegtools._model.working_store import WorkingStore
+from volsegtools._model import DataSet, DataSetInfo
+
+
+class NGFFConverter(Converter):
+    @property
+    def supported_suffixes(self):
+        return ["zarr"]
+
+    def is_suffix_supported(self, suffix: str):
+        return suffix in self.supported_suffixes
+
+    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+        nodes = ome_zarr.reader.Reader(ome_zarr.io.ZarrLocation(input_path))()
+        data_node = next(nodes)
+        metadata = data_node.metadata
+        data_arr = data_node.data[0]
+
+        axis_order = {}
+        current_order = ""
+        for idx, ax in enumerate(metadata["axes"]):
+            axis_order[ax["name"]] = idx
+            if ax["name"] not in ["X", "Y", "Z"]:
+                continue
+            current_order += ax["name"]
+
+        # TODO: this is second time using this, it should be move to upper
+        # module.
+        reordering = tuple(current_order.find(ax) for ax in "XYZ")
+
+        # The 0 is for the 0th resolution
+        voxel_size_info = metadata["coordinateTransformations"][0][0]["scale"]
+
+        info = DataSetInfo(
+            filename=input_path.name,
+            resolution=0,
+            axis_order=Vector3(0, 1, 2),
+            voxel_size=Vector3(
+                100 * voxel_size_info[axis_order["x"]],
+                100 * voxel_size_info[axis_order["y"]],
+                100 * voxel_size_info[axis_order["z"]],
+            ),
+            id=input_path.name,
+            kind=DataKind.VOLUME,
+            lattice_shape=Vector3(
+                data_arr.shape[axis_order["x"]],
+                data_arr.shape[axis_order["y"]],
+                data_arr.shape[axis_order["z"]],
+            ),
+        )
+        data_set = DataSet(WorkingStore.instance.data_store, info)
+
+        # If we have time frames then we have to iterate over them
+        if data_arr.ndim > 4:
+            time_frames = data_arr
+        else:
+            time_frames = [data_arr]
+
+        for frame_data in time_frames:
+            for idx, channel_data in enumerate(frame_data):
+                transposed = channel_data.transpose(reordering)
+                frame = data_set.add_time_frame()
+                channel = frame.add_channel(idx)
+                transposed = transposed.rechunk("auto")
+                channel.set_data(transposed, DaskBackend)
+
+        return [data_set]
+
+    async def collect_annotations(self, input_path) -> None:
+        raise NotImplementedError
+
+    async def collect_metadata(self, input_path) -> None:
+        raise NotImplementedError
+
+    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
+        raise await self.convert_volume(input_path)

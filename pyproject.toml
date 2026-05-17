@@ -31,6 +31,7 @@ dependencies = [
     "isort>=6.1.0",
     "pyometiff>=1.0.1",
     "scikit-image>=0.24.0",
+    "ome-zarr>=0.10.2",
 ]
 
 [project.optional-dependencies]
