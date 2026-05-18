@@ -1,6 +1,6 @@
 import collections
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from typing_extensions import Self
 
@@ -91,7 +91,8 @@ class ProcessingPipelineBuilder:
         preprocessor. Also, the output of the preprocessor is going to be
         saved at this location.
         """
-        # FIXME: this shouldn't be necessary
+        # NOTE: Currently a work-around should be removed together with
+        # working store.
         WorkingStore(file_path)
         self._work_dir = file_path
         return self

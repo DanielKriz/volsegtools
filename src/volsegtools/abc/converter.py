@@ -46,7 +46,7 @@ class Converter(abc.ABC):
             Reference to the internal representation of the output. It is
             going to be changed by this method.
         """
-        pass
+        ...
 
     @abc.abstractmethod
     async def collect_annotations(self, input_path) -> Any:
@@ -60,4 +60,4 @@ class Converter(abc.ABC):
             Reference to the internal representation of the output. It is
             going to be changed by this method.
         """
-        pass
+        ...

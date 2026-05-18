@@ -251,7 +251,6 @@ def run(
     ] = BundlingKind.NULL,
 ):
 
-    # TODO: Add early check here, whether files exist
     for file_path in itertools.chain(volume_source, segmentation_source):
         if not file_path.exists():
             vst_logger.error(f"The file: {file_path} does not exists")
@@ -355,7 +354,6 @@ def run(
     if show_time:
         vst.Timer.print_report(vst.TimerReporter())
     if time_report_path:
-        # TODO: this has to be more sophisticated
         vst.Timer.print_report(
             vst.JSONTimerReporter(
                 output_path=time_report_path,

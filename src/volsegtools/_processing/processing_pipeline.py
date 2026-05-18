@@ -191,7 +191,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
     async def downsample(self, data_set: DataSet) -> List[DataSet]:
         resulting_data_sets: dict[int, DataSet] = {}
 
-        # TODO: add check if we should include the original resolution
         if True:
             resulting_data_sets[0] = data_set
 
@@ -220,7 +219,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                     .time_frames[frame]
                     .add_channel(channel.metadata.id)
                 )
-                # TODO: the backend should be store in the strategy...
                 channel.set_data(downsampled_data, DaskBackend)
                 Timer.push_event(
                     msg.format(data_set.metadata.id, channel.metadata.id, resolution)

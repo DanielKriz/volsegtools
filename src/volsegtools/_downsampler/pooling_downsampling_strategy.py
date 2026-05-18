@@ -8,12 +8,14 @@ from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
 
+
 class PoolingDownsamplingStrategy(DownsamplingStrategy):
     DEFAULT_BLOCK_SIZE = 2
     DEFAULT_PADDING_MODE = "reflect"
+
     def __init__(
         self,
-        operation, 
+        operation,
         block_size: int = DEFAULT_BLOCK_SIZE,
         padding_mode: str = DEFAULT_PADDING_MODE,
     ):
@@ -44,16 +46,10 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
             2: self.block_size,
         }
 
-        i = 0
         resolution = 1
         while data.nbytes > super().MIN_SIZE_THRESHOLD:
-            if i == 2:
-                break
             log_msg = "... downsampling '{}' for resolution number {}"
-            vst_logger.info(log_msg.format(
-                channel.data_set.metadata.id,
-                resolution
-            ))
+            vst_logger.info(log_msg.format(channel.data_set.metadata.id, resolution))
 
             paddings = []
             for dim in data.shape:
@@ -67,7 +63,6 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
             data = data.rechunk("auto")
             resolution += 1
             yield data
-            i += 1
 
 
 class AveragePoolingStrategy(PoolingDownsamplingStrategy):

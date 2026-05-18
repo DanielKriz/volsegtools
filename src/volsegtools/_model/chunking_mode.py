@@ -2,14 +2,7 @@ import enum
 
 
 class ChunkingMode(enum.Enum):
-    """Chunking mode enumeration.
-
-    Attributes
-    ----------
-    AUTO
-        sdasda
-
-    """
+    """Chunking mode enumeration."""
 
     AUTO = 1
     NONE = 2
