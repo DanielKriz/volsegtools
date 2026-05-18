@@ -9,7 +9,6 @@ If you cannot, or don't want to use the [PyPi Package](https://pypi.org/project/
 ```
     git clone https://github.com/DanielKriz/volseg-tools
     cd volseg-tools
-    uv init
     uv venv
     source .venv/bin/activate
     uv pip install .
@@ -26,6 +25,33 @@ you can run:
 ```
 molstar-preprocessor --help
 ```
+
+If you wish to be more informed about the processing you might add `--verbose`
+option.
+
+
+Given that we have downloaded some volumetric data, e.g.
+[EMD-53130](https://www.ebi.ac.uk/emdb/EMD-53130), we can start the processing
+with some downsampling method:
+
+```
+molstar-preprocessor --vs EMD-53130.map --strategy tricubic --bundle mvsx --output-path out
+```
+
+This is going to create downsampled version of the provided dataset in directory
+`out/` in the MVSX archive.
+
+After this step it is possible to drop this archive into, e.g. [Mol*
+Viewer](https://molstar.org/viewer/) for visualization.
+
+To get the list of supported downsampling method you can run
+`--list-strategies`.
+
+Current implementation is sensitive to the contents of the working directory.
+You might want to run `--overwrite-tmp` to ignore the data already stored in the
+working directory and run the processing again (effectively overwriting the
+contents of the working directory).
+
 ## Support
 
 ### Input Formats
