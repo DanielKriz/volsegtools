@@ -299,8 +299,13 @@ def run(
             DataKind.SEGMENTATION_MESH, get_serializer(segmentation_mesh_serializer)
         )
         .set_output_dir(output_path)
-        .set_work_dir(local_store_path)
     )
+
+    try:
+        builder.set_work_dir(local_store_path)
+    except RuntimeError as err:
+        print("Error:", err)
+        raise typer.Exit()
 
     match bundling_approach:
         case BundlingKind.MVXS:

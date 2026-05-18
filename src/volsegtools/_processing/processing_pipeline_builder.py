@@ -1,6 +1,7 @@
 import collections
 from pathlib import Path
 from typing import List
+import zarr.errors
 
 from typing_extensions import Self
 
@@ -93,7 +94,13 @@ class ProcessingPipelineBuilder:
         """
         # NOTE: Currently a work-around should be removed together with
         # working store.
-        WorkingStore(file_path)
+        try:
+            WorkingStore(file_path)
+        except zarr.errors.ContainsGroupError:
+            print("Working store already data from previous processing")
+            print("You might want to add '--overwrite-tmp' to overwrite them")
+            raise RuntimeError("Working store already initialized")
+
         self._work_dir = file_path
         return self
 
