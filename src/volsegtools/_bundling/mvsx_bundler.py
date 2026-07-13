@@ -20,7 +20,7 @@ X11_COLOR_NAMES = [
     "green",
     "wheat",
     "orange",
-    "pale green",
+    "palegreen",
     "violet",
     "sienna",
     "olive",
