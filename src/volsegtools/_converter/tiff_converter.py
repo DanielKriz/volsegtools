@@ -23,6 +23,10 @@ class TIFFConverter(Converter):
     def supported_suffixes(self):
         return ["ome.tiff", "tiff", "tif", "ome.tif"]
 
+    @property
+    def supports_compression(self) -> bool:
+        return False
+
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 

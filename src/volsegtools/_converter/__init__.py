@@ -1,4 +1,4 @@
-from .converter_map import ConverterMap
+from .converter_map import ConverterMap, UnsupportedCompressionError
 from .mrc_converter import MRCConverter
 from .tiff_converter import TIFFConverter
 from .mesh_converter import MeshConverter
@@ -11,6 +11,7 @@ from .cif_converter import CIFConverter
 
 __all__ = [
     "ConverterMap",
+    "UnsupportedCompressionError",
     "MRCConverter",
     "TIFFConverter",
     "MeshConverter",

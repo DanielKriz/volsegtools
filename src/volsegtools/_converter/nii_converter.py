@@ -20,6 +20,10 @@ class NiiConverter(Converter):
         # https://github.com/nipy/nibabel/tree/master/nibabel/tests/data
         return ["mnc", "nii", "PAR", "rst", "dcm", "HEAD", "tck", "trk"]
 
+    @property
+    def supports_compression(self) -> bool:
+        return False
+
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 

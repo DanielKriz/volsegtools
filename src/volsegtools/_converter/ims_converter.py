@@ -97,6 +97,10 @@ class ImarisConverter(Converter):
     def supported_suffixes(self):
         return ["ims"]
 
+    @property
+    def supports_compression(self) -> bool:
+        return False
+
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 

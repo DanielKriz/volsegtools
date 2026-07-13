@@ -155,7 +155,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             raise RuntimeError("There are no valid volume conveters!")
 
         for path in paths:
-            converter = self._volume_converter_map[path.suffix]
+            converter = self._volume_converter_map["".join(path.suffixes)]
             volumes += await converter.convert_volume(path)
             Timer.push_event(f"Finished converting {path}")
 
@@ -171,7 +171,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             raise RuntimeError("There are no valid volume conveters!")
 
         for path in paths:
-            converter = self._segmentation_converter_map[path.suffix]
+            converter = self._segmentation_converter_map["".join(path.suffixes)]
             segmentations += await converter.convert_segmentation(path)
 
         return segmentations

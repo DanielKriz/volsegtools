@@ -12,6 +12,7 @@ from ._bundling import (
 )
 from ._converter import (
     ConverterMap,
+    UnsupportedCompressionError,
     MRCConverter,
     TIFFConverter,
     MeshConverter,
@@ -104,6 +105,7 @@ __all__ = [
     "ResolutionZipBundler",
     "ZipBundler",
     "ConverterMap",
+    "UnsupportedCompressionError",
     "MRCConverter",
     "TIFFConverter",
     "MeshConverter",

@@ -27,12 +27,16 @@ class MRCConverter(Converter):
     def supported_suffixes(self):
         return ["mrc", "map", "cpp4"]
 
+    @property
+    def supports_compression(self) -> bool:
+        return True
+
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
     async def convert_volume(self, input_path: Path) -> List[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
-        with mrcfile.mmap(input_path, "r+") as mrc:
+        with mrcfile.open(input_path, "r+") as mrc:
             if mrc.data is None or mrc.header is None:
                 raise RuntimeError("Failed to read data from MAP file")
 
@@ -95,13 +99,16 @@ class MRCConverter(Converter):
             float(start.z * original_voxel_size.z),
         )
 
+        # We have to completely remove the suffixes to get the id.
+        filename = Path(str(file).strip("".join(file.suffixes))).stem
+
         return DataSetInfo(
-            filename=file.stem,
+            filename=str(file),
             resolution=0,
             axis_order=Vector3(0, 1, 2),  # data should have normalized order
             voxel_size=original_voxel_size,
             origin=origin,
-            id=file.stem,
+            id=filename,
             kind=kind,
             lattice_shape=lattice_shape,
         )
