@@ -1,6 +1,7 @@
 import logging
 import shutil
 from pathlib import Path
+import sys
 from typing import List
 import enum
 import rich
@@ -109,6 +110,11 @@ def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
 class CommandGroup(enum.StrEnum):
     DEFAULT = "Default"
     BENCHMARK_AND_DEBUG = "Benchmarking & Debugging"
+
+
+def report_error(msg):
+    vst_logger.error(msg)
+    print(f"Error: {msg}", file=sys.stderr)
 
 
 @app.command()
@@ -352,6 +358,8 @@ def run(
             )
 
             vst.Timer.pop_stage()
+        except vst.UnsupportedCompressionError as err:
+            report_error(str(err))
         finally:
             if rm_tmp and local_store_path.exists():
                 shutil.rmtree(local_store_path)
