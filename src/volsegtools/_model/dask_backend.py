@@ -29,6 +29,7 @@ class DaskBackend(ComputationBackend):
 
     @staticmethod
     def calculate_statistics(array: da.Array) -> DescriptiveStatistics:
+        array = da.from_zarr(array)
         stats = da.compute(
             da.mean(array),
             da.std(array),
