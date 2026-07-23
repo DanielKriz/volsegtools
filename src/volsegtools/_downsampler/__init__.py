@@ -30,6 +30,9 @@ from .continuous_interpolation import (
     TricubicInterpolation,
     TriquinticInterpolation,
 )
+from .wavelet_transform import (
+    WaveletTransform
+)
 
 __all__ = [
     "HierarchyDownsamplingStrategy",
@@ -45,4 +48,5 @@ __all__ = [
     "TrilinearInterpolation",
     "TricubicInterpolation",
     "TriquinticInterpolation",
+    "WaveletTransform",
 ]

@@ -52,6 +52,7 @@ from ._downsampler import (
     TrilinearInterpolation,
     TricubicInterpolation,
     TriquinticInterpolation,
+    WaveletTransform,
 )
 from ._model import (
     ChunkingMode,
@@ -145,6 +146,7 @@ __all__ = [
     "TrilinearInterpolation",
     "TricubicInterpolation",
     "TriquinticInterpolation",
+    "WaveletTransform",
     "ChunkingMode",
     "StoringParameters",
     "ComputationBackend",
