@@ -66,7 +66,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             DataKind.SEGMENTATION_MESH: segmentation_mesh_serializer,
         }
 
-        self._work_dir = work_dir
+        if work_dir is None:
+            self._work_dir = ProcessingPipeline.DEFAULT_WORK_DIR
+        else:
+            self._work_dir = work_dir
 
         self._post_processing_steps = post_processing_steps
         self._post_conversion_steps = post_conversion_steps
@@ -233,10 +236,15 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
     async def serialize(self, data_set) -> List[Path]:
         kind = data_set.metadata.kind
-        return await self._serializer_map[kind].serialize(data_set, self._work_dir)
 
+        serializer = self._serializer_map[kind]
+        if serializer is None:
+            raise RuntimeError(f"Could not find serializer for '{kind}'")
+
+        return await serializer.serialize(data_set, self._work_dir)
     async def bundle(self, files: List[Path]):
-        return self._bundler.bundle(files, self._output_dir)
+        if self._bundler is None:
+            raise RuntimeError("Cannot bundle without any bundler!")
 
     async def get_progress(self):
         pass
