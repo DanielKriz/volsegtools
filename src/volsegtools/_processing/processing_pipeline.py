@@ -111,10 +111,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 Timer.push_stage(str(kind))
                 self._state.current_stage = PipelineStageKind(kind)
 
-                result = func(self, *args, **kwargs)
-
                 for cb in self._callbacks:
                     cb(self._state)
+
+                result = func(self, *args, **kwargs)
                 return result
 
             return wrapper
