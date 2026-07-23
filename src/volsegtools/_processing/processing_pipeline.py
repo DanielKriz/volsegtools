@@ -245,6 +245,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
     async def bundle(self, files: List[Path]):
         if self._bundler is None:
             raise RuntimeError("Cannot bundle without any bundler!")
+        return self._bundler.bundle(files, self._output_dir)
 
     async def get_progress(self):
         pass
