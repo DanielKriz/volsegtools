@@ -31,10 +31,6 @@ def _flatten(list_of_lists: List[List]) -> List:
 
 
 class ProcessingPipeline(vst.abc.ProcessingPipeline):
-    state = {
-        "stage": None,
-        "downsampling_status": 0.0,
-    }
 
     def __init__(
         self,
@@ -228,8 +224,8 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 )
         return list(resulting_data_sets.values())
 
-    async def apply_post_processing_steps(self, data) -> List[DataSet]:
-        processed_data = data
+    async def apply_post_processing_steps(self, data_set) -> List[DataSet]:
+        processed_data = data_set
         for step in self._post_processing_steps:
             processed_data = await step.execute(processed_data)
         return processed_data
@@ -247,5 +243,3 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             raise RuntimeError("Cannot bundle without any bundler!")
         return self._bundler.bundle(files, self._output_dir)
 
-    async def get_progress(self):
-        pass

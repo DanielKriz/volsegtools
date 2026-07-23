@@ -2,8 +2,6 @@ import abc
 from typing import Any, List, Sequence
 from pathlib import Path
 
-from volsegtools.abc import DataHandle
-
 
 class ProcessingPipeline(abc.ABC):
     """Processes given data set."""
@@ -48,19 +46,14 @@ class ProcessingPipeline(abc.ABC):
         ...
 
     @abc.abstractmethod
-    async def downsample(self, data_handle: Any) -> List[Any]:
+    async def downsample(self, data_set: Any) -> List[Any]:
         """Downsamples given data."""
         ...
 
     @abc.abstractmethod
-    async def get_progress(self):
-        """Provides information about current progress of the pipeline."""
-        ...
-
-    @abc.abstractmethod
     async def apply_post_processing_steps(
-        self, data_handle: DataHandle
-    ) -> Sequence[DataHandle]:
+        self, data_set: Any,
+    ) -> Sequence[Any]:
         """Applies post processing steps on the downsampled data.
 
         Some downsampling methods are known to produce some artifacts that can
