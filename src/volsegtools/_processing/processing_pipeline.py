@@ -121,6 +121,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         return inner
 
+    @property
+    def state(self):
+        return self._state
+
     def add_state_change_callback(self, cb):
         self._callbacks.append(cb)
 
