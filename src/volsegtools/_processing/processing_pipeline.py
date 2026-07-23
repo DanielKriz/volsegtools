@@ -1,8 +1,11 @@
 import asyncio
+import enum
 from pathlib import Path
 from typing import List, Optional
 import itertools
 import logging
+import pydantic
+
 
 import volsegtools as vst
 from volsegtools._converter.converter_map import ConverterMap
@@ -30,7 +33,28 @@ def _flatten(list_of_lists: List[List]) -> List:
     return [x for xs in list_of_lists for x in xs]
 
 
+class PipelineStageKind(enum.StrEnum):
+    NOT_STARTED = "Not Started"
+    CONVERTING_VOLUMES = "Volume Conversion"
+    CONVERTING_SEGMENTATIONS = "Segmentation Conversion"
+    COLLECTING_METADATA = "Metadata Collection"
+    COLLECTING_ANNOTATIONS = "Annotation Collection"
+    POST_CONVERT = "Post-Conversion Steps"
+    DOWNSAMPLING = "Downsampling"
+    POST_PROCESS = "Post-Processing Steps"
+    SERIALIZATION = "Serialization"
+    BUNDLING = "Bundling"
+    FINISHED = "Finished"
+    CUSTOM = enum.auto()
+
+
+class PipelineState(pydantic.BaseModel):
+    current_stage: PipelineStageKind
+    msg: Optional[str]
+
+
 class ProcessingPipeline(vst.abc.ProcessingPipeline):
+    DEFAULT_WORK_DIR = Path(".vst_work_dir")
 
     def __init__(
         self,
@@ -71,6 +95,42 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         self._post_conversion_steps = post_conversion_steps
         self._bundler = bundler
 
+        self._callbacks = []
+
+        self._state = PipelineState(
+            current_stage=PipelineStageKind.NOT_STARTED,
+            msg="The pipeline has not yet started",
+        )
+
+    @staticmethod
+    def pipeline_stage(kind: PipelineStageKind | str):
+        def inner(func):
+            def wrapper(self, *args, **kwargs):
+                vst_logger.info(kind)
+                Timer.push_stage(str(kind))
+                self._state.current_stage = PipelineStageKind(kind)
+
+                result = func(self, *args, **kwargs)
+
+                for cb in self._callbacks:
+                    cb(self._state)
+                return result
+
+            return wrapper
+
+        return inner
+
+    def add_state_change_callback(self, cb):
+        self._callbacks.append(cb)
+
+    @property
+    def started(self):
+        return self._state.current_stage != PipelineStageKind.NOT_STARTED
+
+    @property
+    def done(self):
+        return self._state.current_stage == PipelineStageKind.FINISHED
+
     def sync_process(
         self,
         volumes: List[Path] = [],
@@ -87,22 +147,11 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         metadata: List[Path] = [],
         annotations: List[Path] = [],
     ) -> List[Path]:
-        vst_logger.info("Converting Volumes")
-        Timer.push_stage("Volume Conversion")
         converted_volumes = await self.convert_volumes(volumes)
-
-        vst_logger.info("Converting Segmentations")
-        Timer.push_stage("Segmentation Conversion")
         converted_segmentations = await self.convert_segmentations(segmentations)
-
-        Timer.push_stage("Metadata Collection")
         collected_metadata = await self.collect_metadata(metadata)
-
-        Timer.push_stage("Annotation Collection")
         collected_annotations = await self.collect_annotation(annotations)
 
-        vst_logger.info("Applying post conversion steps")
-        Timer.push_stage("Post Conversion Steps")
         if self._post_conversion_steps != []:
             await self.apply_post_conversion_steps(
                 converted_volumes,
@@ -111,8 +160,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 collected_annotations,
             )
 
-        vst_logger.info("Downsampling Volumes and Segmentations")
-        Timer.push_stage("Downsampling")
         downsampled_data = await asyncio.gather(
             *[
                 self.downsample(handle)
@@ -122,28 +169,21 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             ]
         )
         downsampled_data = _flatten(downsampled_data)
-        vst_logger.info("Downsampling Volumes and Segmentations - DONE")
 
-        vst_logger.info("Applying Post Processing Steps")
-        Timer.push_stage("Post Processing")
         if self._post_processing_steps != []:
             downsampled_data = await self.apply_post_processing_steps(downsampled_data)
-        vst_logger.info("Applying Post Processing Steps - DONE")
 
-        vst_logger.info("Serializing Volumes and Segmentations")
-        Timer.push_stage("Serialization")
         serialized_files = await asyncio.gather(
             *[self.serialize(handle) for handle in downsampled_data]
         )
         serialized_files = _flatten(serialized_files)
-        vst_logger.info("Serializing Volumes and Segmentations - DONE")
 
         if self._bundler is not None:
-            Timer.push_stage("Bundling")
             serialized_files = await self.bundle(serialized_files)
 
         return serialized_files
 
+    @pipeline_stage("Volume Conversion")
     async def convert_volumes(self, paths: List[Path]) -> List[DataSet]:
         volumes = []
 
@@ -155,11 +195,13 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         for path in paths:
             converter = self._volume_converter_map["".join(path.suffixes)]
+            self._state.msg = f"Converting '{path}'"
             volumes += await converter.convert_volume(path)
             Timer.push_event(f"Finished converting {path}")
 
         return volumes
 
+    @pipeline_stage("Segmentation Conversion")
     async def convert_segmentations(self, paths: List[Path]) -> List[DataSet]:
         segmentations = []
 
@@ -171,24 +213,31 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
         for path in paths:
             converter = self._segmentation_converter_map["".join(path.suffixes)]
+            self._state.msg = f"Converting '{path}'"
             segmentations += await converter.convert_segmentation(path)
 
         return segmentations
 
+    @pipeline_stage("Metadata Collection")
     async def collect_metadata(self, paths: List[Path]):
         return []
 
+    @pipeline_stage("Annotation Collection")
     async def collect_annotation(self, paths: List[Path]):
         return []
 
+    @pipeline_stage("Post-Conversion Steps")
     async def apply_post_conversion_steps(
         self, volumes, segmentations, metadata, annotations
     ):
         for step in self._post_conversion_steps:
             await step(volumes, segmentations, metadata, annotations)
 
+    @pipeline_stage("Downsampling")
     async def downsample(self, data_set: DataSet) -> List[DataSet]:
         resulting_data_sets: dict[int, DataSet] = {}
+
+        self._state.msg = f"Downsampling '{data_set.metadata.id}'"
 
         if True:
             resulting_data_sets[0] = data_set
@@ -224,12 +273,14 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 )
         return list(resulting_data_sets.values())
 
+    @pipeline_stage("Post-Processing Steps")
     async def apply_post_processing_steps(self, data_set) -> List[DataSet]:
         processed_data = data_set
         for step in self._post_processing_steps:
             processed_data = await step.execute(processed_data)
         return processed_data
 
+    @pipeline_stage("Serialization")
     async def serialize(self, data_set) -> List[Path]:
         kind = data_set.metadata.kind
 
@@ -238,8 +289,9 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             raise RuntimeError(f"Could not find serializer for '{kind}'")
 
         return await serializer.serialize(data_set, self._work_dir)
+
+    @pipeline_stage("Bundling")
     async def bundle(self, files: List[Path]):
         if self._bundler is None:
             raise RuntimeError("Cannot bundle without any bundler!")
         return self._bundler.bundle(files, self._output_dir)
-
