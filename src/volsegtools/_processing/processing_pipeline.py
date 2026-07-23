@@ -168,7 +168,9 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
                 )
             ]
         )
-        downsampled_data = _flatten(downsampled_data)
+        downsampled_data = list(
+            filter(lambda x: x.metadata.resolution != 0, _flatten(downsampled_data))
+        )
 
         if self._post_processing_steps != []:
             downsampled_data = await self.apply_post_processing_steps(downsampled_data)
