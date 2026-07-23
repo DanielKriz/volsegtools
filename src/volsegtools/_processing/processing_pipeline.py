@@ -71,6 +71,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         work_dir: Optional[Path] = None,
         output_dir: Optional[Path] = None,
     ):
+        # The conversion and bundling are required stages
         self._downsampling_strategy = downsampling_strategy
 
         self._volume_converter_map = volume_converter_map
