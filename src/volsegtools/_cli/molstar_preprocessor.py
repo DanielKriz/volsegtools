@@ -349,9 +349,18 @@ def run(
             )
         )
 
-    with console.status("Processing..."):
+    with console.status("Processing...") as status:
+
+        def update_status(state):
+            status.update(
+                "Processing... {} ".format(
+                    state.current_stage,
+                )
+            )
+
         try:
             pipeline: vst.ProcessingPipeline = builder.build()
+            pipeline.add_state_change_callback(update_status)
             pipeline.sync_process(
                 volumes=volume_source,
                 segmentations=segmentation_source,
