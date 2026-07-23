@@ -22,6 +22,7 @@ vst_logger = logging.getLogger("volsegtools")
 # TODO: Make this a template method, where most of the logging is going to be
 # handled by the base class.
 
+
 class MRCConverter(Converter):
     @property
     def supported_suffixes(self):
@@ -36,26 +37,27 @@ class MRCConverter(Converter):
 
     async def convert_volume(self, input_path: Path) -> List[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
-        with mrcfile.open(input_path, "r+") as mrc:
-            if mrc.data is None or mrc.header is None:
-                raise RuntimeError("Failed to read data from MAP file")
 
-            array = da.from_array(mrc.data)
-            array = MRCConverter._normalize_axis_order(array, mrc.header)
+        mrc = mrcfile.mmap(input_path, "r")
+        if mrc.data is None or mrc.header is None:
+            raise RuntimeError("Failed to read data from MAP file")
 
-            data_set_info = MRCConverter._collect_data_set_metadata(
-                input_path,
-                mrc.header,
-                DataKind.VOLUME,
-            )
+        array = da.from_array(mrc.data, chunks=(256, 256, 256))
+        array = MRCConverter._normalize_axis_order(array, mrc.header)
 
-            data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
-            frame = data_set.add_time_frame()
+        data_set_info = MRCConverter._collect_data_set_metadata(
+            input_path,
+            mrc.header,
+            DataKind.VOLUME,
+        )
+        mrc.close()
 
-            channel = frame.add_channel(0)
-            channel.set_data(array, DaskBackend)
+        data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
+        frame = data_set.add_time_frame()
 
-            return [data_set]
+        channel = frame.add_channel(0)
+        channel.set_data(array, DaskBackend)
+        return [data_set]
 
     async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
         raise NotImplementedError()
