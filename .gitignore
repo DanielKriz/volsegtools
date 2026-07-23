@@ -1,7 +1,10 @@
 # Volseg Tools Specific
 data/
 volsegtools_workdir/
+.vst_work_dir/
 
+# Development specific
+.direnv
 
 # Python Specific
 
