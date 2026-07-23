@@ -84,13 +84,12 @@ class MVSXBundler(Bundler):
                 # We have to make sure that the file is written before using it.
                 tmp_file.flush()
 
-                output_file_paths.append(
-                    mvs.mvsj_to_mvsx(
-                        tmp_file.name,
-                        archive_path,
-                        download_external=True,
-                    )
+                mvs.mvsj_to_mvsx(
+                    tmp_file.name,
+                    archive_path,
+                    download_external=True,
                 )
+                output_file_paths.append(archive_path)
                 vst_logger.info(f"Created MVSX archive at: {archive_path}")
 
         return output_file_paths
