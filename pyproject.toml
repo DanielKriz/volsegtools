@@ -52,3 +52,25 @@ packages = ["src/volsegtools"]
 dev = [
     "pre-commit>=4.3.0",
 ]
+
+[tool.bumpver]
+current_version = "0.1.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "chore: Bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_scope = "default"
+pre_commit_hook = "scripts/pre-bump.sh"
+post_commit_hook = ""
+commit = true
+tag = true
+push = false
+allowed_branches = "master,main,default,release*"
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    '^version = "{version}"',
+    '^current_version = "{version}"',
+]
+"src/volsegtools/__init__.py" = [
+    '__version__ = "{version}"',
+]
