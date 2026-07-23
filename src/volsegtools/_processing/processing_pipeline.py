@@ -185,7 +185,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         self, volumes, segmentations, metadata, annotations
     ):
         for step in self._post_conversion_steps:
-            step(volumes, segmentations, metadata, annotations)
+            await step(volumes, segmentations, metadata, annotations)
 
     async def downsample(self, data_set: DataSet) -> List[DataSet]:
         resulting_data_sets: dict[int, DataSet] = {}
