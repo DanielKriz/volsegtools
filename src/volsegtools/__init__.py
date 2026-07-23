@@ -93,7 +93,7 @@ from ._serialization import (
 # this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
 from . import abc
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 import logging
 
