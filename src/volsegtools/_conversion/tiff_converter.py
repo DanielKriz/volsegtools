@@ -7,8 +7,7 @@ import logging
 
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools.abc import Converter
-from volsegtools._core import DataKind, Vector3
-from volsegtools._model.working_store import WorkingStore
+from volsegtools._core import DataKind, Vector3, WorkingStore
 
 from volsegtools._model import (
     DataSet,

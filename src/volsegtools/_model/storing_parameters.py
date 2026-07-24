@@ -3,8 +3,7 @@ import pydantic
 from zarr.abc.codec import BytesBytesCodec
 from zarr.codecs import BloscCodec
 
-from volsegtools._core.data_kind import DataKind
-from volsegtools._model.chunking_mode import ChunkingMode
+from volsegtools._core import DataKind, ChunkingMode
 
 from typing import Any
 

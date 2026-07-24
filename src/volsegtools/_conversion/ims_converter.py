@@ -8,12 +8,9 @@ import numpy as np
 import collections
 import re
 
-from volsegtools._core.data_kind import DataKind
-from volsegtools._core.vector import Vector3
-from volsegtools._core.unit_kind import unit_from_str
+from volsegtools._core import DataKind, Vector3, unit_from_str, WorkingStore
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model.data_set import DataSet, DataSetInfo
-from volsegtools._model.working_store import WorkingStore
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")

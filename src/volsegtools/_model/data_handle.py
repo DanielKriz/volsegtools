@@ -4,8 +4,7 @@ import zarr
 import zarr.storage
 import trimesh
 
-from volsegtools._core.data_kind import DataKind
-from volsegtools._model.working_store import WorkingStore
+from volsegtools._core import DataKind, WorkingStore
 from volsegtools.abc import ComputationBackend
 
 

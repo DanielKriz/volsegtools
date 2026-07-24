@@ -12,6 +12,8 @@ from .gaussian_kernel_3D import Gaussian3DKernel
 from .downsampling_parameters import DownsamplingParameters, to_bytes
 from .timer import Timer, TimerReporter, JSONTimerReporter
 from .unit_kind import UnitKind, unit_from_str, to_micrometer, to_angstrom
+from .chunking_mode import ChunkingMode
+from .working_store import WorkingStore
 
 __all__ = [
     "DataKind",
@@ -27,4 +29,6 @@ __all__ = [
     "unit_from_str",
     "to_micrometer",
     "to_angstrom",
+    "ChunkingMode",
+    "WorkingStore",
 ]

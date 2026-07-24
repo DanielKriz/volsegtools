@@ -9,19 +9,20 @@ import pydantic
 
 import volsegtools as vst
 from volsegtools._conversion.converter_map import ConverterMap
-from volsegtools._core.data_kind import DataKind
-from volsegtools._core.timer import Timer
-from volsegtools._core.vector import Vector3
+from volsegtools._core import DataKind, Timer, Vector3, WorkingStore
 from volsegtools._downsampling.null import Null
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._model.data_set import DataSet
-from volsegtools._model.working_store import WorkingStore
+from volsegtools._model import (
+    DataSet,
+    PipelineStageKind,
+    PipelineState,
+    PipelineStateManager,
+)
 from volsegtools.abc import (
     PostProcessingStep,
     PostConversionStep,
 )
-from volsegtools.abc.bundler import Bundler
-from volsegtools.abc.serializer import Serializer
+from volsegtools.abc import Bundler, Serializer
 
 vst_logger = logging.getLogger("volsegtools")
 
@@ -29,26 +30,6 @@ vst_logger = logging.getLogger("volsegtools")
 def _flatten(list_of_lists: List[List]) -> List:
     # Source - https://stackoverflow.com/a/952952
     return [x for xs in list_of_lists for x in xs]
-
-
-class PipelineStageKind(enum.StrEnum):
-    NOT_STARTED = "Not Started"
-    CONVERTING_VOLUMES = "Volume Conversion"
-    CONVERTING_SEGMENTATIONS = "Segmentation Conversion"
-    COLLECTING_METADATA = "Metadata Collection"
-    COLLECTING_ANNOTATIONS = "Annotation Collection"
-    POST_CONVERT = "Post-Conversion Steps"
-    DOWNSAMPLING = "Downsampling"
-    POST_PROCESS = "Post-Processing Steps"
-    SERIALIZATION = "Serialization"
-    BUNDLING = "Bundling"
-    FINISHED = "Finished"
-    CUSTOM = enum.auto()
-
-
-class PipelineState(pydantic.BaseModel):
-    current_stage: PipelineStageKind
-    msg: Optional[str]
 
 
 class ProcessingPipeline(vst.abc.ProcessingPipeline):

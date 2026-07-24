@@ -37,6 +37,8 @@ from ._core import (
     unit_from_str,
     to_angstrom,
     to_micrometer,
+    ChunkingMode,
+    WorkingStore,
 )
 from ._downsampling import (
     Null,
@@ -54,9 +56,7 @@ from ._downsampling import (
     TriquinticInterpolation,
 )
 from ._model import (
-    ChunkingMode,
     StoringParameters,
-    WorkingStore,
     DataSet,
     DataSetInfo,
     DescriptiveStatistics,

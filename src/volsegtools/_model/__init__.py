@@ -6,27 +6,30 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
-from .chunking_mode import ChunkingMode
 from .storing_parameters import StoringParameters
-from .working_store import WorkingStore
-from .data_set import (
-    DataSet,
+from .metadata import (
     DataSetInfo,
     DescriptiveStatistics,
-    Channel,
     ChannelInfo,
-    Mesh,
     MeshInfo,
-    TimeFrame,
     TimeFrameInfo,
+)
+from .data_set import (
+    DataSet,
+    Channel,
+    Mesh,
+    TimeFrame,
     create_file_name,
     info_from_file_path,
 )
+from .pipeline_state import (
+    PipelineStageKind,
+    PipelineState,
+    PipelineStateManager,
+)
 
 __all__ = [
-    "ChunkingMode",
     "StoringParameters",
-    "WorkingStore",
     "DataSet",
     "DataSetInfo",
     "DescriptiveStatistics",
@@ -38,4 +41,7 @@ __all__ = [
     "MeshInfo",
     "create_file_name",
     "info_from_file_path",
+    "PipelineStageKind",
+    "PipelineState",
+    "PipelineStateManager",
 ]

@@ -6,7 +6,7 @@ import zarr
 import zarr.storage
 
 from volsegtools._core.data_kind import DataKind
-from volsegtools._model.chunking_mode import ChunkingMode
+from volsegtools._core.chunking_mode import ChunkingMode
 
 
 class Singleton(type):
