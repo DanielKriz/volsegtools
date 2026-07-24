@@ -9,7 +9,7 @@ from ciftools.models.writer import CIFCategoryDesc as CategoryDesc
 from ciftools.models.writer import CIFFieldDesc as Field
 
 from volsegtools._model.data_set import Channel
-from volsegtools._model.numpy_backend import NumPyBackend
+from volsegtools._processing.numpy_backend import NumPyBackend
 from volsegtools.abc import Serializer
 
 

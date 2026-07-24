@@ -13,7 +13,7 @@ from volsegtools._core.data_kind import DataKind
 from volsegtools._core.timer import Timer
 from volsegtools._core.vector import Vector3
 from volsegtools._downsampling.null import Null
-from volsegtools._model.dask_backend import DaskBackend
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model.data_set import DataSet
 from volsegtools._model.working_store import WorkingStore
 from volsegtools.abc import (

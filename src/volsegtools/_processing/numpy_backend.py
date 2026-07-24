@@ -2,7 +2,7 @@ import zarr
 import numpy as np
 from typing import Any
 
-from volsegtools._model.computation_backend import ComputationBackend
+from volsegtools.abc import ComputationBackend
 from volsegtools._model.data_set import DescriptiveStatistics
 from volsegtools.typing import ZarrObject
 

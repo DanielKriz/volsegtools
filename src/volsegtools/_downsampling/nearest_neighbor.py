@@ -1,7 +1,7 @@
 import logging
 from volsegtools._model.data_set import Channel
 from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
-from volsegtools._model.dask_backend import DaskBackend
+from volsegtools._processing.dask_backend import DaskBackend
 
 vst_logger = logging.getLogger("volsegtools")
 

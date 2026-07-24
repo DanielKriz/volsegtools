@@ -4,7 +4,7 @@ from typing import List
 import trimesh
 import logging
 
-from volsegtools._model.mesh_backend import MeshBackend
+from volsegtools._processing.mesh_backend import MeshBackend
 from volsegtools.abc import Converter
 from volsegtools._core import DataKind, Vector3
 from volsegtools._model.working_store import WorkingStore

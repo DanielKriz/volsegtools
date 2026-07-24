@@ -11,8 +11,8 @@ import numpy as np
 import json
 from skimage.metrics import structural_similarity as ssim
 
-from volsegtools.abc.post_processing_step import PostProcessingStep
-from volsegtools._model.dask_backend import DaskBackend
+from volsegtools.abc import PostProcessingStep
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._core.timer import Timer
 from volsegtools._model.data_set import DataSet
 

@@ -3,7 +3,7 @@ from typing import List
 import logging
 import math
 
-from volsegtools._model.dask_backend import DaskBackend
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model.data_set import Channel
 import volsegtools as vst
 

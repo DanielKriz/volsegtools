@@ -7,7 +7,6 @@ import from the `volsegtools` namespace.
 """
 
 from .chunking_mode import ChunkingMode
-from .computation_backend import ComputationBackend
 from .storing_parameters import StoringParameters
 from .working_store import WorkingStore
 from .data_set import (
@@ -26,7 +25,6 @@ from .data_set import (
 
 __all__ = [
     "ChunkingMode",
-    "ComputationBackend",
     "StoringParameters",
     "WorkingStore",
     "DataSet",

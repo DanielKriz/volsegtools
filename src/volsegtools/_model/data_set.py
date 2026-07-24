@@ -10,7 +10,8 @@ import zarr.storage
 from volsegtools._core.data_kind import DataKind
 from volsegtools._core.vector import Vector3
 from volsegtools._model.data_handle import DataHandle
-from volsegtools._model.computation_backend import ComputationBackend
+
+from volsegtools.abc import ComputationBackend
 
 
 class DataSetInfo(pydantic.BaseModel):

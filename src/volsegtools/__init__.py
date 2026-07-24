@@ -55,7 +55,6 @@ from ._downsampling import (
 )
 from ._model import (
     ChunkingMode,
-    ComputationBackend,
     StoringParameters,
     WorkingStore,
     DataSet,
@@ -147,7 +146,6 @@ __all__ = [
     "TriquinticInterpolation",
     "ChunkingMode",
     "StoringParameters",
-    "ComputationBackend",
     "WorkingStore",
     "DataSet",
     "DataSetInfo",

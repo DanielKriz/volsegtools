@@ -4,7 +4,7 @@ from typing import List
 import logging
 import dask_image.ndfilters as dask_filter
 
-from volsegtools._model.dask_backend import DaskBackend
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model.data_set import Channel
 from volsegtools._core.gaussian_kernel_3D import Gaussian3DKernel
 import volsegtools as vst

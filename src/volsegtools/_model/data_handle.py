@@ -6,7 +6,7 @@ import trimesh
 
 from volsegtools._core.data_kind import DataKind
 from volsegtools._model.working_store import WorkingStore
-from volsegtools._model.computation_backend import ComputationBackend
+from volsegtools.abc import ComputationBackend
 
 
 class DataHandle:

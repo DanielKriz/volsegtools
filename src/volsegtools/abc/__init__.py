@@ -4,6 +4,7 @@ Contains abstract interface to core classes that are used in the processing pipe
 
 from .data_handle import DataHandle
 from .bundler import Bundler
+from .computation_backend import ComputationBackend
 from .converter import Converter
 from .downsampling_strategy import DownsamplingStrategy
 from .kernel import ConvolutionKernel
@@ -15,6 +16,7 @@ from .post_processing_step import PostProcessingStep
 __all__ = [
     "DataHandle",
     "Bundler",
+    "ComputationBackend"
     "Converter",
     "DownsamplingStrategy",
     "ConvolutionKernel",

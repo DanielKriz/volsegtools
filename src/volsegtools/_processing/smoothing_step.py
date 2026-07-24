@@ -3,8 +3,8 @@ import numpy as np
 import scipy
 import logging
 
-from volsegtools._model.dask_backend import DaskBackend
-from volsegtools.abc.post_processing_step import PostProcessingStep
+from volsegtools._processing.dask_backend import DaskBackend
+from volsegtools.abc import PostProcessingStep
 from volsegtools._core.data_kind import DataKind
 from volsegtools._model.data_set import DataSet
 
