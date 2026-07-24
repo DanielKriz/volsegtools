@@ -8,13 +8,11 @@ import pydantic
 
 
 import volsegtools as vst
-from volsegtools._converter.converter_map import ConverterMap
+from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core.data_kind import DataKind
 from volsegtools._core.timer import Timer
 from volsegtools._core.vector import Vector3
-from volsegtools._downsampler.null_downsampling_strategy import (
-    NullDownsamplingStrategy,
-)
+from volsegtools._downsampling.null import Null
 from volsegtools._model.dask_backend import DaskBackend
 from volsegtools._model.data_set import DataSet
 from volsegtools._model.working_store import WorkingStore
@@ -58,7 +56,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
 
     def __init__(
         self,
-        downsampling_strategy=NullDownsamplingStrategy(),
+        downsampling_strategy=Null(),
         volume_converter_map: Optional[ConverterMap] = None,
         segmentation_converter_map: Optional[ConverterMap] = None,
         volume_serializer: Optional[Serializer] = None,

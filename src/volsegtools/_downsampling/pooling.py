@@ -65,7 +65,7 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
             yield data
 
 
-class AveragePoolingStrategy(PoolingDownsamplingStrategy):
+class AveragePooling(PoolingDownsamplingStrategy):
     def __init__(
         self,
         block_size: int = PoolingDownsamplingStrategy.DEFAULT_BLOCK_SIZE,
@@ -74,7 +74,7 @@ class AveragePoolingStrategy(PoolingDownsamplingStrategy):
         super().__init__(np.mean, block_size, padding_mode)
 
 
-class MinPoolingStrategy(PoolingDownsamplingStrategy):
+class MinPooling(PoolingDownsamplingStrategy):
     def __init__(
         self,
         block_size: int = PoolingDownsamplingStrategy.DEFAULT_BLOCK_SIZE,
@@ -83,7 +83,7 @@ class MinPoolingStrategy(PoolingDownsamplingStrategy):
         super().__init__(np.min, block_size, padding_mode)
 
 
-class MaxPoolingStrategy(PoolingDownsamplingStrategy):
+class MaxPooling(PoolingDownsamplingStrategy):
     def __init__(
         self,
         block_size: int = PoolingDownsamplingStrategy.DEFAULT_BLOCK_SIZE,

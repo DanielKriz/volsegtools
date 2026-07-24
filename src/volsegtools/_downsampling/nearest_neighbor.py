@@ -6,7 +6,7 @@ from volsegtools._model.dask_backend import DaskBackend
 vst_logger = logging.getLogger("volsegtools")
 
 
-class NearestNeighborDownsamplingStrategy(DownsamplingStrategy):
+class NearestNeighbor(DownsamplingStrategy):
     def __init__(self, factor=2):
         assert factor > 1
         self.factor = factor

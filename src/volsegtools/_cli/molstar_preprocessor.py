@@ -80,13 +80,13 @@ def get_serializer(kind: SerializerKind):
 def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
     match kind:
         case DownsamplignAlgorithmKind.NEAREST_NEIGHBOR:
-            return vst.NearestNeighborDownsamplingStrategy()
+            return vst.NearestNeighbor()
         case DownsamplignAlgorithmKind.MAX:
-            return vst.MaxPoolingStrategy()
+            return vst.MaxPooling()
         case DownsamplignAlgorithmKind.MIN:
-            return vst.MinPoolingStrategy()
+            return vst.MinPooling()
         case DownsamplignAlgorithmKind.AVG:
-            return vst.AveragePoolingStrategy()
+            return vst.AveragePooling()
         case DownsamplignAlgorithmKind.TRILINEAR:
             return vst.TrilinearInterpolation()
         case DownsamplignAlgorithmKind.TRICUBIC:
@@ -96,15 +96,15 @@ def get_downsampling_strategy(kind: DownsamplignAlgorithmKind):
         case DownsamplignAlgorithmKind.TRIQUINTIC_NO_SMOOTH:
             return vst.TriquinticInterpolation()
         case DownsamplignAlgorithmKind.SMOOTHING:
-            return vst.HierarchyDownsamplingStrategy()
+            return vst.Smoothing()
         case DownsamplignAlgorithmKind.STRIDED_SMOOTHING:
             return vst.StridedSmoothing(vst.Gaussian3DKernel(5, 1))
         case DownsamplignAlgorithmKind.SEPARATED_SMOOTHING:
-            return vst.SeparableSmoothing(5, 1)
+            return vst.SeparatedSmoothing(5, 1)
         case DownsamplignAlgorithmKind.NULL:
-            return vst.NullDownsamplingStrategy()
+            return vst.Null()
         case _:
-            return vst.NullDownsamplingStrategy()
+            return vst.Null()
 
 
 class CommandGroup(enum.StrEnum):

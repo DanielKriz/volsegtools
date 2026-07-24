@@ -5,11 +5,9 @@ import zarr.errors
 
 from typing_extensions import Self
 
-from volsegtools._converter.converter_map import ConverterMap
+from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core.data_kind import DataKind
-from volsegtools._downsampler.null_downsampling_strategy import (
-    NullDownsamplingStrategy,
-)
+from volsegtools._downsampling.null import Null
 from volsegtools._model.working_store import WorkingStore
 from volsegtools._processing.processing_pipeline import ProcessingPipeline
 
@@ -29,7 +27,7 @@ class ProcessingPipelineBuilder:
         self._output_dir: Path | None = None
         self._volume_converter: Converter | None = None
         self._segmentation_converter: Converter | None = None
-        self._downsampling_strategy: DownsamplingStrategy = NullDownsamplingStrategy()
+        self._downsampling_strategy: DownsamplingStrategy = Null()
         self._post_processing_steps: List[PostProcessingStep] = []
         self._post_conversion_steps: List[PostConversionStep] = []
         self._serializer_map = collections.defaultdict(None)
