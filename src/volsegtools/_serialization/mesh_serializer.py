@@ -1,9 +1,10 @@
 import logging
 from typing import List
 from pathlib import Path
-from volsegtools._model.data_set import DataSet
-from volsegtools._processing.mesh_backend import MeshBackend
-from volsegtools.abc.serializer import Serializer
+
+from volsegtools._storage import DataSet
+from volsegtools._processing import MeshBackend
+from volsegtools.abc import Serializer
 
 vst_logger = logging.getLogger("volsegtools")
 

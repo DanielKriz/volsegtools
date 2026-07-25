@@ -6,13 +6,11 @@ import pyometiff as ome_tiff
 import logging
 
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools.abc import Converter
 from volsegtools._core import DataKind, Vector3, WorkingStore
+from volsegtools._model import DataSetInfo
+from volsegtools._storage import DataSet
 
-from volsegtools._model import (
-    DataSet,
-    DataSetInfo,
-)
+from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
 

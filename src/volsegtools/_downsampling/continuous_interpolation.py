@@ -4,7 +4,7 @@ import logging
 import math
 
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._model.data_set import Channel
+from volsegtools._storage.data_set import Channel
 import volsegtools as vst
 
 vst_logger = logging.getLogger("volsegtools")

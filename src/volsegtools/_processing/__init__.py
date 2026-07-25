@@ -17,6 +17,10 @@ from .size_evaluation_step import (
     StdoutSizeReporter,
 )
 
+from .dask_backend import DaskBackend
+from .numpy_backend import NumPyBackend
+from .mesh_backend import MeshBackend
+
 __all__ = [
     "ProcessingPipeline",
     "ProcessingPipelineBuilder",
@@ -27,4 +31,8 @@ __all__ = [
     "SizeEvaluationStep",
     "JSONSizeReporter",
     "StdoutSizeReporter",
+
+    "DaskBackend",
+    "NumPyBackend",
+    "MeshBackend",
 ]

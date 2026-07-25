@@ -1,7 +1,7 @@
 import pydantic
 from pydantic import Field
-from volsegtools._core.data_kind import DataKind
-from volsegtools._core.vector import Vector3
+
+from volsegtools._core import DataKind, Vector3
 
 class DataSetInfo(pydantic.BaseModel):
     filename: str = "Unknown File"

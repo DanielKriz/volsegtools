@@ -4,10 +4,12 @@ from typing import List
 import logging
 import nibabel as nib
 
-from volsegtools._processing.numpy_backend import NumPyBackend
-from volsegtools.abc import Converter
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model.data_set import DataSet, DataSetInfo
+from volsegtools._model import DataSetInfo
+from volsegtools._storage import DataSet
+
+from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
 

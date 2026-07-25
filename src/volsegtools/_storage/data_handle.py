@@ -4,9 +4,7 @@ import zarr
 import zarr.storage
 import trimesh
 
-from volsegtools._core import DataKind, WorkingStore
-from volsegtools.abc import ComputationBackend
-
+from volsegtools._core import DataKind, ComputationBackend, WorkingStore
 
 class DataHandle:
     def __init__(

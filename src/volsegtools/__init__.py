@@ -28,8 +28,6 @@ from ._core import (
     Vector3,
     Bounds,
     Gaussian3DKernel,
-    DownsamplingParameters,
-    to_bytes,
     Timer,
     TimerReporter,
     JSONTimerReporter,
@@ -37,6 +35,7 @@ from ._core import (
     unit_from_str,
     to_angstrom,
     to_micrometer,
+    to_bytes,
     ChunkingMode,
     WorkingStore,
 )
@@ -57,17 +56,11 @@ from ._downsampling import (
 )
 from ._model import (
     StoringParameters,
-    DataSet,
     DataSetInfo,
     DescriptiveStatistics,
-    Channel,
     ChannelInfo,
-    Mesh,
     MeshInfo,
-    TimeFrame,
     TimeFrameInfo,
-    create_file_name,
-    info_from_file_path,
 )
 from ._processing import (
     ProcessingPipeline,
@@ -87,6 +80,15 @@ from ._serialization import (
     OBJSerializer,
     PLYSerializer,
     STLSerializer,
+)
+from ._storage import (
+    DataHandle,
+    DataSet,
+    Channel,
+    Mesh,
+    TimeFrame,
+    create_file_name,
+    info_from_file_path,
 )
 
 # this makes it possible to use abbreviation for `volsegtools` and then using `abc`.
@@ -122,7 +124,6 @@ __all__ = [
     "Vector3",
     "Bounds",
     "Gaussian3DKernel",
-    "DownsamplingParameters",
     "to_bytes",
     "Timer",
     "TimerReporter",
@@ -147,6 +148,7 @@ __all__ = [
     "ChunkingMode",
     "StoringParameters",
     "WorkingStore",
+    "DataHandle",
     "DataSet",
     "DataSetInfo",
     "DescriptiveStatistics",

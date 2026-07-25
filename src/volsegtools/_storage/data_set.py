@@ -6,16 +6,14 @@ import pydantic
 import zarr
 import zarr.storage
 
-from volsegtools._model.data_handle import DataHandle
-from volsegtools._model.metadata import (
+from volsegtools._model import (
     DataSetInfo,
     TimeFrameInfo,
-    DescriptiveStatistics,
     ChannelInfo,
     MeshInfo,
 )
-
-from volsegtools.abc import ComputationBackend
+from volsegtools._core import ComputationBackend
+from volsegtools._storage.data_handle import DataHandle
 
 
 class DataSet:

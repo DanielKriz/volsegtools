@@ -6,7 +6,7 @@ import logging
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools.abc import PostProcessingStep
 from volsegtools._core.data_kind import DataKind
-from volsegtools._model.data_set import DataSet
+from volsegtools._storage.data_set import DataSet
 
 
 vst_logger = logging.getLogger("volsegtools")

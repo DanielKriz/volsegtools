@@ -5,9 +5,11 @@ from typing import List
 from pathlib import Path
 
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools.abc import Converter
 from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model import DataSet, DataSetInfo
+from volsegtools._model import DataSetInfo
+from volsegtools._storage import DataSet
+
+from volsegtools.abc import Converter
 
 
 class NGFFConverter(Converter):

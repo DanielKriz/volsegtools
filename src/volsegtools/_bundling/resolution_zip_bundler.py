@@ -6,7 +6,7 @@ import zipfile
 import logging
 
 from volsegtools.abc.bundler import Bundler
-from volsegtools._model.data_set import info_from_file_path
+from volsegtools._storage.data_set import info_from_file_path
 
 vst_logger = logging.getLogger("volsegtools")
 

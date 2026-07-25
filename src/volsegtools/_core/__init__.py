@@ -9,10 +9,11 @@ from .data_kind import DataKind
 from .vector import Vector3
 from .bounds import Bounds
 from .gaussian_kernel_3D import Gaussian3DKernel
-from .downsampling_parameters import DownsamplingParameters, to_bytes
 from .timer import Timer, TimerReporter, JSONTimerReporter
-from .unit_kind import UnitKind, unit_from_str, to_micrometer, to_angstrom
+from .unit_kind import UnitKind, unit_from_str, to_micrometer, to_angstrom, to_bytes
 from .chunking_mode import ChunkingMode
+from .computation_backend import ComputationBackend
+from .kernel import ConvolutionKernel
 from .working_store import WorkingStore
 
 __all__ = [
@@ -20,7 +21,6 @@ __all__ = [
     "Vector3",
     "Bounds",
     "Gaussian3DKernel",
-    "DownsamplingParameters",
     "to_bytes",
     "Timer",
     "TimerReporter",
@@ -30,5 +30,7 @@ __all__ = [
     "to_micrometer",
     "to_angstrom",
     "ChunkingMode",
+    "ComputationBackend",
+    "ConvolutionKernel",
     "WorkingStore",
 ]

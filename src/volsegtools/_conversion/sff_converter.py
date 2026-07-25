@@ -5,9 +5,11 @@ import sfftkrw as sff
 
 from volsegtools._processing.mesh_backend import MeshBackend
 from volsegtools._processing.numpy_backend import NumPyBackend
-from volsegtools.abc import Converter
 from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model.data_set import DataSet, DataSetInfo
+from volsegtools._model import DataSetInfo
+from volsegtools._storage import DataSet
+
+from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
 

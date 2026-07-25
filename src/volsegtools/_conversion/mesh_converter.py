@@ -5,9 +5,10 @@ import trimesh
 import logging
 
 from volsegtools._processing.mesh_backend import MeshBackend
-from volsegtools.abc import Converter
 from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model.data_set import DataSet, DataSetInfo
+from volsegtools._model.metadata import DataSetInfo
+from volsegtools.abc import Converter
+from volsegtools._storage import DataSet
 
 vst_logger = logging.getLogger("volsegtools")
 

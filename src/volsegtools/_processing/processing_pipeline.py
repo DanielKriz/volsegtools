@@ -13,16 +13,18 @@ from volsegtools._core import DataKind, Timer, Vector3, WorkingStore
 from volsegtools._downsampling.null import Null
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model import (
-    DataSet,
     PipelineStageKind,
     PipelineState,
     PipelineStateManager,
 )
+from volsegtools._storage import DataSet
+
 from volsegtools.abc import (
     PostProcessingStep,
     PostConversionStep,
+    Bundler,
+    Serializer,
 )
-from volsegtools.abc import Bundler, Serializer
 
 vst_logger = logging.getLogger("volsegtools")
 

@@ -8,7 +8,6 @@ import zarr.storage
 from volsegtools._core.data_kind import DataKind
 from volsegtools._core.chunking_mode import ChunkingMode
 
-
 class Singleton(type):
     _instances = {}
 

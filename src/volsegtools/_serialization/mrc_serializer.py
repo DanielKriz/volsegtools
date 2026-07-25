@@ -1,10 +1,11 @@
 from typing import List
 from pathlib import Path
-from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools.abc import Serializer
-
 import mrcfile
 import logging
+
+
+from volsegtools._processing import DaskBackend
+from volsegtools.abc import Serializer
 
 vst_logger = logging.getLogger("volsegtools")
 

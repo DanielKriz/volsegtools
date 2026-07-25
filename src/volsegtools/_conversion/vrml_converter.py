@@ -6,7 +6,7 @@ import json
 
 from volsegtools._conversion.mesh_converter import MeshConverter
 from volsegtools.abc import Converter
-from volsegtools._model import DataSet
+from volsegtools._storage import DataSet
 
 
 class VRMLConverter(Converter):

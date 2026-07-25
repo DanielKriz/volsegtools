@@ -10,7 +10,9 @@ import re
 
 from volsegtools._core import DataKind, Vector3, unit_from_str, WorkingStore
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._model.data_set import DataSet, DataSetInfo
+from volsegtools._model import DataSetInfo
+from volsegtools._storage import DataSet
+
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")

@@ -7,7 +7,7 @@ import logging
 
 from molviewspec.mvsx_converter import tempfile
 
-from volsegtools._model.data_set import info_from_file_path
+from volsegtools._storage.data_set import info_from_file_path
 from volsegtools.abc.bundler import Bundler
 
 vst_logger = logging.getLogger("volsegtools")

@@ -7,7 +7,7 @@ import dask.array as da
 from typing import Any
 
 from volsegtools.abc import ComputationBackend
-from volsegtools._model.data_set import DescriptiveStatistics
+from volsegtools._model.metadata import DescriptiveStatistics
 from volsegtools.typing import ZarrObject
 
 

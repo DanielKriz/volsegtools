@@ -14,7 +14,7 @@ from skimage.metrics import structural_similarity as ssim
 from volsegtools.abc import PostProcessingStep
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._core.timer import Timer
-from volsegtools._model.data_set import DataSet
+from volsegtools._storage.data_set import DataSet
 
 vst_logger = logging.getLogger("volsegtools")
 
