@@ -18,6 +18,7 @@ from .pipeline_state import (
     PipelineStageKind,
     PipelineState,
     PipelineStateManager,
+    PipelineContext,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "PipelineStageKind",
     "PipelineState",
     "PipelineStateManager",
+    "PipelineContext",
 ]

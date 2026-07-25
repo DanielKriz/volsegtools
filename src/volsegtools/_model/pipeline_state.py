@@ -3,6 +3,9 @@ import pydantic
 import enum
 import dataclasses
 
+from volsegtools._core.timer import Timer
+from volsegtools._core.working_store import WorkingStore
+
 class PipelineStageKind(enum.StrEnum):
     NOT_STARTED = "Not Started"
     CONVERTING_VOLUMES = "Volume Conversion"
@@ -45,3 +48,8 @@ class PipelineStateManager:
         self._state = dataclasses.replace(self._state, *kwargs)
         for cb in self._callbacks:
             cb(self.current)
+
+class PipelineContext:
+    timer: Timer
+    working_store: WorkingStore
+    state: PipelineStateManager
