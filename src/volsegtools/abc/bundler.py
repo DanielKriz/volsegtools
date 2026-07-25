@@ -1,16 +1,14 @@
-import abc
-from typing import List
+from typing import List, Protocol
 from pathlib import Path
 
 
-class Bundler(abc.ABC):
+class Bundler(Protocol):
     """Bundles a collection of data sets into an another artifact.
 
     For some formats and workflows it might be beneficial to return mutliple
     artifacts, not just one.
     """
 
-    @abc.abstractmethod
     def bundle(self, data_paths: List[Path], output_path: Path) -> List[Path]:
         """Bundles provided files into an another artifact.
 

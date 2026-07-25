@@ -1,10 +1,7 @@
-import abc
-
-from typing import List, Any
+from typing import List, Any, Protocol
 
 
-class PostProcessingStep(abc.ABC):
-    @abc.abstractmethod
+class PostProcessingStep(Protocol):
     async def execute(self, data_sets: List[Any]) -> List[Any]: ...
 
     async def __call__(self, data_sets: List[Any]) -> List[Any]:

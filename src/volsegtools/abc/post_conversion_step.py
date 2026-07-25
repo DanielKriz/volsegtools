@@ -1,8 +1,6 @@
-import abc
+from typing import Protocol
 
-
-class PostConversionStep(abc.ABC):
-    @abc.abstractmethod
+class PostConversionStep(Protocol):
     async def execute(
         self, volumes, segmentations, metadata, annotations
     ): ...

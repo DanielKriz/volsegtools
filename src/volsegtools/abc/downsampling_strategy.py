@@ -1,9 +1,9 @@
-import abc
-from typing import Any
+from typing import Any, Protocol
 
-class DownsamplingStrategy(abc.ABC):
+class DownsamplingStrategy(Protocol):
     """Downsamples given data."""
     MIN_SIZE_THRESHOLD = 5_000_000  # 5 MB
+
     def execute(self, data) -> Any:
         """Executes give downsampling strategy on given data.
 

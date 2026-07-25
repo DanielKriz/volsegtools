@@ -1,14 +1,12 @@
-import abc
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 
-class Converter(abc.ABC):
+class Converter(Protocol):
     """Converts the contents of some file format into the internal data
     structure that is then going to be used further in the processing.
     """
 
-    @abc.abstractmethod
     async def convert_volume(self, input_path: Path) -> Any:
         """Transforms volumetric data into a zarr array.
 
@@ -23,7 +21,6 @@ class Converter(abc.ABC):
         """
         ...
 
-    @abc.abstractmethod
     async def convert_segmentation(self, input_path: Path) -> Any:
         """Transforms the segmentation data into a zarr array.
 
@@ -34,7 +31,6 @@ class Converter(abc.ABC):
         """
         ...
 
-    @abc.abstractmethod
     async def collect_metadata(self, input_path) -> Any:
         """Collects metadata from a file.
 
@@ -48,7 +44,6 @@ class Converter(abc.ABC):
         """
         ...
 
-    @abc.abstractmethod
     async def collect_annotations(self, input_path) -> Any:
         """Collects annotations from a file.
 
