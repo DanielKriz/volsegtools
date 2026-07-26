@@ -1,3 +1,5 @@
+# ruff: noqa: B008
+
 import enum
 import itertools
 import logging
