@@ -1,7 +1,8 @@
-import json
 from pathlib import Path
-import tempfile
 from typing import ClassVar
+
+import json
+import tempfile
 
 import vrmlxpy as vrml
 

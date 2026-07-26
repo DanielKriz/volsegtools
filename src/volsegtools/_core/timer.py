@@ -1,9 +1,10 @@
+from pathlib import Path
+from typing import Any
+
 import datetime
 import json
 import logging
-from pathlib import Path
 import time
-from typing import Any
 import uuid
 
 vst_logger = logging.getLogger("volsegtools")

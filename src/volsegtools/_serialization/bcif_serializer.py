@@ -1,9 +1,10 @@
 from collections.abc import Collection
 from pathlib import Path
 
-import ciftools
 from ciftools.binary.encoder import BYTE_ARRAY
 from ciftools.models.writer import CIFCategoryDesc as CategoryDesc, CIFFieldDesc as Field
+
+import ciftools
 import ciftools.serialization
 import numpy as np
 

@@ -1,7 +1,8 @@
-import json
-import logging
 from pathlib import Path
 from typing import Protocol
+
+import json
+import logging
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend

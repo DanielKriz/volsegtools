@@ -1,5 +1,6 @@
-import logging
 from pathlib import Path
+
+import logging
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import MeshBackend

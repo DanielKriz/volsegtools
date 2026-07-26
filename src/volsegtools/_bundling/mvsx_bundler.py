@@ -1,10 +1,12 @@
+from pathlib import Path
+
 import collections
 import itertools
 import logging
-from pathlib import Path
+
+from molviewspec.mvsx_converter import tempfile
 
 import molviewspec as mvs
-from molviewspec.mvsx_converter import tempfile
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._storage.data_set import info_from_file_path

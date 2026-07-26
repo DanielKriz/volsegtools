@@ -1,16 +1,18 @@
+from pathlib import Path
+from typing import Protocol
+
 import datetime
 import itertools
 import json
 import logging
 import math
-from pathlib import Path
-from typing import Protocol
+
+from scipy.ndimage import gaussian_laplace
+from skimage.metrics import structural_similarity as ssim
 
 import dask.array as da
 import numpy as np
 import scipy
-from scipy.ndimage import gaussian_laplace
-from skimage.metrics import structural_similarity as ssim
 
 from volsegtools._core.timer import Timer
 from volsegtools._model.pipeline_state import PipelineContext

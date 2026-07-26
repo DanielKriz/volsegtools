@@ -1,7 +1,8 @@
+from pathlib import Path
+
 import asyncio
 import itertools
 import logging
-from pathlib import Path
 
 from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core import DataKind, Timer, Vector3, WorkingStore

@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import collections
 import logging
-from pathlib import Path
 import re
 
 import dask.array as da

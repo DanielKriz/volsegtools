@@ -1,6 +1,7 @@
 from pathlib import Path
-import re
 from typing import Self
+
+import re
 
 import pydantic
 

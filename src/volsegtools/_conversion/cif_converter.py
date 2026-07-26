@@ -1,5 +1,6 @@
-import logging
 from pathlib import Path
+
+import logging
 
 import ciftools.serialization
 import dask.array as da

@@ -1,6 +1,7 @@
-import collections
 from pathlib import Path
 from typing import Self
+
+import collections
 
 import zarr.errors
 

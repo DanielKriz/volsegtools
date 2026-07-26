@@ -1,9 +1,10 @@
 from typing import Any
 
-import numpy as np
-import pydantic
 from zarr.abc.codec import BytesBytesCodec
 from zarr.codecs import BloscCodec
+
+import numpy as np
+import pydantic
 
 from volsegtools._core.chunking_mode import ChunkingMode
 from volsegtools._core.data_kind import DataKind

@@ -1,5 +1,6 @@
-import logging
 from pathlib import Path
+
+import logging
 
 import dask.array as da
 import mrcfile

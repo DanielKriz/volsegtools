@@ -1,5 +1,6 @@
-import math
 from typing import Any
+
+import math
 
 import dask
 import dask.array as da

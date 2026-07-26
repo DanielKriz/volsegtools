@@ -1,21 +1,23 @@
 # ruff: noqa: B008
 
+from pathlib import Path
+from typing import Annotated
+
 import enum
 import itertools
 import logging
 import os
-from pathlib import Path
 import shutil
 import sys
-from typing import Annotated
 
 import rich
 import rich.console
 import rich.logging
 import typer
 
-import volsegtools as vst
 from volsegtools._core.data_kind import DataKind
+
+import volsegtools as vst
 
 vst_logger = logging.getLogger("volsegtools")
 

@@ -1,5 +1,6 @@
-import pydantic
 from pydantic import Field
+
+import pydantic
 
 from volsegtools._core import DataKind, Vector3
 

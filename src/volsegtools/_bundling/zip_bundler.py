@@ -1,5 +1,6 @@
-import logging
 from pathlib import Path
+
+import logging
 import zipfile
 
 from volsegtools._model.pipeline_state import PipelineContext

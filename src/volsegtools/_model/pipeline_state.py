@@ -1,7 +1,8 @@
 from collections.abc import Callable
+from typing import Any
+
 import dataclasses
 import enum
-from typing import Any
 
 import pydantic
 
