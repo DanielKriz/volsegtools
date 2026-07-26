@@ -8,22 +8,6 @@ from volsegtools._core.chunking_mode import ChunkingMode
 from volsegtools._core.data_kind import DataKind
 
 
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
-            cls._instances[cls] = instance
-        return cls._instances[cls]
-
-    @property
-    def instance(cls):
-        return cls._instances[cls]
-
-
-# TODO: Remove the Singleton
-# TODO: Make it possible to share existing store
 # TODO: Rename to 'Workspace'
 # TODO: There is huge chance, that we do not need this...
 class WorkingStore:
