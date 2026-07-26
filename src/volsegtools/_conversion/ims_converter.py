@@ -1,7 +1,7 @@
 import collections
 import logging
-import re
 from pathlib import Path
+import re
 
 import dask.array as da
 import h5py as hdf
@@ -52,7 +52,12 @@ def _find_all_channels(ch_list: list, info: dict):
         ["namespace", "resolution", "time_frame", "channel_id", "metadata", "data"],
     )
 
-    hdf_re = r"(?P<namespace>.*)\/DataSet\d*\/(?P<resolution>ResolutionLevel \d+)\/(?P<time_frame>TimePoint \d+)\/(?P<channel>Channel \d+)$"
+    hdf_re = re.compile(
+        r"(?P<namespace>.*)"
+        r"\/DataSet\d*\/(?P<resolution>ResolutionLevel \d+)"
+        r"\/(?P<time_frame>TimePoint \d+)"
+        r"\/(?P<channel>Channel \d+)$"
+    )
 
     def _find_all(x, y):
         match = re.match(hdf_re, x.strip())
@@ -73,7 +78,7 @@ def _find_all_channels(ch_list: list, info: dict):
 
 
 def _channel_to_str(channel):
-    return f"{channel.namespace} (R: {channel.resolution}, T: {channel.time_frame}, C:{channel.channel_id},)"
+    return f"{channel.namespace} (R: {channel.resolution}, T: {channel.time_frame}, C:{channel.channel_id})"
 
 
 def _find_image_info(info: dict):

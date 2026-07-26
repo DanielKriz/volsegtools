@@ -1,10 +1,9 @@
-import abc
+from typing import Protocol
 
 import numpy as np
 
 
-class ConvolutionKernel(abc.ABC):
-    @abc.abstractmethod
+class ConvolutionKernel(Protocol):
     def as_ndarray(self) -> np.ndarray: ...
 
     @property

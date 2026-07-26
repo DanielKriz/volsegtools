@@ -83,11 +83,10 @@ class VFM(ErrorFunction):
         new,
         old,
     ) -> float:
-        print("CALCULING VFM FFS")
-        THRESHOLD = 0.0
+        threshold = 0.0
 
-        original_empty_count = (old < THRESHOLD).sum()
-        upscaled_empty_count = (new < THRESHOLD).sum()
+        original_empty_count = (old < threshold).sum()
+        upscaled_empty_count = (new < threshold).sum()
 
         value = (upscaled_empty_count / original_empty_count).compute()
         print(value)
@@ -217,7 +216,7 @@ def rmse(original, reconstructed):
 class ErrorEvaluationStep(PostProcessingStep):
     def __init__(
         self,
-        error_fn: ErrorFunction | str = MSE(),
+        error_fn: ErrorFunction | str,
         output_path: Path | None = None,
         output_to_stdout: bool = False,
         label: str = "",
@@ -251,17 +250,16 @@ class ErrorEvaluationStep(PostProcessingStep):
             return tuple(
                 tuple(math.ceil(ax * factor) for ax in axes) for axes in channel.chunks
             )
-        elif isinstance(factor, tuple):
+        if isinstance(factor, tuple):
             return tuple(
                 tuple(math.ceil(ax * factor[idx]) for ax in axes)
                 for idx, axes in enumerate(channel.chunks)
             )
-        else:
-            raise TypeError("Unsupported type for chunk calculation")
+        raise TypeError("Unsupported type for chunk calculation")
 
     def _upsample_data(self, original: da.Array, data: da.Array):
 
-        zoom = tuple(x / y for x, y in zip(original.shape, data.shape))
+        zoom = tuple(x / y for x, y in zip(original.shape, data.shape, strict=False))
 
         def block_triquintic_zoom(block):
             return scipy.ndimage.zoom(block, zoom=zoom, order=3, mode="reflect")
@@ -293,6 +291,7 @@ class ErrorEvaluationStep(PostProcessingStep):
             for original_data, data in zip(
                 resolution_to_data[0].flat_channel_iter(),
                 resolution_to_data[resolution].flat_channel_iter(),
+                strict=False,
             ):
                 data_set_id = data.data_set.metadata.id
                 data_set_resolution = data.data_set.metadata.resolution
@@ -341,10 +340,10 @@ class ErrorEvaluationStep(PostProcessingStep):
 
         if self.output_path is not None:
             if self.output_path.exists():
-                with open(self.output_path, "r") as file:
+                with Path.open(self.output_path) as file:
                     old_errors = json.load(file)
                     errors += old_errors
-            with open(self.output_path, "w") as file:
+            with Path.open(self.output_path, "w") as file:
                 file.write(json.dumps(errors, indent=2))
 
         if self.output_to_stdout:
@@ -391,17 +390,16 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
             return tuple(
                 tuple(math.ceil(ax * factor) for ax in axes) for axes in channel.chunks
             )
-        elif isinstance(factor, tuple):
+        if isinstance(factor, tuple):
             return tuple(
                 tuple(math.ceil(ax * factor[idx]) for ax in axes)
                 for idx, axes in enumerate(channel.chunks)
             )
-        else:
-            raise TypeError("Unsupported type for chunk calculation")
+        raise TypeError("Unsupported type for chunk calculation")
 
     def _upsample_data(self, original: da.Array, data: da.Array):
 
-        zoom = tuple(x / y for x, y in zip(original.shape, data.shape))
+        zoom = tuple(x / y for x, y in zip(original.shape, data.shape, strict=False))
 
         def block_triquintic_zoom(block):
             return scipy.ndimage.zoom(block, zoom=zoom, order=3, mode="reflect")
@@ -427,6 +425,7 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
             for original_data, data in zip(
                 resolution_to_data[0].flat_channel_iter(),
                 resolution_to_data[resolution].flat_channel_iter(),
+                strict=False,
             ):
                 data_set_id = data.data_set.metadata.id
                 data_set_resolution = data.data_set.metadata.resolution
@@ -486,10 +485,10 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
 
         if self.output_path is not None:
             if self.output_path.exists():
-                with open(self.output_path, "r") as file:
+                with Path.open(self.output_path) as file:
                     old_errors = json.load(file)
                     errors += old_errors
-            with open(self.output_path, "w") as file:
+            with Path.open(self.output_path, "w") as file:
                 file.write(json.dumps(errors, indent=2))
 
         if self.output_to_stdout:

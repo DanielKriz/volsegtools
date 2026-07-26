@@ -33,9 +33,12 @@ def _flatten(list_of_lists: list[list]) -> list:
 class ProcessingPipeline(ProcessingPipeline):
     DEFAULT_WORK_DIR = Path(".vst_work_dir")
 
+    # It is safe to ignore the B008 error here, because the Null downsampling
+    # strategy does not contain any state. Thus, it is safe to share it between
+    # instances.
     def __init__(
         self,
-        downsampling_strategy=Null(),
+        downsampling_strategy=Null(), # noqa: B008
         volume_converter_map: ConverterMap | None = None,
         segmentation_converter_map: ConverterMap | None = None,
         volume_serializer: Serializer | None = None,
@@ -109,8 +112,7 @@ class ProcessingPipeline(ProcessingPipeline):
                 for cb in self._callbacks:
                     cb(self._state)
 
-                result = func(self, *args, **kwargs)
-                return result
+                return func(self, *args, **kwargs)
 
             return wrapper
 

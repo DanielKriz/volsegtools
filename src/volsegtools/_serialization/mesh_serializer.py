@@ -46,7 +46,12 @@ class MeshSerializer(Serializer):
             for mesh in frame.meshes:
                 mesh_data = mesh.handle.get_mesh(MeshBackend)
 
-                file_name = f"{data_set.metadata.id}_r{data_set.metadata.resolution}_tf{frame.metadata.id}_m{mesh.metadata.id}"
+                file_name = (
+                    f"{data_set.metadata.id}"
+                    f"_r{data_set.metadata.resolution}"
+                    f"_tf{frame.metadata.id}"
+                    f"_m{mesh.metadata.id}.mrc"
+                )
 
                 output = self.serialization_fn(
                     output_path,

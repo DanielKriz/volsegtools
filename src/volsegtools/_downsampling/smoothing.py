@@ -81,8 +81,7 @@ class SeparatedSmoothing(DownsamplingStrategy):
     def calculate_convolution_kernel(self):
         x = np.arange(-self.radius, self.radius + 1)
         kernel = np.exp(-(x**2) / (2 * self.sigma**2))
-        kernel = kernel / kernel.sum()
-        return kernel
+        return kernel / kernel.sum()
 
     def execute(self, data: Channel, context: PipelineContext):
         kernel = self.calculate_convolution_kernel()

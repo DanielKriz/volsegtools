@@ -96,7 +96,7 @@ class ProcessingPipelineBuilder:
         except zarr.errors.ContainsGroupError:
             print("Working store already data from previous processing")
             print("You might want to add '--overwrite-tmp' to overwrite them")
-            raise RuntimeError("Working store already initialized")
+            raise RuntimeError("Working store already initialized") from None
 
         self._work_dir = file_path
         return self

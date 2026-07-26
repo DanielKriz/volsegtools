@@ -4,9 +4,9 @@ import enum
 import itertools
 import logging
 import os
+from pathlib import Path
 import shutil
 import sys
-from pathlib import Path
 from typing import Annotated
 
 import rich
@@ -316,7 +316,7 @@ def run(
         builder.set_work_dir(local_store_path)
     except RuntimeError as err:
         print("Error:", err)
-        raise typer.Exit()
+        raise typer.Exit() from None
 
     match bundling_approach:
         case BundlingKind.MVXS:

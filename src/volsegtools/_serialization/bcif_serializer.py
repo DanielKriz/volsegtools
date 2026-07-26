@@ -2,11 +2,10 @@ from collections.abc import Collection
 from pathlib import Path
 
 import ciftools
+from ciftools.binary.encoder import BYTE_ARRAY
+from ciftools.models.writer import CIFCategoryDesc as CategoryDesc, CIFFieldDesc as Field
 import ciftools.serialization
 import numpy as np
-from ciftools.binary.encoder import BYTE_ARRAY
-from ciftools.models.writer import CIFCategoryDesc as CategoryDesc
-from ciftools.models.writer import CIFFieldDesc as Field
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import NumPyBackend
@@ -38,7 +37,13 @@ class BCIFSerializer(Serializer):
 
             writer.write_category(VolumeData3DDesc, [np.ravel(data, order="F")])
 
-            file_name = f"{data_set.metadata.id}_r{data_set.metadata.resolution}_tf{channel.parent.metadata.id}_ch{channel.metadata.id}.bcif"
+            file_name = (
+                f"{data_set.metadata.id}"
+                f"_r{data_set.metadata.resolution}"
+                f"_tf{channel.parent.metadata.id}"
+                f"_ch{channel.metadata.id}.bcif"
+            )
+
             output_file_path = output_path / file_name
             output_file_path.write_bytes(writer.encode())
             output_files.append(output_file_path)

@@ -60,8 +60,7 @@ class WorkingStore:
     def _compute_chunk_size_based_on_data(
         data_shape: tuple[int, ...],
     ) -> tuple[int, ...]:
-        chunks = tuple([int(i / 4) if i > 4 else i for i in data_shape])
-        return chunks
+        return tuple([int(i / 4) if i > 4 else i for i in data_shape])
 
     @staticmethod
     def _resolve_chunking_method(mode: ChunkingMode, data_shape: tuple[int, ...]):

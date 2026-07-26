@@ -1,5 +1,5 @@
-import re
 from pathlib import Path
+import re
 from typing import Self
 
 import pydantic
@@ -190,7 +190,12 @@ class DataSetDefaultDict(dict):
 
 
 def create_file_name(channel: Channel, suffix: str = ".bcif"):
-    return f"{channel.parent.parent.metadata.id}_r{channel.parent.parent.metadata.resolution}_tf{channel.parent.metadata.id}_c{channel.metadata.id}{suffix}"
+    return (
+        f"{channel.parent.parent.metadata.id}"
+        f"_r{channel.parent.parent.metadata.resolution}"
+        f"_tf{channel.parent.metadata.id}"
+        f"_c{channel.metadata.id}{suffix}"
+    )
 
 
 class FileNameInfo(pydantic.BaseModel):
@@ -207,7 +212,12 @@ def info_from_file_path(file_path: Path):
     if file_name == "":
         raise RuntimeError(f"Encountered empty file name from: '{file_path}'")
 
-    file_name_re = r"(?P<set_id>.*)_r(?P<resolution>\d+)_tf(?P<time_frame>\d+)_ch(?P<channel>\d+)\.(?P<suffix>.*)$"
+    file_name_re = re.compile(
+        r"(?P<set_id>.*)"
+        r"_r(?P<resolution>\d+)"
+        r"_tf(?P<time_frame>\d+)"
+        r"_ch(?P<channel>\d+)\.(?P<suffix>.*)$"
+    )
 
     match = re.match(file_name_re, file_name)
     if match is None:

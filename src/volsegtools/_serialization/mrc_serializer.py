@@ -21,7 +21,12 @@ class MRCSerializer(Serializer):
         output_files = []
 
         for channel in data_set.flat_channel_iter():
-            file_name = f"{data_set.metadata.id}_r{data_set.metadata.resolution}_tf{channel.parent.metadata.id}_ch{channel.metadata.id}.mrc"
+            file_name = (
+                f"{data_set.metadata.id}"
+                f"_r{data_set.metadata.resolution}"
+                f"_tf{channel.parent.metadata.id}"
+                f"_ch{channel.metadata.id}.mrc"
+            )
             output_file_path = output_path / file_name
             vst_logger.info(f"... serialized into {output_file_path}")
 

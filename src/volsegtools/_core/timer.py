@@ -1,10 +1,10 @@
 import datetime
 import json
 import logging
-import time
-import uuid
 from pathlib import Path
+import time
 from typing import Any
+import uuid
 
 vst_logger = logging.getLogger("volsegtools")
 
@@ -241,11 +241,11 @@ class JSONTimerReporter:
 
         # TODO: if json parsing fails, we need some behavior (forceful overwrite?)
         if self.output_path.exists():
-            with open(self.output_path, "r") as file:
+            with Path.open(self.output_path) as file:
                 old_records = json.load(file)
                 records += old_records
 
-        with open(self.output_path, "w") as file:
+        with Path.open(self.output_path, "w") as file:
             file.write(json.dumps(records, indent=2))
 
         vst_logger.info(f"Finished writing timer report into {self.output_path}")

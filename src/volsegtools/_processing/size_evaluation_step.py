@@ -22,7 +22,10 @@ class StdoutSizeReporter(SizeReporter):
     def report(self, channel, size_in_bytes, label):
         print("--------------------------------------------------------------")
         print(
-            f"Size Evaluation of '{channel.data_set.metadata.id}_ch{channel.metadata.id} - Resolution {channel.data_set.metadata.resolution}.' with {label}"
+            f"Size Evaluation of '{channel.data_set.metadata.id}"
+            f"_ch{channel.metadata.id}"
+            f"- Resolution {channel.data_set.metadata.resolution}.'"
+            f" with {label}"
         )
         print("--------------------------------------------------------------")
 
@@ -55,7 +58,7 @@ class JSONSizeReporter(SizeReporter):
         sizes = []
         if self.output_path.exists():
             # TODO: check that valid JSON
-            with open(self.output_path, "r") as file:
+            with Path.open(self.output_path) as file:
                 old_sizes = json.load(file)
                 sizes += old_sizes
 
@@ -71,12 +74,18 @@ class JSONSizeReporter(SizeReporter):
             }
         )
 
-        with open(self.output_path, "w") as file:
+        with Path.open(self.output_path, "w") as file:
             file.write(json.dumps(sizes, indent=2))
 
 
 class SizeEvaluationStep(PostProcessingStep):
-    def __init__(self, reporter: SizeReporter = StdoutSizeReporter(), label: str = ""):
+    # It is safe to ignore this kind of error here, because the reported does
+    # not contain any state. Thus, the instance can be shared between calls.
+    def __init__(
+        self,
+        reporter: SizeReporter = StdoutSizeReporter(), # noqa: B008
+        label: str = ""
+    ):
         self.reporter = reporter
         self.label = label
 

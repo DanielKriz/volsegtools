@@ -1,6 +1,7 @@
 import json
-import tempfile
 from pathlib import Path
+import tempfile
+from typing import ClassVar
 
 import vrmlxpy as vrml
 
@@ -11,7 +12,7 @@ from volsegtools.abc import Converter
 
 
 class VRMLConverter(Converter):
-    DEFAULT_CONFIG = {
+    DEFAULT_CONFIG: ClassVar[dict] = {
         "ignoreUnknownNode": False,
         "logFileName": "vrmlproc",
         "logFileDirectory": ".",
@@ -22,7 +23,7 @@ class VRMLConverter(Converter):
         "IFSSettings": {"checkRange": True},
     }
 
-    DEFAULT_SYNONYMS = {
+    DEFAULT_SYNONYMS: ClassVar[dict[str, str]] = {
         "VRMLGroup": "Group",
         "VRMLTransform": "Transform",
         "VRMLSwitch": "Switch",
@@ -74,26 +75,27 @@ class VRMLConverter(Converter):
         input_path: Path,
         context: PipelineContext,
     ) -> list[DataSet]:
-        tmp_config = tempfile.NamedTemporaryFile()
-        tmp_synonyms = tempfile.NamedTemporaryFile()
-        tmp_out = tempfile.NamedTemporaryFile(suffix=".stl")
+        with (
+            tempfile.NamedTemporaryFile() as tmp_config,
+            tempfile.NamedTemporaryFile() as tmp_synonyms,
+            tempfile.NamedTemporaryFile(suffix=".stl") as tmp_out,
+        ):
+            config = self.DEFAULT_CONFIG.copy()
+            config["synonymsFile"] = str(tmp_synonyms.name)
 
-        config = self.DEFAULT_CONFIG.copy()
-        config["synonymsFile"] = str(tmp_synonyms.name)
+            with Path.open(Path(tmp_config.name), "w") as file:
+                file.write(json.dumps(config))
+            with Path.open(Path(tmp_synonyms.name), mode="w") as file:
+                file.write(json.dumps(self.DEFAULT_SYNONYMS))
 
-        with open(str(tmp_config.name), "w") as file:
-            file.write(json.dumps(config))
-        with open(str(tmp_synonyms.name), "w") as file:
-            file.write(json.dumps(self.DEFAULT_SYNONYMS))
+            vrml.convert_vrml(
+                str(input_path),
+                str(tmp_out.name),
+                str(tmp_config.name),
+            )
 
-        vrml.convert_vrml(
-            str(input_path),
-            str(tmp_out.name),
-            str(tmp_config.name),
-        )
-
-        mesh_converter = MeshConverter()
-        return await mesh_converter.convert_segmentation(Path(tmp_out.name))
+            mesh_converter = MeshConverter()
+            return await mesh_converter.convert_segmentation(Path(tmp_out.name))
 
     async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError

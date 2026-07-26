@@ -71,7 +71,7 @@ class TIFFConverter(Converter):
         if data_array.ndim == 5:
             # There are multiple frames
             raise NotImplementedError()
-        elif data_array.ndim == 4:
+        if data_array.ndim == 4:
             frame = data_set.add_time_frame()
             for idx, channel_data in enumerate(array):
                 transposed = channel_data.transpose(permutation)

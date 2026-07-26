@@ -1,5 +1,5 @@
-import logging
 from collections.abc import Callable
+import logging
 
 import numpy as np
 import scipy
@@ -27,8 +27,7 @@ class SmoothingStep(PostProcessingStep):
     def calculate_convolution_kernel(self):
         x = np.arange(-5, 5 + 1)
         kernel = np.exp(-(x**2) / (2 * 1**2))
-        kernel = kernel / kernel.sum()
-        return kernel
+        return kernel / kernel.sum()
 
     async def execute(
         self,

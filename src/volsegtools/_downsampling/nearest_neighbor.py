@@ -10,7 +10,8 @@ vst_logger = logging.getLogger("volsegtools")
 
 class NearestNeighbor(DownsamplingStrategy):
     def __init__(self, factor=2):
-        assert factor > 1
+        if factor < 1:
+            raise RuntimeError("factor has to be atleast 2")
         self.factor = factor
 
     def execute(self, channel: Channel, context: PipelineContext):
