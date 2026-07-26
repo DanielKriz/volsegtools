@@ -11,14 +11,16 @@ vst_logger = logging.getLogger("volsegtools")
 
 
 class Timer:
+    RESOLUTION = 3
+
     class Stage:
-        def __init__(self, name):
+        def __init__(self, name: str):
             self.events: list[Timer.Event] = []
             self.start = time.time()
             self.end: float | None = None
             self.name = name
 
-        def push_event(self, name):
+        def push_event(self, name: str):
             if len(self.events) != 0:
                 self.events.append(Timer.Event(self.events[-1].end, name, self))
             else:
@@ -32,6 +34,8 @@ class Timer:
 
         @property
         def total_time(self) -> float:
+            if self.end is None:
+                raise RuntimeError("There was not measurement")
             return self.end - self.start
 
         def serialize(self, use_ms=False):
@@ -49,11 +53,11 @@ class Timer:
             }
 
     class Event:
-        def __init__(self, start, name: str, parent: Any | None = None):
+        def __init__(self, start: float, name: str, parent: Any | None = None):
             self.parent: Timer.Stage | None = parent
             self.name: str = name
-            self.start = start
-            self.end = time.time()
+            self.start: float = start
+            self.end: float = time.time()
 
         def serialize(self, use_ms=False):
             return {
@@ -71,71 +75,62 @@ class Timer:
         def total_time(self) -> float:
             return self.end - self.start
 
-    RESOLUTION = 3
+    def __init__(self):
+        self.start = time.time()
+        self.points: list[Timer.Stage | Timer.Event] = []
+        self.current_event: Timer.Event | None = None
+        self.current_stage: Timer.Stage | None = None
 
-    start = time.time()
-    points: list[Stage | Event] = []
-    current_stage: Stage | None = None
-    current_event: Event | None = None
+    def restart(self):
+        self.start = time.time()
+        self.points = []
 
-    @staticmethod
-    def restart():
-        Timer.start = time.time()
-        Timer.points = []
+    def push_stage(self, name: str):
+        if self.current_stage is not None:
+            self.pop_stage()
+        self.current_stage = Timer.Stage(name)
+        self.points.append(self.current_stage)
 
-    @staticmethod
-    def push_stage(name: str):
-        if Timer.current_stage is not None:
-            Timer.pop_stage()
-        Timer.current_stage = Timer.Stage(name)
-        Timer.points.append(Timer.current_stage)
+    def pop_stage(self):
+        if self.current_stage is not None:
+            self.current_stage.end = time.time()
+            self.current_stage = None
 
-    @staticmethod
-    def pop_stage():
-        if Timer.current_stage is not None:
-            Timer.current_stage.end = time.time()
-            Timer.current_stage = None
+    def pop_event(self):
+        if self.current_stage is not None:
+            self.current_stage.pop_event()
+        elif len(self.points) != 0:
+            self.points[-1].end = time.time()
 
-    @staticmethod
-    def pop_event():
-        if Timer.current_stage is not None:
-            Timer.current_stage.pop_event()
-        elif len(Timer.points) != 0:
-            Timer.points[-1].end = time.time()
-
-    @staticmethod
-    def push_event(name: str):
-        if Timer.current_stage is not None:
-            Timer.current_stage.push_event(name)
-            Timer.current_event = Timer.current_stage.events[-1]
+    def push_event(self, name: str):
+        if self.current_stage is not None:
+            self.current_stage.push_event(name)
+            self.current_event = self.current_stage.events[-1]
         else:
-            Timer.current_event = Timer.Event(name)
-            Timer.points.append(Timer.current_event)
+            self.current_event = Timer.Event(name)
+            self.points.append(self.current_event)
 
-    @staticmethod
-    def total_time():
-        return Timer.start + sum([p.end - p.start for p in Timer.points])
+    def total_time(self):
+        return self.start + sum([p.end - p.start for p in self.points])
 
-    @staticmethod
-    def serialize(use_ms=False):
-        Timer.pop_stage()
+    def serialize(self, use_ms=False):
+        self.pop_stage()
         return {
-            "total_time": round(Timer.total_time() - Timer.start, Timer.RESOLUTION)
+            "total_time": round(self.total_time() - self.start, Timer.RESOLUTION)
             if use_ms
-            else Timer.total_time(),
-            "stamps": [p.serialize(use_ms) for p in Timer.points],
+            else self.total_time(),
+            "stamps": [p.serialize(use_ms) for p in self.points],
         }
 
-    @staticmethod
-    def print_report(reporter):
-        reporter.report(Timer.serialize(True))
+    def print_report(self, reporter):
+        reporter.report(self.serialize(True))
 
 
 class TimerReporter:
     STAGE_FMT = "({:6.3f}%) Stage: '{}' ({:0.3f}s / {:0.3f}s / {:0.3f}s)"
     EVENT_FMT = "({:6.3f}% / {:6.3f}%) Event: '{}' ({:0.3f}s / {:0.3f}s / {:0.3f}s)"
 
-    def to_percent(self, part, total):
+    def to_percent(self, part: float, total: float):
         step = total / 100.0
         return part / step
 

@@ -1,17 +1,16 @@
 from pathlib import Path
-from typing import Any, Self
+from typing import Self
 
 import trimesh
 import zarr
-import zarr.storage
 
 from volsegtools._core import ComputationBackend, DataKind, WorkingStore
+from volsegtools.typing import ZarrObject
 
 
 class DataHandle:
     def __init__(
         self,
-        # store: zarr.storage.StoreLike,
         store: WorkingStore,
         zarr_path: Path,
         data_kind: DataKind,
@@ -57,7 +56,11 @@ class DataHandle:
             )
             backend.store_to_zarr(data, arr)
 
-    def require_kind(self, *allowed_kinds: DataKind, inverse=False) -> None:
+    def require_kind(
+        self,
+        *allowed_kinds: DataKind,
+        inverse: bool = False
+    ) -> None:
         result = self.data_kind not in allowed_kinds
         result = not result if inverse else result
         if result:
@@ -65,7 +68,7 @@ class DataHandle:
                 f"Cannot proceed. Expected one of {allowed_kinds}, got {self.data_kind}"
             )
 
-    def get_lattice(self, backend: ComputationBackend) -> Any:
+    def get_lattice(self, backend: ComputationBackend) -> ZarrObject:
         self.require_kind(
             DataKind.VOLUME, DataKind.SEGMENTATION_MASK, DataKind.SEGMENTATION_VOLUME
         )
@@ -83,7 +86,7 @@ class DataHandle:
 
         return backend.load_from_zarr(self.zarr_object)
 
-    def calculate_statistics(self, backend):
+    def calculate_statistics(self, backend: ComputationBackend):
         return backend.calculate_statistics(self.zarr_object["data"])
 
     def close(self) -> None:

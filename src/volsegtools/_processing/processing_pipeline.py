@@ -107,7 +107,7 @@ class ProcessingPipeline(ProcessingPipeline):
         def inner(func):
             def wrapper(self, *args, **kwargs):
                 vst_logger.info(kind)
-                Timer.push_stage(str(kind))
+                self.context.timer.push_stage(str(kind))
                 self._state.current_stage = PipelineStageKind(kind)
 
                 for cb in self._callbacks:
@@ -218,7 +218,7 @@ class ProcessingPipeline(ProcessingPipeline):
             converter = self._volume_converter_map["".join(path.suffixes)]
             self._state.msg = f"Converting '{path}'"
             volumes += await converter.convert_volume(path, self.context)
-            Timer.push_event(f"Finished converting {path}")
+            self.context.timer.push_event(f"Finished converting {path}")
 
         return volumes
 
@@ -289,7 +289,7 @@ class ProcessingPipeline(ProcessingPipeline):
                     .add_channel(channel.metadata.id)
                 )
                 channel.set_data(downsampled_data, DaskBackend)
-                Timer.push_event(
+                self.context.timer.push_event(
                     msg.format(data_set.metadata.id, channel.metadata.id, resolution)
                 )
         return list(resulting_data_sets.values())

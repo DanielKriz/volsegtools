@@ -7,7 +7,7 @@ from volsegtools._core.kernel import ConvolutionKernel
 
 from .bundler import Bundler
 from .converter import Converter
-from .downsampling_strategy import DownsamplingStrategy
+from .downsampling_strategy import DataType, DownsamplingStrategy, TData
 from .post_conversion_step import PostConversionStep
 from .post_processing_step import PostProcessingStep
 from .processing_pipeline import ProcessingPipeline
@@ -18,9 +18,11 @@ __all__ = [
     "ComputationBackend",
     "Converter",
     "ConvolutionKernel",
+    "DataType",
     "DownsamplingStrategy",
     "PostConversionStep",
     "PostProcessingStep",
     "ProcessingPipeline",
     "Serializer",
+    "TData",
 ]

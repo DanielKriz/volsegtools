@@ -142,14 +142,14 @@ class MRCConverter(Converter):
             Array with normalized order of axes. It is the view to the input
             array.
         """
-        CORRECT_ORDER = (0, 1, 2)
+        correct_order = (0, 1, 2)
 
         current_order = tuple(
             int(axis) - 1 for axis in [header.mapc, header.mapr, header.maps]
         )
 
-        if tuple(current_order) != CORRECT_ORDER:
-            da.moveaxis(data, current_order, CORRECT_ORDER)
+        if tuple(current_order) != correct_order:
+            da.moveaxis(data, current_order, correct_order)
 
         data.transpose()
 

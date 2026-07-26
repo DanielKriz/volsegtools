@@ -38,11 +38,10 @@ class TIFFConverter(Converter):
         data_array, metadata, _ = reader.read()
         array = da.from_array(data_array)
 
-        axis_order_map = {}
-        for idx, axis in enumerate(
-            filter(lambda x: x in ["X", "Y", "Z"], metadata["DimOrder BF Array"])
-        ):
-            axis_order_map[idx] = axis
+        axis_order_map = dict(enumerate(filter(
+            lambda x: x in ["X", "Y", "Z"],
+            metadata["DimOrder BF Array"]
+        )))
 
         current_order = f"{axis_order_map[0]}{axis_order_map[1]}{axis_order_map[2]}"
 

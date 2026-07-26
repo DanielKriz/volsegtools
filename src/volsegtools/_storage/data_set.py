@@ -1,19 +1,20 @@
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 import re
 
 import pydantic
 
-from volsegtools._core.computation_backend import ComputationBackend
-from volsegtools._core.working_store import WorkingStore
-from volsegtools._model import (
-    ChannelInfo,
-    DataSetInfo,
-    MeshInfo,
-    TimeFrameInfo,
-)
-from volsegtools._storage.data_handle import DataHandle
+from volsegtools._model import DataSetInfo
+from volsegtools._storage.time_frame import TimeFrame
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from volsegtools._core.working_store import WorkingStore
+    from volsegtools._storage.channel import Channel
 
 
 class DataSet:
@@ -29,21 +30,22 @@ class DataSet:
         self._last_time_frame_num = 0
 
     @property
-    def zarr_path(self):
+    def zarr_path(self) -> Path:
         if self.metadata.kind.is_segmentation():
             root = Path("segmentation_data")
         else:
             root = Path("volume_data")
         return root / self.metadata.id / f"resolution_{self.metadata.resolution}"
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[TimeFrame]:
         yield from self.time_frames
 
-    def flat_channel_iter(self):
+    # TODO: this should work with meshes too
+    def flat_channel_iter(self) -> Iterator[Channel]:
         for frame in self.time_frames:
             yield from frame
 
-    def add_time_frame(self, id=-1):
+    def add_time_frame(self, id: int = -1) -> TimeFrame:
         if id == -1:
             id = self._last_time_frame_num
             self._last_time_frame_num += 1
@@ -53,7 +55,7 @@ class DataSet:
         self.time_frames.append(TimeFrame(self, id))
         return self.time_frames[-1]
 
-    def update_metadata(self, other: Self):
+    def update_metadata(self, other: Self) -> None:
         """Updates missing parts of metadata from other data set.
 
         Generally, the other data set should contain the same data, but in
@@ -66,131 +68,14 @@ class DataSet:
             self.metadata = other.metadata.model_copy(deep=True)
             self._metadata_is_set = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"DataSet({self.metadata}, {self.time_frames})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
 
-class TimeFrame:
-    def __init__(self, parent: DataSet, id):
-        self.parent = parent
-        self.channels = []
-        self.meshes = []
-        self.metadata = TimeFrameInfo(id=id)
-
-    @property
-    def data_set(self):
-        return self.parent
-
-    @property
-    def zarr_path(self):
-        return self.data_set.zarr_path / f"time_frame_{self.metadata.id}"
-
-    def add_channel(self, id):
-        self.channels.append(Channel(self, id))
-        return self.channels[-1]
-
-    def add_mesh(self, id):
-        self.meshes.append(Mesh(self, id))
-        return self.meshes[-1]
-
-    def __iter__(self):
-        yield from self.channels
-
-    def __str__(self):
-        return f"TimerFrame({self.metadata}, {self.channels}, {self.meshes})"
-
-    def __repr__(self):
-        return self.__str__()
-
-
-class Mesh:
-    def __init__(self, parent: TimeFrame, id: int):
-        self.parent = parent
-        self.metadata = MeshInfo(id=id)
-
-    def set_data(self, mesh_data, backend):
-        self.handle = DataHandle(
-            self.data_set.store, self.zarr_path, self.data_set.metadata.kind
-        )
-        self.handle.store_data(mesh_data, backend)
-
-    @property
-    def zarr_path(self):
-        return self.time_frame.zarr_path / f"mesh_{self.metadata.id}"
-
-    @property
-    def data_set(self):
-        return self.parent.parent
-
-    @property
-    def time_frame(self):
-        return self.parent
-
-    def __str__(self):
-        return f"Mesh({self.metadata})"
-
-    def __repr__(self):
-        return self.__str__()
-
-
-class Channel:
-    def __init__(self, parent: TimeFrame, id: int):
-        self.parent = parent
-        self.metadata = ChannelInfo(id=id)
-        self._handle: DataHandle | None = None
-
-    @property
-    def handle(self) -> DataHandle:
-        if self._handle is None:
-            raise RuntimeError("There are not data in the channel")
-        return self._handle
-
-    @handle.setter
-    def handle(self, new_handle):
-        self._handle = new_handle
-
-    def set_data(self, data, backend: ComputationBackend):
-        self.handle = DataHandle(
-            self.data_set.store, self.zarr_path, self.data_set.metadata.kind
-        )
-        self.handle.store_data(data, backend)
-        self.metadata.statistics = self.handle.calculate_statistics(backend)
-
-    @property
-    def zarr_path(self):
-        return self.time_frame.zarr_path / f"channel_{self.metadata.id}"
-
-    @property
-    def data_set(self):
-        return self.parent.parent
-
-    @property
-    def time_frame(self):
-        return self.parent
-
-    def __str__(self):
-        return f"Channel({self.metadata})"
-
-    def __repr__(self):
-        return self.__str__()
-
-
-class DataSetDefaultDict(dict):
-    def __missing__(self, key: int):
-        if not isinstance(key, int):
-            raise RuntimeError("Keys to data set dictionary have to be int")
-
-        new_info = DataSetInfo(resolution=key)
-        new_data_set = DataSet(new_info)
-
-        self[key] = new_data_set
-        return new_data_set
-
-
-def create_file_name(channel: Channel, suffix: str = ".bcif"):
+def create_file_name(channel: Channel, suffix: str = ".bcif") -> str:
     return (
         f"{channel.parent.parent.metadata.id}"
         f"_r{channel.parent.parent.metadata.resolution}"
@@ -208,7 +93,7 @@ class FileNameInfo(pydantic.BaseModel):
     file_path: Path
 
 
-def info_from_file_path(file_path: Path):
+def info_from_file_path(file_path: Path) -> FileNameInfo:
     file_name = file_path.name
     if file_name == "":
         raise RuntimeError(f"Encountered empty file name from: '{file_path}'")

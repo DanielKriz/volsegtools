@@ -1,3 +1,5 @@
+from collections.abc import Iterator
+
 import logging
 
 import dask_image.ndfilters as dask_filter
@@ -7,13 +9,13 @@ import scipy
 from volsegtools._core import ConvolutionKernel, Gaussian3DKernel
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage.data_set import Channel
+from volsegtools._storage.channel import Channel
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
 
 
-class Smoothing(DownsamplingStrategy):
+class Smoothing(DownsamplingStrategy[Channel]):
     # We have to choose some reasonable size of the chunks with which
     # we will be working here. This has been chosen because for floats
     # it has around 70MB, the chunk size should be somewhere between
@@ -33,7 +35,11 @@ class Smoothing(DownsamplingStrategy):
     def calculate_steps(self, channel: Channel) -> int:
         return len(self.calculate_approx_downsampled_sizes(channel))
 
-    def execute(self, data: Channel, context: PipelineContext):
+    def execute(
+        self,
+        data: Channel,
+        context: PipelineContext
+    ) -> Iterator[Channel]:
         vst_logger.info("Using the 'Smoothing' downsampling strategy")
 
         if 1 in data.handle.shape:
@@ -58,7 +64,7 @@ class Smoothing(DownsamplingStrategy):
             yield current_data
 
 
-class SeparatedSmoothing(DownsamplingStrategy):
+class SeparatedSmoothing(DownsamplingStrategy[Channel]):
     def __init__(self, size: int, sigma: float):
         self.radius = int(size * sigma + 0.5)
         self.sigma = sigma
@@ -83,7 +89,11 @@ class SeparatedSmoothing(DownsamplingStrategy):
         kernel = np.exp(-(x**2) / (2 * self.sigma**2))
         return kernel / kernel.sum()
 
-    def execute(self, data: Channel, context: PipelineContext):
+    def execute(
+        self,
+        data: Channel,
+        context: PipelineContext
+    ) -> Iterator[Channel]:
         kernel = self.calculate_convolution_kernel()
 
         def conv_block(block, axis):
@@ -113,7 +123,7 @@ class SeparatedSmoothing(DownsamplingStrategy):
             yield current_data
 
 
-class StridedSmoothing(DownsamplingStrategy):
+class StridedSmoothing(DownsamplingStrategy[Channel]):
     def __init__(self, kernel: ConvolutionKernel, stride=2):
         self.kernel = kernel
         self.stride = stride
@@ -133,7 +143,11 @@ class StridedSmoothing(DownsamplingStrategy):
     def calculate_steps(self, channel: Channel) -> int:
         return len(self.calculate_approx_downsampled_sizes(channel))
 
-    def execute(self, data: Channel):
+    def execute(
+        self,
+        data: Channel,
+        context: PipelineContext,
+    ) -> Iterator[Channel]:
         radius = self.kernel.size
         kernel_arr = self.kernel.as_ndarray()
 

@@ -9,7 +9,7 @@ from .bounds import Bounds
 from .chunking_mode import ChunkingMode
 from .computation_backend import ComputationBackend
 from .data_kind import DataKind
-from .gaussian_kernel_3D import Gaussian3DKernel
+from .gaussian_kernel import Gaussian3DKernel
 from .kernel import ConvolutionKernel
 from .timer import JSONTimerReporter, Timer, TimerReporter
 from .unit_kind import UnitKind, to_angstrom, to_bytes, to_micrometer, unit_from_str

@@ -5,15 +5,11 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
+from .channel import Channel
 from .data_handle import DataHandle
-from .data_set import (
-    Channel,
-    DataSet,
-    Mesh,
-    TimeFrame,
-    create_file_name,
-    info_from_file_path,
-)
+from .data_set import DataSet, create_file_name, info_from_file_path
+from .mesh import Mesh
+from .time_frame import TimeFrame
 
 __all__ = [
     "Channel",

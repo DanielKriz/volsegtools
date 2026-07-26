@@ -23,6 +23,7 @@ class ConverterMap:
                 warnings.warn(
                     f"Overwriting converter for suffix: {suffix}",
                     RuntimeWarning,
+                    stacklevel=2,
                 )
             self._suffix_to_converter_map[suffix] = converter
 
@@ -48,7 +49,7 @@ class ConverterMap:
             return self._suffix_to_converter_map[suffix]
         except KeyError:
             if suffix.endswith(("gz", "bz2")):
-                raise UnsupportedCompressionError()
+                raise UnsupportedCompressionError() from None
             raise
 
     def __getitem__(self, suffix) -> Converter:

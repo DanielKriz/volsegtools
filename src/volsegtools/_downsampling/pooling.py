@@ -1,3 +1,5 @@
+from collections.abc import Iterator
+
 import logging
 
 import dask.array as da
@@ -5,13 +7,13 @@ import numpy as np
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage.data_set import Channel
+from volsegtools._storage.channel import Channel
 from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
 
 
-class PoolingDownsamplingStrategy(DownsamplingStrategy):
+class PoolingDownsamplingStrategy(DownsamplingStrategy[Channel]):
     DEFAULT_BLOCK_SIZE = 2
     DEFAULT_PADDING_MODE = "reflect"
 
@@ -29,7 +31,11 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
         self.block_size = block_size
         self.padding_mode = padding_mode
 
-    def execute(self, channel: Channel, context: PipelineContext):
+    def execute(
+        self,
+        data: Channel,
+        context: PipelineContext
+    ) -> Iterator[Channel]:
         match self.operation:
             case np.mean:
                 vst_logger.info("Using the 'Mean' downsampling strategy")
@@ -38,9 +44,9 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
             case np.max:
                 vst_logger.info("Using the 'Max' downsampling strategy")
 
-        data = channel.handle.get_lattice(DaskBackend)
+        lattice = data.handle.get_lattice(DaskBackend)
 
-        original_dtype = data.dtype
+        original_dtype = lattice.dtype
 
         axes_block_sizes = {
             0: self.block_size,
@@ -49,22 +55,22 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
         }
 
         resolution = 1
-        while data.nbytes > super().MIN_SIZE_THRESHOLD:
+        while lattice.nbytes > super().MIN_SIZE_THRESHOLD:
             log_msg = "... downsampling '{}' for resolution number {}"
-            vst_logger.info(log_msg.format(channel.data_set.metadata.id, resolution))
+            vst_logger.info(log_msg.format(data.data_set.metadata.id, resolution))
 
             paddings = []
-            for dim in data.shape:
+            for dim in lattice.shape:
                 remainder = dim % self.block_size
                 pad = self.block_size - remainder if remainder != 0 else 0
                 paddings.append((0, pad))
 
-            data = da.pad(data, pad_width=paddings, mode=self.padding_mode)
-            data = da.coarsen(self.operation, data, axes_block_sizes)
-            data = data.astype(original_dtype)
-            data = data.rechunk("auto")
+            lattice = da.pad(lattice, pad_width=paddings, mode=self.padding_mode)
+            lattice = da.coarsen(self.operation, lattice, axes_block_sizes)
+            lattice = lattice.astype(original_dtype)
+            lattice = lattice.rechunk("auto")
             resolution += 1
-            yield data
+            yield lattice
 
 
 class AveragePooling(PoolingDownsamplingStrategy):

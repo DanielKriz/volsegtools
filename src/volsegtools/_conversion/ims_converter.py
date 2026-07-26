@@ -79,7 +79,12 @@ def _find_all_channels(ch_list: list, info: dict):
 
 
 def _channel_to_str(channel):
-    return f"{channel.namespace} (R: {channel.resolution}, T: {channel.time_frame}, C:{channel.channel_id})"
+    return (
+        f"{channel.namespace} "
+        f"(R: {channel.resolution}, "
+        f"T: {channel.time_frame}, "
+        f"C:{channel.channel_id})"
+    )
 
 
 def _find_image_info(info: dict):

@@ -6,7 +6,6 @@ from typing import Annotated
 import enum
 import itertools
 import logging
-import os
 import shutil
 import sys
 
@@ -115,7 +114,7 @@ class CommandGroup(enum.StrEnum):
     BENCHMARK_AND_DEBUG = "Benchmarking & Debugging"
 
 
-def report_error(msg):
+def report_error(msg: str):
     vst_logger.error(msg)
     print(f"Error: {msg}", file=sys.stderr)
 
@@ -275,7 +274,7 @@ def run(
         raise typer.Exit()
 
     if not output_path.exists():
-        os.makedirs(output_path, exist_ok=True)
+        output_path.mkdir(parents=True, exist_ok=True)
 
     console = rich.console.Console()
 
@@ -317,7 +316,7 @@ def run(
     try:
         builder.set_work_dir(local_store_path)
     except RuntimeError as err:
-        print("Error:", err)
+        report_error(str(err))
         raise typer.Exit() from None
 
     match bundling_approach:
@@ -356,20 +355,21 @@ def run(
             )
         )
 
+    pipeline: vst.ProcessingPipeline = builder.build()
+
     with console.status("Processing...") as status:
 
         def update_status(state):
             status.update(f"Processing... {state.current_stage} ")
 
         try:
-            pipeline: vst.ProcessingPipeline = builder.build()
             pipeline.add_state_change_callback(update_status)
             pipeline.sync_process(
                 volumes=volume_source,
                 segmentations=segmentation_source,
             )
 
-            vst.Timer.pop_stage()
+            pipeline.context.timer.pop_stage()
         except vst.UnsupportedCompressionError as err:
             report_error(str(err))
         finally:
@@ -377,9 +377,9 @@ def run(
                 shutil.rmtree(local_store_path)
 
     if show_time:
-        vst.Timer.print_report(vst.TimerReporter())
+        pipeline.context.timer.print_report(vst.TimerReporter())
     if time_report_path:
-        vst.Timer.print_report(
+        pipeline.context.timer.print_report(
             vst.JSONTimerReporter(
                 output_path=time_report_path,
                 label=volume_source[0].stem,

@@ -1,18 +1,24 @@
-from typing import Any, Protocol
+from collections.abc import Iterator
+from typing import Protocol, TypeVar
+
+import trimesh
 
 from volsegtools._model import PipelineContext
+from volsegtools._storage import Channel
 
+DataType = Channel | trimesh.Trimesh
+TData = TypeVar("TData", bound=DataType)
 
-class DownsamplingStrategy(Protocol):
+class DownsamplingStrategy(Protocol[TData]):
     """Downsamples given data."""
 
     MIN_SIZE_THRESHOLD = 5_000_000  # 5 MB
 
     def execute(
         self,
-        data_set,
+        data: TData,
         context: PipelineContext,
-    ) -> Any:
+    ) -> Iterator[TData]:
         """Executes give downsampling strategy on given data.
 
         It shall be implemented as a generator, where each yield represents

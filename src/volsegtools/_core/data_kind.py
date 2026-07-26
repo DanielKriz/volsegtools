@@ -7,8 +7,8 @@ class DataKind(enum.IntEnum):
     SEGMENTATION_MASK = enum.auto()
     SEGMENTATION_MESH = enum.auto()
 
-    def is_volume(self):
+    def is_volume(self) -> bool:
         return self.value < DataKind.SEGMENTATION_VOLUME
 
-    def is_segmentation(self):
+    def is_segmentation(self) -> bool:
         return self.value >= DataKind.SEGMENTATION_VOLUME

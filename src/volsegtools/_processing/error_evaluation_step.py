@@ -14,7 +14,6 @@ import dask.array as da
 import numpy as np
 import scipy
 
-from volsegtools._core.timer import Timer
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import DataSet
@@ -412,7 +411,11 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
             chunks=self.calculate_new_chunks(data, zoom),
         )
 
-    async def execute(self, data_sets: list[DataSet]) -> list[DataSet]:
+    async def execute(
+        self,
+        data_sets: list[DataSet],
+        context: PipelineContext,
+    ) -> list[DataSet]:
         vst_logger.info("Started 'Error Evaluation Multi' post-processing step")
         resolution_to_data = {}
         for _, group in itertools.groupby(data_sets, lambda x: x.metadata.id):
@@ -479,7 +482,7 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
                             f"{task_id}-ch{data.metadata.id}", error_fn.name
                         )
                     )
-                    Timer.push_event(
+                    context.timer.push_event(
                         "Evaluation of '{}' with {}".format(
                             f"{task_id}-ch{data.metadata.id}", error_fn.name
                         )

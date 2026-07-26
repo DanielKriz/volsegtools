@@ -34,6 +34,7 @@ class ProcessingPipelineBuilder:
         self._volume_converter_map = ConverterMap()
         self._segmentation_converter_map = ConverterMap()
         self._bundler = None
+        self._keep_original = False
 
     def _mend_suffixes(self, converter, suffixes=None, preserve_builtin=False):
         if preserve_builtin:
@@ -102,6 +103,10 @@ class ProcessingPipelineBuilder:
         self._work_dir = file_path
         return self
 
+    def keep_original(self, value: bool) -> Self:
+        self._keep_original = value
+        return self
+
     def set_output_dir(self, file_path: Path) -> Self:
         self._output_dir = file_path
         return self
@@ -131,6 +136,7 @@ class ProcessingPipelineBuilder:
             bundler=self._bundler,
             work_dir=self._work_dir,
             output_dir=self._output_dir,
+            keep_original=self._keep_original,
         )
 
 

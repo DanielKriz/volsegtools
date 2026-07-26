@@ -67,10 +67,7 @@ class NGFFConverter(Converter):
         data_set = DataSet(context.working_store, info)
 
         # If we have time frames then we have to iterate over them
-        if data_arr.ndim > 4:
-            time_frames = data_arr
-        else:
-            time_frames = [data_arr]
+        time_frames = data_arr if data_arr.ndim > 4 else [data_arr]
 
         for frame_data in time_frames:
             for idx, channel_data in enumerate(frame_data):

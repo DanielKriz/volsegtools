@@ -33,7 +33,7 @@ class CIFConverter(Converter):
     ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
-        with open(input_path, "rb") as file:
+        with Path.open(input_path, "rb") as file:
             cif_data = ciftools.serialization.loads(file.read(), lazy=False)
 
         data_set = None

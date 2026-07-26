@@ -34,7 +34,7 @@ class PipelineState:
 class PipelineStateManager:
     def __init__(
         self,
-        pipeline: "ProcessingPipeline",
+        pipeline,
         initial_state: PipelineState,
     ) -> None:
         self._pipeline = pipeline
