@@ -1,11 +1,7 @@
 import asyncio
-import enum
 import itertools
 import logging
 from pathlib import Path
-from typing import List, Optional
-
-import pydantic
 
 from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core import DataKind, Timer, Vector3, WorkingStore
@@ -29,7 +25,7 @@ from volsegtools.abc import (
 vst_logger = logging.getLogger("volsegtools")
 
 
-def _flatten(list_of_lists: List[List]) -> List:
+def _flatten(list_of_lists: list[list]) -> list:
     # Source - https://stackoverflow.com/a/952952
     return [x for xs in list_of_lists for x in xs]
 
@@ -40,17 +36,17 @@ class ProcessingPipeline(ProcessingPipeline):
     def __init__(
         self,
         downsampling_strategy=Null(),
-        volume_converter_map: Optional[ConverterMap] = None,
-        segmentation_converter_map: Optional[ConverterMap] = None,
-        volume_serializer: Optional[Serializer] = None,
-        segmentation_mask_serializer: Optional[Serializer] = None,
-        segmentation_volume_serializer: Optional[Serializer] = None,
-        segmentation_mesh_serializer: Optional[Serializer] = None,
-        post_processing_steps: List[PostProcessingStep] = [],
-        post_conversion_steps: List[PostConversionStep] = [],
-        bundler: Optional[Bundler] = None,
-        work_dir: Optional[Path] = None,
-        output_dir: Optional[Path] = None,
+        volume_converter_map: ConverterMap | None = None,
+        segmentation_converter_map: ConverterMap | None = None,
+        volume_serializer: Serializer | None = None,
+        segmentation_mask_serializer: Serializer | None = None,
+        segmentation_volume_serializer: Serializer | None = None,
+        segmentation_mesh_serializer: Serializer | None = None,
+        post_processing_steps: list[PostProcessingStep] = [],
+        post_conversion_steps: list[PostConversionStep] = [],
+        bundler: Bundler | None = None,
+        work_dir: Path | None = None,
+        output_dir: Path | None = None,
     ):
         # The conversion and bundling are required stages
         self._downsampling_strategy = downsampling_strategy
@@ -133,20 +129,20 @@ class ProcessingPipeline(ProcessingPipeline):
 
     def sync_process(
         self,
-        volumes: List[Path] = [],
-        segmentations: List[Path] = [],
-        metadata: List[Path] = [],
-        annotations: List[Path] = [],
-    ) -> List[Path]:
+        volumes: list[Path] = [],
+        segmentations: list[Path] = [],
+        metadata: list[Path] = [],
+        annotations: list[Path] = [],
+    ) -> list[Path]:
         return asyncio.run(self.process(volumes, segmentations, metadata, annotations))
 
     async def process(
         self,
-        volumes: List[Path] = [],
-        segmentations: List[Path] = [],
-        metadata: List[Path] = [],
-        annotations: List[Path] = [],
-    ) -> List[Path]:
+        volumes: list[Path] = [],
+        segmentations: list[Path] = [],
+        metadata: list[Path] = [],
+        annotations: list[Path] = [],
+    ) -> list[Path]:
         converted_volumes = await self.convert_volumes(volumes)
         converted_segmentations = await self.convert_segmentations(segmentations)
         collected_metadata = await self.collect_metadata(metadata)
@@ -186,7 +182,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return serialized_files
 
     @pipeline_stage("Volume Conversion")
-    async def convert_volumes(self, paths: List[Path]) -> List[DataSet]:
+    async def convert_volumes(self, paths: list[Path]) -> list[DataSet]:
         volumes = []
 
         if self._volume_converter_map is None:
@@ -204,7 +200,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return volumes
 
     @pipeline_stage("Segmentation Conversion")
-    async def convert_segmentations(self, paths: List[Path]) -> List[DataSet]:
+    async def convert_segmentations(self, paths: list[Path]) -> list[DataSet]:
         segmentations = []
 
         if self._segmentation_converter_map is None:
@@ -221,11 +217,11 @@ class ProcessingPipeline(ProcessingPipeline):
         return segmentations
 
     @pipeline_stage("Metadata Collection")
-    async def collect_metadata(self, paths: List[Path]):
+    async def collect_metadata(self, paths: list[Path]):
         return []
 
     @pipeline_stage("Annotation Collection")
-    async def collect_annotation(self, paths: List[Path]):
+    async def collect_annotation(self, paths: list[Path]):
         return []
 
     @pipeline_stage("Post-Conversion Steps")
@@ -236,7 +232,7 @@ class ProcessingPipeline(ProcessingPipeline):
             await step(volumes, segmentations, metadata, annotations, self.context)
 
     @pipeline_stage("Downsampling")
-    async def downsample(self, data_set: DataSet) -> List[DataSet]:
+    async def downsample(self, data_set: DataSet) -> list[DataSet]:
         resulting_data_sets: dict[int, DataSet] = {}
 
         self._state.msg = f"Downsampling '{data_set.metadata.id}'"
@@ -252,7 +248,7 @@ class ProcessingPipeline(ProcessingPipeline):
                 self._downsampling_strategy.execute(channel, self.context),
                 start=1,  # 0 is reserved for the original data resolution
             ):
-                if resolution not in resulting_data_sets.keys():
+                if resolution not in resulting_data_sets:
                     resulting_data_sets[resolution] = DataSet(
                         self.context.working_store
                     )
@@ -276,14 +272,14 @@ class ProcessingPipeline(ProcessingPipeline):
         return list(resulting_data_sets.values())
 
     @pipeline_stage("Post-Processing Steps")
-    async def apply_post_processing_steps(self, data_set) -> List[DataSet]:
+    async def apply_post_processing_steps(self, data_set) -> list[DataSet]:
         processed_data = data_set
         for step in self._post_processing_steps:
             processed_data = await step.execute(processed_data, self.context)
         return processed_data
 
     @pipeline_stage("Serialization")
-    async def serialize(self, data_set) -> List[Path]:
+    async def serialize(self, data_set) -> list[Path]:
         kind = data_set.metadata.kind
 
         serializer = self._serializer_map[kind]
@@ -293,7 +289,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return await serializer.serialize(data_set, self._work_dir, self.context)
 
     @pipeline_stage("Bundling")
-    async def bundle(self, files: List[Path]):
+    async def bundle(self, files: list[Path]):
         if self._bundler is None:
             raise RuntimeError("Cannot bundle without any bundler!")
         return self._bundler.bundle(files, self._output_dir, self.context)

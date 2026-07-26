@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import List, Protocol
+from typing import Protocol
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
@@ -22,12 +22,7 @@ class StdoutSizeReporter(SizeReporter):
     def report(self, channel, size_in_bytes, label):
         print("--------------------------------------------------------------")
         print(
-            "Size Evaluation of '{}_ch{} - Resolution {}.' with {}".format(
-                channel.data_set.metadata.id,
-                channel.metadata.id,
-                channel.data_set.metadata.resolution,
-                label,
-            )
+            f"Size Evaluation of '{channel.data_set.metadata.id}_ch{channel.metadata.id} - Resolution {channel.data_set.metadata.resolution}.' with {label}"
         )
         print("--------------------------------------------------------------")
 
@@ -87,9 +82,9 @@ class SizeEvaluationStep(PostProcessingStep):
 
     async def execute(
         self,
-        data_sets: List[DataSet],
+        data_sets: list[DataSet],
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info("Started 'Size Evaluation' post-processing step")
 
         for ds in data_sets:

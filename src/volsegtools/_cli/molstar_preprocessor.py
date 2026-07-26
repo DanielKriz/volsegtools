@@ -5,13 +5,12 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import List
+from typing import Annotated
 
 import rich
 import rich.console
 import rich.logging
 import typer
-from typing_extensions import Annotated
 
 import volsegtools as vst
 from volsegtools._core.data_kind import DataKind
@@ -120,7 +119,7 @@ def report_error(msg):
 @app.command()
 def run(
     volume_source: Annotated[
-        List[Path],
+        list[Path],
         typer.Option(
             "--volume-source",
             "--vs",
@@ -128,7 +127,7 @@ def run(
         ),
     ] = [],
     segmentation_source: Annotated[
-        List[Path],
+        list[Path],
         typer.Option(
             "--segmentation-source",
             "--ss",
@@ -167,7 +166,7 @@ def run(
         bool, typer.Option(help="Overwrite temporal Zarr store if present.")
     ] = False,
     error_func: Annotated[
-        List[ErrorFunctionKind] | None,
+        list[ErrorFunctionKind] | None,
         typer.Option(
             help="Which error functions shall be used for evaluation",
             rich_help_panel=CommandGroup.BENCHMARK_AND_DEBUG,
@@ -353,9 +352,7 @@ def run(
 
         def update_status(state):
             status.update(
-                "Processing... {} ".format(
-                    state.current_stage,
-                )
+                f"Processing... {state.current_stage} "
             )
 
         try:

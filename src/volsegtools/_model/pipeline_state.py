@@ -1,6 +1,7 @@
 import dataclasses
 import enum
-from typing import Any, Callable, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import pydantic
 
@@ -26,7 +27,7 @@ class PipelineStageKind(enum.StrEnum):
 @pydantic.dataclasses.dataclass()
 class PipelineState:
     current_stage: PipelineStageKind
-    msg: Optional[str]
+    msg: str | None
 
 
 class PipelineStateManager:
@@ -37,7 +38,7 @@ class PipelineStateManager:
     ) -> None:
         self._pipeline = pipeline
         self._state = initial_state
-        self._callbacks: List[Callable] = []
+        self._callbacks: list[Callable] = []
 
     @property
     def current(self) -> PipelineState:

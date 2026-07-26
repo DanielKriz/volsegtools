@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import dask.array as da
 import pyometiff as ome_tiff
@@ -30,7 +29,7 @@ class TIFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         reader = ome_tiff.OMETIFFReader(fpath=input_path)
@@ -44,11 +43,7 @@ class TIFFConverter(Converter):
         ):
             axis_order_map[idx] = axis
 
-        current_order = "{}{}{}".format(
-            axis_order_map[0],
-            axis_order_map[1],
-            axis_order_map[2],
-        )
+        current_order = f"{axis_order_map[0]}{axis_order_map[1]}{axis_order_map[2]}"
 
         target_order = "XYZ"
         permutation = tuple(current_order.find(axis) for axis in target_order)
@@ -94,7 +89,7 @@ class TIFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         raise NotImplementedError()
 
     async def collect_annotations(self, input_path, context) -> None:

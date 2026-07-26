@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import mrcfile
 
@@ -18,16 +17,11 @@ class MRCSerializer(Serializer):
         data_set: DataSet,
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]:
+    ) -> list[Path]:
         output_files = []
 
         for channel in data_set.flat_channel_iter():
-            file_name = "{}_r{}_tf{}_ch{}.mrc".format(
-                data_set.metadata.id,
-                data_set.metadata.resolution,
-                channel.parent.metadata.id,
-                channel.metadata.id,
-            )
+            file_name = f"{data_set.metadata.id}_r{data_set.metadata.resolution}_tf{channel.parent.metadata.id}_ch{channel.metadata.id}.mrc"
             output_file_path = output_path / file_name
             vst_logger.info(f"... serialized into {output_file_path}")
 

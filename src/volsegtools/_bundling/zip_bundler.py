@@ -1,7 +1,6 @@
 import logging
 import zipfile
 from pathlib import Path
-from typing import List
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._storage.data_set import info_from_file_path
@@ -13,10 +12,10 @@ vst_logger = logging.getLogger("volsegtools")
 class ZipBundler(Bundler):
     def bundle(
         self,
-        data_paths: List[Path],
+        data_paths: list[Path],
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]:
+    ) -> list[Path]:
         parsed_paths = [info_from_file_path(x) for x in data_paths]
 
         archive_path = output_path / "vst_output.zip"

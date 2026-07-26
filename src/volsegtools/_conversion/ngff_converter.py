@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import ome_zarr.io
 import ome_zarr.reader
@@ -27,7 +26,7 @@ class NGFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         nodes = ome_zarr.reader.Reader(ome_zarr.io.ZarrLocation(input_path))()
         data_node = next(nodes)
         metadata = data_node.metadata
@@ -87,7 +86,7 @@ class NGFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         raise await self.convert_volume(input_path, context)
 
     async def collect_annotations(self, input_path, context) -> None:

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Protocol
+from typing import Protocol
 
 from volsegtools._model import PipelineContext
 
@@ -12,4 +12,4 @@ class Serializer(Protocol):
         data_set,
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]: ...
+    ) -> list[Path]: ...

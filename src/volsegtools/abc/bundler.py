@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Protocol
+from typing import Protocol
 
 from volsegtools._model import PipelineContext
 
@@ -13,10 +13,10 @@ class Bundler(Protocol):
 
     def bundle(
         self,
-        data_paths: List[Path],
+        data_paths: list[Path],
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]:
+    ) -> list[Path]:
         """Bundles provided files into an another artifact.
 
         Parameters

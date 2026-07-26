@@ -4,7 +4,7 @@ import json
 import logging
 import math
 from pathlib import Path
-from typing import List, Optional, Protocol, Tuple
+from typing import Protocol
 
 import dask.array as da
 import numpy as np
@@ -218,7 +218,7 @@ class ErrorEvaluationStep(PostProcessingStep):
     def __init__(
         self,
         error_fn: ErrorFunction | str = MSE(),
-        output_path: Optional[Path] = None,
+        output_path: Path | None = None,
         output_to_stdout: bool = False,
         label: str = "",
     ):
@@ -246,7 +246,7 @@ class ErrorEvaluationStep(PostProcessingStep):
         self.label = label
 
     # TODO is from elsewhere
-    def calculate_new_chunks(self, channel, factor: float | Tuple[float, ...]):
+    def calculate_new_chunks(self, channel, factor: float | tuple[float, ...]):
         if isinstance(factor, float):
             return tuple(
                 tuple(math.ceil(ax * factor) for ax in axes) for axes in channel.chunks
@@ -274,13 +274,11 @@ class ErrorEvaluationStep(PostProcessingStep):
 
     async def execute(
         self,
-        data_sets: List[DataSet],
+        data_sets: list[DataSet],
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(
-            "Started 'Error Evaluation - {}' post-processing step".format(
-                self.error_fn.name
-            )
+            f"Started 'Error Evaluation - {self.error_fn.name}' post-processing step"
         )
         resolution_to_data = {}
         for _, group in itertools.groupby(data_sets, lambda x: x.metadata.id):
@@ -358,8 +356,8 @@ class ErrorEvaluationStep(PostProcessingStep):
 class ErrorEvaluationMultiStep(PostProcessingStep):
     def __init__(
         self,
-        error_fn: List[str] = [],
-        output_path: Optional[Path] = None,
+        error_fn: list[str] = [],
+        output_path: Path | None = None,
         output_to_stdout: bool = False,
         label: str = "",
     ):
@@ -386,7 +384,7 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
         self.label = label
 
     # TODO is from elsewhere
-    def calculate_new_chunks(self, channel, factor: float | Tuple[float, ...]):
+    def calculate_new_chunks(self, channel, factor: float | tuple[float, ...]):
         if isinstance(factor, float):
             return tuple(
                 tuple(math.ceil(ax * factor) for ax in axes) for axes in channel.chunks
@@ -412,7 +410,7 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
             chunks=self.calculate_new_chunks(data, zoom),
         )
 
-    async def execute(self, data_sets: List[DataSet]) -> List[DataSet]:
+    async def execute(self, data_sets: list[DataSet]) -> list[DataSet]:
         vst_logger.info("Started 'Error Evaluation Multi' post-processing step")
         resolution_to_data = {}
         for _, group in itertools.groupby(data_sets, lambda x: x.metadata.id):

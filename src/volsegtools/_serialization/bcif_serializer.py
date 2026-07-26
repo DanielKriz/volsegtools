@@ -1,5 +1,5 @@
+from collections.abc import Collection
 from pathlib import Path
-from typing import Collection, List
 
 import ciftools
 import ciftools.serialization
@@ -20,7 +20,7 @@ class BCIFSerializer(Serializer):
         data_set: DataSet,
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]:
+    ) -> list[Path]:
         # This is currently working only for volumes!
         output_files = []
         for channel in data_set.flat_channel_iter():
@@ -38,12 +38,7 @@ class BCIFSerializer(Serializer):
 
             writer.write_category(VolumeData3DDesc, [np.ravel(data, order="F")])
 
-            file_name = "{}_r{}_tf{}_ch{}.bcif".format(
-                data_set.metadata.id,
-                data_set.metadata.resolution,
-                channel.parent.metadata.id,
-                channel.metadata.id,
-            )
+            file_name = f"{data_set.metadata.id}_r{data_set.metadata.resolution}_tf{channel.parent.metadata.id}_ch{channel.metadata.id}.bcif"
             output_file_path = output_path / file_name
             output_file_path.write_bytes(writer.encode())
             output_files.append(output_file_path)

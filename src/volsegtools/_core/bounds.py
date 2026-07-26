@@ -1,4 +1,3 @@
-from typing import Optional
 
 import pydantic
 
@@ -8,5 +7,5 @@ import pydantic
 class Bounds:
     # TODO: might be int
     # TODO: this should be generic and accept any class that support some traits
-    min: Optional[pydantic.NonNegativeFloat] = 0.0
-    max: Optional[pydantic.NonNegativeFloat] = 0.0
+    min: pydantic.NonNegativeFloat | None = 0.0
+    max: pydantic.NonNegativeFloat | None = 0.0

@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, List, Protocol, Sequence
+from typing import Any, Protocol
 
 
 class ProcessingPipeline(Protocol):
@@ -9,20 +10,20 @@ class ProcessingPipeline(Protocol):
         percent_done: int
         current_file: Path
 
-    async def convert_volumes(self, paths: List[Path]) -> Any:
+    async def convert_volumes(self, paths: list[Path]) -> Any:
         """Converts collection of volumes into standardized data handles."""
         ...
 
-    async def convert_segmentations(self, paths: List[Path]) -> Any:
+    async def convert_segmentations(self, paths: list[Path]) -> Any:
         """Converts collection of segmentations into a standardized data
         handles."""
         ...
 
-    async def collect_metadata(self, paths: List[Path]) -> Any:
+    async def collect_metadata(self, paths: list[Path]) -> Any:
         """Collects metadata from collection of files."""
         ...
 
-    async def collect_annotation(self, paths: List[Path]) -> Any:
+    async def collect_annotation(self, paths: list[Path]) -> Any:
         """Collects annotations from collection of files."""
         ...
 
@@ -39,7 +40,7 @@ class ProcessingPipeline(Protocol):
         """
         ...
 
-    async def downsample(self, data_set: Any) -> List[Any]:
+    async def downsample(self, data_set: Any) -> list[Any]:
         """Downsamples given data."""
         ...
 
@@ -55,26 +56,26 @@ class ProcessingPipeline(Protocol):
         """
         ...
 
-    async def serialize(self, data_set) -> List[Path]:
+    async def serialize(self, data_set) -> list[Path]:
         """Serializes given data into files."""
         ...
 
     async def process(
         self,
-        volumes: List[Path],
-        segmentations: List[Path],
-        metadata: List[Path],
-        annotations: List[Path],
-    ) -> List[Path]:
+        volumes: list[Path],
+        segmentations: list[Path],
+        metadata: list[Path],
+        annotations: list[Path],
+    ) -> list[Path]:
         """Processes given data using this processing pipeline."""
         ...
 
     def sync_process(
         self,
-        volumes: List[Path],
-        segmentations: List[Path] = [],
-        metadata: List[Path] = [],
-        annotations: List[Path] = [],
-    ) -> List[Path]:
+        volumes: list[Path],
+        segmentations: list[Path] = [],
+        metadata: list[Path] = [],
+        annotations: list[Path] = [],
+    ) -> list[Path]:
         """Processes given data in synchronous manner."""
         ...

@@ -1,5 +1,4 @@
 import warnings
-from typing import Dict, List, Optional, Union
 
 from volsegtools.abc.converter import Converter
 
@@ -11,12 +10,12 @@ class UnsupportedCompressionError(Exception):
 
 class ConverterMap:
     def __init__(self) -> None:
-        self._suffix_to_converter_map: Dict[str, Converter] = dict()
+        self._suffix_to_converter_map: dict[str, Converter] = dict()
 
     def set_converter(
         self,
         converter,
-        suffixes: Optional[Union[List[str], str]] = None,
+        suffixes: list[str] | str | None = None,
         force=False,
     ) -> None:
         for suffix in self.split_suffixes(suffixes):

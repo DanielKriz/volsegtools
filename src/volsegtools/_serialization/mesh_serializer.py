@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import MeshBackend
@@ -40,19 +39,14 @@ class MeshSerializer(Serializer):
         data_set: DataSet,
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]:
+    ) -> list[Path]:
         output_files = []
 
         for frame in data_set.time_frames:
             for mesh in frame.meshes:
                 mesh_data = mesh.handle.get_mesh(MeshBackend)
 
-                file_name = "{}_r{}_tf{}_m{}".format(
-                    data_set.metadata.id,
-                    data_set.metadata.resolution,
-                    frame.metadata.id,
-                    mesh.metadata.id,
-                )
+                file_name = f"{data_set.metadata.id}_r{data_set.metadata.resolution}_tf{frame.metadata.id}_m{mesh.metadata.id}"
 
                 output = self.serialization_fn(
                     output_path,

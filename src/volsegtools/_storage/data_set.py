@@ -1,10 +1,8 @@
 import re
 from pathlib import Path
-from typing import Optional, Self
+from typing import Self
 
 import pydantic
-import zarr
-import zarr.storage
 
 from volsegtools._core.computation_backend import ComputationBackend
 from volsegtools._core.working_store import WorkingStore
@@ -18,7 +16,7 @@ from volsegtools._storage.data_handle import DataHandle
 
 
 class DataSet:
-    def __init__(self, store: WorkingStore, metadata: Optional[DataSetInfo] = None):
+    def __init__(self, store: WorkingStore, metadata: DataSetInfo | None = None):
         self.store = store
         if metadata:
             self._metadata_is_set = True
@@ -144,7 +142,7 @@ class Channel:
     def __init__(self, parent: TimeFrame, id: int):
         self.parent = parent
         self.metadata = ChannelInfo(id=id)
-        self._handle: Optional[DataHandle] = None
+        self._handle: DataHandle | None = None
 
     @property
     def handle(self) -> DataHandle:
@@ -195,13 +193,7 @@ class DataSetDefaultDict(dict):
 
 
 def create_file_name(channel: Channel, suffix: str = ".bcif"):
-    return "{}_r{}_tf{}_c{}{}".format(
-        channel.parent.parent.metadata.id,
-        channel.parent.parent.metadata.resolution,
-        channel.parent.metadata.id,
-        channel.metadata.id,
-        suffix,
-    )
+    return f"{channel.parent.parent.metadata.id}_r{channel.parent.parent.metadata.resolution}_tf{channel.parent.metadata.id}_c{channel.metadata.id}{suffix}"
 
 
 class FileNameInfo(pydantic.BaseModel):

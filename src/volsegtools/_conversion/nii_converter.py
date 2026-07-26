@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import nibabel as nib
 
@@ -31,14 +30,14 @@ class NiiConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         raise RuntimeError("Cannot convert mesh to volume")
 
     async def convert_segmentation(
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         nibabel_img = nib.load(str(input_path))

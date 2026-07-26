@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 import dask_image.ndfilters as dask_filter
 import numpy as np
@@ -21,7 +20,7 @@ class Smoothing(DownsamplingStrategy):
     # 50-150MB on modern processors.
     CHUNKS = (256, 256, 256)
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> List[float]:
+    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
         bytes_count = channel.handle.nbytes
         sizes = []
         while bytes_count > super().MIN_SIZE_THRESHOLD:
@@ -66,7 +65,7 @@ class SeparatedSmoothing(DownsamplingStrategy):
 
     CHUNKS = (256, 256, 256)
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> List[float]:
+    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
         bytes_count = channel.handle.nbytes
         sizes = []
         while bytes_count > super().MIN_SIZE_THRESHOLD:
@@ -122,7 +121,7 @@ class StridedSmoothing(DownsamplingStrategy):
 
     CHUNKS = (256, 256, 256)
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> List[float]:
+    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
         bytes_count = channel.handle.nbytes
         sizes = []
         while bytes_count > super().MIN_SIZE_THRESHOLD:

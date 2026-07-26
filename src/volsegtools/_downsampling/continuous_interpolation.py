@@ -1,6 +1,5 @@
 import logging
 import math
-from typing import List
 
 import scipy
 
@@ -32,7 +31,7 @@ class InterpolationBased(DownsamplingStrategy):
         self.factor = 1 / inv_factor
         self.inv_factor = inv_factor
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> List[float]:
+    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
         bytes_count = channel.handle.nbytes
         sizes = []
         while bytes_count > super().MIN_SIZE_THRESHOLD:

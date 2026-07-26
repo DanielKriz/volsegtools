@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, List, Optional
+from collections.abc import Callable
 
 import numpy as np
 import scipy
@@ -15,7 +15,7 @@ vst_logger = logging.getLogger("volsegtools")
 
 class SmoothingStep(PostProcessingStep):
     def __init__(
-        self, appliable_kinds: List[DataKind] = [], filter_fn: Optional[Callable] = None
+        self, appliable_kinds: list[DataKind] = [], filter_fn: Callable | None = None
     ):
         self.appliable_kinds = appliable_kinds
         self.filter_fn = filter_fn
@@ -28,9 +28,9 @@ class SmoothingStep(PostProcessingStep):
 
     async def execute(
         self,
-        data_sets: List[DataSet],
+        data_sets: list[DataSet],
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info("Started 'Smoothing' post-processing step")
 
         kernel = self.calculate_convolution_kernel()

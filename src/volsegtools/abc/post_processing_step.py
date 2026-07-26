@@ -1,4 +1,4 @@
-from typing import Any, List, Protocol
+from typing import Any, Protocol
 
 from volsegtools._model import PipelineContext
 
@@ -6,13 +6,13 @@ from volsegtools._model import PipelineContext
 class PostProcessingStep(Protocol):
     async def execute(
         self,
-        data_sets: List[Any],
+        data_sets: list[Any],
         context: PipelineContext,
-    ) -> List[Any]: ...
+    ) -> list[Any]: ...
 
     async def __call__(
         self,
-        data_sets: List[Any],
+        data_sets: list[Any],
         context: PipelineContext,
-    ) -> List[Any]:
+    ) -> list[Any]:
         return await self.execute(data_sets, context)

@@ -2,7 +2,6 @@ import collections
 import logging
 import re
 from pathlib import Path
-from typing import List
 
 import dask.array as da
 import h5py as hdf
@@ -69,7 +68,7 @@ def _find_all_channels(ch_list: list, info: dict):
                 )
             )
             vst_logger.debug(
-                "Added new channel: {}".format(_channel_to_str(ch_list[-1]))
+                f"Added new channel: {_channel_to_str(ch_list[-1])}"
             )
 
     return _find_all
@@ -126,7 +125,7 @@ class ImarisConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         if not input_path.exists():
             raise RuntimeError(
                 f"You have to provide a valid file, {input_path} does not exists"
@@ -202,7 +201,7 @@ class ImarisConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         return await self.convert_volume(input_path, context)
 
     async def collect_annotations(self, input_path, context) -> None:

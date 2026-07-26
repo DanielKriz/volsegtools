@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Optional, Self, Union
+from typing import Any, Self
 
 import trimesh
 import zarr
@@ -19,7 +19,7 @@ class DataHandle:
         self.store = store
         self.zarr_path: Path = zarr_path
         self.data_kind: DataKind = data_kind
-        self._zarr_object: Optional[zarr.Group] = None
+        self._zarr_object: zarr.Group | None = None
 
     @property
     def attributes(self) -> dict:
@@ -29,7 +29,7 @@ class DataHandle:
         return self.zarr_object.attrs.update(new_attrs)
 
     @property
-    def zarr_object(self) -> Union[zarr.Array, zarr.Group]:
+    def zarr_object(self) -> zarr.Array | zarr.Group:
         if self._zarr_object is None:
             self._zarr_object = zarr.open_group(
                 self.store.data_store, path=str(self.zarr_path)
@@ -62,10 +62,7 @@ class DataHandle:
         result = not result if inverse else result
         if result:
             raise RuntimeError(
-                "Cannot proceed. Expected one of {}, got {}".format(
-                    allowed_kinds,
-                    self.data_kind,
-                )
+                f"Cannot proceed. Expected one of {allowed_kinds}, got {self.data_kind}"
             )
 
     def get_lattice(self, backend: ComputationBackend) -> Any:

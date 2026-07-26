@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import ciftools.serialization
 import dask.array as da
@@ -30,7 +29,7 @@ class CIFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         with open(input_path, "rb") as file:
@@ -89,7 +88,7 @@ class CIFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         data_sets = await self.convert_volume(input_path, context)
         for ds in data_sets:
             ds.metadata.kind = DataKind.SEGMENTATION_VOLUME

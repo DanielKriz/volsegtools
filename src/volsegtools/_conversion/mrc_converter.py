@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import dask.array as da
 import mrcfile
@@ -35,7 +34,7 @@ class MRCConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         mrc = mrcfile.mmap(input_path, "r")
@@ -63,7 +62,7 @@ class MRCConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         data_sets = await self.convert_volume(input_path, context)
         for ds in data_sets:
             ds.metadata.kind = DataKind.SEGMENTATION_VOLUME

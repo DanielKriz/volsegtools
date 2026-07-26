@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import sfftkrw as sff
 
@@ -30,14 +29,14 @@ class SFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         raise RuntimeError("SFF does not support normal volumes")
 
     async def convert_segmentation(
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         seg = sff.SFFSegmentation.from_file(str(input_path))

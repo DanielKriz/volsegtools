@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 import zarr
@@ -75,13 +74,13 @@ class WorkingStore:
 
     @staticmethod
     def _compute_chunk_size_based_on_data(
-        data_shape: Tuple[int, ...],
-    ) -> Tuple[int, ...]:
+        data_shape: tuple[int, ...],
+    ) -> tuple[int, ...]:
         chunks = tuple([int(i / 4) if i > 4 else i for i in data_shape])
         return chunks
 
     @staticmethod
-    def _resolve_chunking_method(mode: ChunkingMode, data_shape: Tuple[int, ...]):
+    def _resolve_chunking_method(mode: ChunkingMode, data_shape: tuple[int, ...]):
         match mode:
             case ChunkingMode.AUTO:
                 return "auto"

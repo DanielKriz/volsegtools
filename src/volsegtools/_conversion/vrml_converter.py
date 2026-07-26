@@ -1,7 +1,6 @@
 import json
 import tempfile
 from pathlib import Path
-from typing import List
 
 import vrmlxpy as vrml
 
@@ -67,14 +66,14 @@ class VRMLConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path, context) -> List[DataSet]:
+    async def convert_volume(self, input_path: Path, context) -> list[DataSet]:
         raise RuntimeError("This converter does not support volumes!")
 
     async def convert_segmentation(
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         tmp_config = tempfile.NamedTemporaryFile()
         tmp_synonyms = tempfile.NamedTemporaryFile()
         tmp_out = tempfile.NamedTemporaryFile(suffix=".stl")

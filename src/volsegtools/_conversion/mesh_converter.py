@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import List
 
 import trimesh
 
@@ -25,7 +24,7 @@ class MeshConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+    async def convert_volume(self, input_path: Path) -> list[DataSet]:
         # TODO: we could include some algorithm for conversion of mesh to volume
         raise RuntimeError("Cannot convert mesh to volume")
 
@@ -33,7 +32,7 @@ class MeshConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> List[DataSet]:
+    ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
         mesh_data = trimesh.load_mesh(input_path)
 

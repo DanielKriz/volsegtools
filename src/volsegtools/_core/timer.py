@@ -4,7 +4,7 @@ import logging
 import time
 import uuid
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any
 
 vst_logger = logging.getLogger("volsegtools")
 
@@ -12,9 +12,9 @@ vst_logger = logging.getLogger("volsegtools")
 class Timer:
     class Stage:
         def __init__(self, name):
-            self.events: List[Timer.Event] = []
+            self.events: list[Timer.Event] = []
             self.start = time.time()
-            self.end: Optional[float] = None
+            self.end: float | None = None
             self.name = name
 
         def push_event(self, name):
@@ -48,8 +48,8 @@ class Timer:
             }
 
     class Event:
-        def __init__(self, start, name: str, parent: Optional[Any] = None):
-            self.parent: Optional[Timer.Stage] = parent
+        def __init__(self, start, name: str, parent: Any | None = None):
+            self.parent: Timer.Stage | None = parent
             self.name: str = name
             self.start = start
             self.end = time.time()
@@ -73,9 +73,9 @@ class Timer:
     RESOLUTION = 3
 
     start = time.time()
-    points: List[Stage | Event] = []
-    current_stage: Optional[Stage] = None
-    current_event: Optional[Event] = None
+    points: list[Stage | Event] = []
+    current_stage: Stage | None = None
+    current_event: Event | None = None
 
     @staticmethod
     def restart():
@@ -249,5 +249,5 @@ class JSONTimerReporter:
             file.write(json.dumps(records, indent=2))
 
         vst_logger.info(
-            "Finished writing timer report into {}".format(self.output_path)
+            f"Finished writing timer report into {self.output_path}"
         )

@@ -2,7 +2,6 @@ import collections
 import itertools
 import logging
 from pathlib import Path
-from typing import List
 
 import molviewspec as mvs
 from molviewspec.mvsx_converter import tempfile
@@ -40,10 +39,10 @@ class MVSXBundler(Bundler):
 
     def bundle(
         self,
-        data_paths: List[Path],
+        data_paths: list[Path],
         output_path: Path,
         context: PipelineContext,
-    ) -> List[Path]:
+    ) -> list[Path]:
         parsed_paths = [info_from_file_path(x) for x in data_paths]
 
         data_per_resolution = collections.defaultdict(list)

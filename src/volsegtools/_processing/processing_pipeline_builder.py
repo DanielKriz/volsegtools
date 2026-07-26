@@ -1,9 +1,8 @@
 import collections
 from pathlib import Path
-from typing import List
+from typing import Self
 
 import zarr.errors
-from typing_extensions import Self
 
 from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core import DataKind, WorkingStore
@@ -28,8 +27,8 @@ class ProcessingPipelineBuilder:
         self._volume_converter: Converter | None = None
         self._segmentation_converter: Converter | None = None
         self._downsampling_strategy: DownsamplingStrategy = Null()
-        self._post_processing_steps: List[PostProcessingStep] = []
-        self._post_conversion_steps: List[PostConversionStep] = []
+        self._post_processing_steps: list[PostProcessingStep] = []
+        self._post_conversion_steps: list[PostConversionStep] = []
         self._serializer_map = collections.defaultdict(None)
         self._volume_converter_map = ConverterMap()
         self._segmentation_converter_map = ConverterMap()
