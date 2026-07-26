@@ -15,8 +15,12 @@ vst_logger = logging.getLogger("volsegtools")
 
 class SmoothingStep(PostProcessingStep):
     def __init__(
-        self, appliable_kinds: list[DataKind] = [], filter_fn: Callable | None = None
+        self,
+        appliable_kinds: list[DataKind] | None = None,
+        filter_fn: Callable | None = None,
     ):
+        if appliable_kinds is None:
+            appliable_kinds = []
         self.appliable_kinds = appliable_kinds
         self.filter_fn = filter_fn
 

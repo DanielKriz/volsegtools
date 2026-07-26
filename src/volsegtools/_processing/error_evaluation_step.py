@@ -356,11 +356,13 @@ class ErrorEvaluationStep(PostProcessingStep):
 class ErrorEvaluationMultiStep(PostProcessingStep):
     def __init__(
         self,
-        error_fn: list[str] = [],
+        error_fn: list[str] | None = None,
         output_path: Path | None = None,
         output_to_stdout: bool = False,
         label: str = "",
     ):
+        if error_fn is None:
+            error_fn = []
         self.error_functions = []
         for err in error_fn:
             match err.lower():

@@ -73,9 +73,9 @@ class ProcessingPipeline(Protocol):
     def sync_process(
         self,
         volumes: list[Path],
-        segmentations: list[Path] = [],
-        metadata: list[Path] = [],
-        annotations: list[Path] = [],
+        segmentations: list[Path] | None = None,
+        metadata: list[Path] | None = None,
+        annotations: list[Path] | None = None,
     ) -> list[Path]:
         """Processes given data in synchronous manner."""
         ...

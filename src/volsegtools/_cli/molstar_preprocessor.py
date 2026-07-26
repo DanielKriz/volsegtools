@@ -119,21 +119,21 @@ def report_error(msg):
 @app.command()
 def run(
     volume_source: Annotated[
-        list[Path],
+        list[Path] | None,
         typer.Option(
             "--volume-source",
             "--vs",
             help="Specifies a path to volumetric data.",
         ),
-    ] = [],
+    ] = None,
     segmentation_source: Annotated[
-        list[Path],
+        list[Path] | None,
         typer.Option(
             "--segmentation-source",
             "--ss",
             help="Specifies a path to segmentation data.",
         ),
-    ] = [],
+    ] = None,
     verbose: Annotated[
         int,
         typer.Option(
@@ -256,6 +256,10 @@ def run(
     ] = BundlingKind.NULL,
 ):
 
+    if segmentation_source is None:
+        segmentation_source = []
+    if volume_source is None:
+        volume_source = []
     for file_path in itertools.chain(volume_source, segmentation_source):
         if not file_path.exists():
             vst_logger.error(f"The file: {file_path} does not exists")

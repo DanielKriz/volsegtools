@@ -42,13 +42,17 @@ class ProcessingPipeline(ProcessingPipeline):
         segmentation_mask_serializer: Serializer | None = None,
         segmentation_volume_serializer: Serializer | None = None,
         segmentation_mesh_serializer: Serializer | None = None,
-        post_processing_steps: list[PostProcessingStep] = [],
-        post_conversion_steps: list[PostConversionStep] = [],
+        post_processing_steps: list[PostProcessingStep] | None = None,
+        post_conversion_steps: list[PostConversionStep] | None = None,
         bundler: Bundler | None = None,
         work_dir: Path | None = None,
         output_dir: Path | None = None,
     ):
         # The conversion and bundling are required stages
+        if post_conversion_steps is None:
+            post_conversion_steps = []
+        if post_processing_steps is None:
+            post_processing_steps = []
         self._downsampling_strategy = downsampling_strategy
 
         self._volume_converter_map = volume_converter_map
@@ -129,20 +133,36 @@ class ProcessingPipeline(ProcessingPipeline):
 
     def sync_process(
         self,
-        volumes: list[Path] = [],
-        segmentations: list[Path] = [],
-        metadata: list[Path] = [],
-        annotations: list[Path] = [],
+        volumes: list[Path] | None = None,
+        segmentations: list[Path] | None = None,
+        metadata: list[Path] | None = None,
+        annotations: list[Path] | None = None,
     ) -> list[Path]:
+        if annotations is None:
+            annotations = []
+        if metadata is None:
+            metadata = []
+        if segmentations is None:
+            segmentations = []
+        if volumes is None:
+            volumes = []
         return asyncio.run(self.process(volumes, segmentations, metadata, annotations))
 
     async def process(
         self,
-        volumes: list[Path] = [],
-        segmentations: list[Path] = [],
-        metadata: list[Path] = [],
-        annotations: list[Path] = [],
+        volumes: list[Path] | None = None,
+        segmentations: list[Path] | None = None,
+        metadata: list[Path] | None = None,
+        annotations: list[Path] | None = None,
     ) -> list[Path]:
+        if annotations is None:
+            annotations = []
+        if metadata is None:
+            metadata = []
+        if segmentations is None:
+            segmentations = []
+        if volumes is None:
+            volumes = []
         converted_volumes = await self.convert_volumes(volumes)
         converted_segmentations = await self.convert_segmentations(segmentations)
         collected_metadata = await self.collect_metadata(metadata)
