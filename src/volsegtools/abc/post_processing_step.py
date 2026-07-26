@@ -1,6 +1,7 @@
-from typing import List, Any, Protocol
+from typing import Any, List, Protocol
 
 from volsegtools._model import PipelineContext
+
 
 class PostProcessingStep(Protocol):
     async def execute(

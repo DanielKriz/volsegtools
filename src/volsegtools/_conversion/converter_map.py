@@ -1,11 +1,13 @@
 import warnings
-from typing import Optional, Union, Dict, List
+from typing import Dict, List, Optional, Union
 
 from volsegtools.abc.converter import Converter
+
 
 class UnsupportedCompressionError(Exception):
     def __init__(self):
         super().__init__("Unsupported compression for this file type")
+
 
 class ConverterMap:
     def __init__(self) -> None:

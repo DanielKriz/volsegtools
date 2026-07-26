@@ -1,5 +1,5 @@
-from typing import Any, List, Sequence, Protocol
 from pathlib import Path
+from typing import Any, List, Protocol, Sequence
 
 
 class ProcessingPipeline(Protocol):
@@ -44,7 +44,8 @@ class ProcessingPipeline(Protocol):
         ...
 
     async def apply_post_processing_steps(
-        self, data_set: Any,
+        self,
+        data_set: Any,
     ) -> Sequence[Any]:
         """Applies post processing steps on the downsampled data.
 

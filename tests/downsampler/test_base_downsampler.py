@@ -1,6 +1,6 @@
 import pytest
 
-from volsegtools import DownsamplingParameters, BaseDownsampler
+from volsegtools import BaseDownsampler, DownsamplingParameters
 
 
 def test_base_downsampler_init():

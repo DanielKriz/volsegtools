@@ -7,8 +7,8 @@ import from the `volsegtools` namespace.
 
 from .data_handle import DataHandle
 from .data_set import (
-    DataSet,
     Channel,
+    DataSet,
     Mesh,
     TimeFrame,
     create_file_name,
@@ -16,11 +16,11 @@ from .data_set import (
 )
 
 __all__ = [
+    "Channel",
     "DataHandle",
     "DataSet",
-    "TimeFrame",
-    "Channel",
     "Mesh",
+    "TimeFrame",
     "create_file_name",
     "info_from_file_path",
 ]

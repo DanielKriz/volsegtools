@@ -1,7 +1,8 @@
-from typing import List, Protocol
 from pathlib import Path
+from typing import List, Protocol
 
 from volsegtools._model import PipelineContext
+
 
 class Bundler(Protocol):
     """Bundles a collection of data sets into an another artifact.

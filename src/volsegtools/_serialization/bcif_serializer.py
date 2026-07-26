@@ -1,17 +1,16 @@
 from pathlib import Path
 from typing import Collection, List
-from ciftools.binary.encoder import BYTE_ARRAY
-from ciftools.models.writer import CIFCategoryDesc as CategoryDesc
-from ciftools.models.writer import CIFFieldDesc as Field
 
 import ciftools
 import ciftools.serialization
 import numpy as np
+from ciftools.binary.encoder import BYTE_ARRAY
+from ciftools.models.writer import CIFCategoryDesc as CategoryDesc
+from ciftools.models.writer import CIFFieldDesc as Field
 
 from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools._storage import Channel, DataSet
 from volsegtools._processing import NumPyBackend
-
+from volsegtools._storage import Channel, DataSet
 from volsegtools.abc import Serializer
 
 

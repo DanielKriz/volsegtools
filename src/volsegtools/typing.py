@@ -1,7 +1,7 @@
 from typing import Union
 
-import numpy as np
 import dask.array as da
+import numpy as np
 import zarr
 
 ZarrObject = Union[zarr.Array, zarr.Group]

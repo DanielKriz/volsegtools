@@ -1,30 +1,29 @@
 import asyncio
 import enum
-from pathlib import Path
-from typing import List, Optional
 import itertools
 import logging
-import pydantic
+from pathlib import Path
+from typing import List, Optional
 
+import pydantic
 
 from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core import DataKind, Timer, Vector3, WorkingStore
 from volsegtools._downsampling.null import Null
-from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model import (
     PipelineStageKind,
     PipelineState,
     PipelineStateManager,
 )
+from volsegtools._model.pipeline_state import PipelineContext
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
-
 from volsegtools.abc import (
-    PostProcessingStep,
-    PostConversionStep,
     Bundler,
-    Serializer,
+    PostConversionStep,
+    PostProcessingStep,
     ProcessingPipeline,
+    Serializer,
 )
 
 vst_logger = logging.getLogger("volsegtools")
@@ -85,15 +84,18 @@ class ProcessingPipeline(ProcessingPipeline):
             msg="The pipeline has not yet started",
         )
 
-        self.state__ = PipelineStateManager(self, PipelineState(
-            current_stage=PipelineStageKind.NOT_STARTED,
-            msg="The pipeline has not yet started",
-        ))
+        self.state__ = PipelineStateManager(
+            self,
+            PipelineState(
+                current_stage=PipelineStageKind.NOT_STARTED,
+                msg="The pipeline has not yet started",
+            ),
+        )
 
         self.context = PipelineContext(
-            timer = Timer(),
-            working_store = self.working_store,
-            state = self.state__,
+            timer=Timer(),
+            working_store=self.working_store,
+            state=self.state__,
         )
 
     @staticmethod

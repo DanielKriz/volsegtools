@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Protocol, List
+from typing import List, Protocol
 
 from volsegtools._model import PipelineContext
 from volsegtools._storage.data_set import DataSet
+
 
 class Converter(Protocol):
     """Converts the contents of some file format into the internal data
@@ -13,7 +14,7 @@ class Converter(Protocol):
         self,
         input_path: Path,
         context: PipelineContext,
-        ) -> List[DataSet]:
+    ) -> List[DataSet]:
         """Transforms volumetric data into a zarr array.
 
         Parameters

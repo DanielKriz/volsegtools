@@ -1,8 +1,8 @@
-from typing import List
+import logging
 from pathlib import Path
+from typing import List
 
 import mrcfile
-import logging
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import DaskBackend

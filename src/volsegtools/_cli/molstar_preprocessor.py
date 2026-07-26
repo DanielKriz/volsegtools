@@ -1,15 +1,15 @@
-import logging
-import shutil
-from pathlib import Path
-import sys
-from typing import List
 import enum
+import itertools
+import logging
+import os
+import shutil
+import sys
+from pathlib import Path
+from typing import List
+
 import rich
 import rich.console
 import rich.logging
-import itertools
-import os
-
 import typer
 from typing_extensions import Annotated
 

@@ -6,21 +6,19 @@ import pydantic
 import zarr
 import zarr.storage
 
-from volsegtools._model import (
-    DataSetInfo,
-    TimeFrameInfo,
-    ChannelInfo,
-    MeshInfo,
-)
 from volsegtools._core.computation_backend import ComputationBackend
 from volsegtools._core.working_store import WorkingStore
+from volsegtools._model import (
+    ChannelInfo,
+    DataSetInfo,
+    MeshInfo,
+    TimeFrameInfo,
+)
 from volsegtools._storage.data_handle import DataHandle
 
 
 class DataSet:
-    def __init__(
-        self, store: WorkingStore, metadata: Optional[DataSetInfo] = None
-    ):
+    def __init__(self, store: WorkingStore, metadata: Optional[DataSetInfo] = None):
         self.store = store
         if metadata:
             self._metadata_is_set = True

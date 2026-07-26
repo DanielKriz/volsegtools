@@ -2,8 +2,10 @@ from typing import Any, Protocol
 
 from volsegtools._model import PipelineContext
 
+
 class DownsamplingStrategy(Protocol):
     """Downsamples given data."""
+
     MIN_SIZE_THRESHOLD = 5_000_000  # 5 MB
 
     def execute(

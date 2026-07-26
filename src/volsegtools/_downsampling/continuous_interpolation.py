@@ -1,15 +1,16 @@
-import scipy
-from typing import List
 import logging
 import math
+from typing import List
+
+import scipy
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import Channel
-
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
+
 
 class InterpolationBased(DownsamplingStrategy):
     TRILINEAR_FACTOR = 1
@@ -46,8 +47,7 @@ class InterpolationBased(DownsamplingStrategy):
 
     def calculate_new_chunks(self, channel, factor: float):
         return tuple(
-            tuple(math.ceil(ax / factor) for ax in axes)
-            for axes in channel.chunks
+            tuple(math.ceil(ax / factor) for ax in axes) for axes in channel.chunks
         )
 
     def execute(self, data: Channel, context: PipelineContext):
@@ -60,34 +60,31 @@ class InterpolationBased(DownsamplingStrategy):
                 vst_logger.info("Using the 'Triquintic' downsampling strategy")
 
         current_data = data.handle.get_lattice(DaskBackend)
-        
+
         def block_zoom(block, zoom_factor=self.factor, order=self.order):
             return scipy.ndimage.zoom(
-                block,
-                zoom=zoom_factor,
-                order=order,
-                mode="reflect"
+                block, zoom=zoom_factor, order=order, mode="reflect"
             )
 
         steps = self.calculate_steps(data)
         for _ in range(steps):
             current_data = current_data.map_blocks(
-                block_zoom, 
+                block_zoom,
                 dtype=current_data.dtype,
-                chunks=self.calculate_new_chunks(
-                    current_data,
-                    self.inv_factor
-                ),
+                chunks=self.calculate_new_chunks(current_data, self.inv_factor),
             )
             yield current_data
+
 
 class TrilinearInterpolation(InterpolationBased):
     def __init__(self):
         super().__init__(self.TRILINEAR_FACTOR, 2)
 
+
 class TricubicInterpolation(InterpolationBased):
     def __init__(self):
         super().__init__(self.TRICUBIC_FACTOR, 2)
+
 
 class TriquinticInterpolation(InterpolationBased):
     def __init__(self):

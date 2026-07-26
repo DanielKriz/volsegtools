@@ -2,6 +2,7 @@ from typing import Protocol
 
 from volsegtools._model import PipelineContext
 
+
 class PostConversionStep(Protocol):
     async def execute(
         self,
@@ -21,9 +22,5 @@ class PostConversionStep(Protocol):
         context: PipelineContext,
     ):
         return await self.execute(
-            volumes,
-            segmentations,
-            metadata,
-            annotations,
-            context
+            volumes, segmentations, metadata, annotations, context
         )

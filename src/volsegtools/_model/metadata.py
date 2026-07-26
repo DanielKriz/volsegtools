@@ -3,6 +3,7 @@ from pydantic import Field
 
 from volsegtools._core import DataKind, Vector3
 
+
 class DataSetInfo(pydantic.BaseModel):
     filename: str = "Unknown File"
     resolution: int = -1
@@ -37,5 +38,3 @@ class ChannelInfo(pydantic.BaseModel):
 
 class MeshInfo(pydantic.BaseModel):
     id: int
-
-

@@ -1,14 +1,13 @@
+import logging
 from pathlib import Path
 from typing import List
 
-import logging
 import nibabel as nib
 
-from volsegtools._processing.numpy_backend import NumPyBackend
 from volsegtools._core import DataKind, Vector3
 from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._processing.numpy_backend import NumPyBackend
 from volsegtools._storage import DataSet
-
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")

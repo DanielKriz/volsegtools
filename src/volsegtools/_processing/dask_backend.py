@@ -1,13 +1,13 @@
-import zarr
-import dask
-import dask.config
 import math
-import dask.array as da
-
 from typing import Any
 
-from volsegtools.abc import ComputationBackend
+import dask
+import dask.array as da
+import dask.config
+import zarr
+
 from volsegtools._model.metadata import DescriptiveStatistics
+from volsegtools.abc import ComputationBackend
 from volsegtools.typing import ZarrObject
 
 

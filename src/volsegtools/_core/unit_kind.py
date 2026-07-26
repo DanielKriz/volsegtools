@@ -26,5 +26,6 @@ def to_angstrom(micrometers):
 def to_micrometer(angstroms):
     return angstroms / 10000
 
+
 def to_bytes(megabytes: int):
     return megabytes * 10**6

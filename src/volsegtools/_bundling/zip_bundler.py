@@ -1,11 +1,11 @@
-from typing import List
-from pathlib import Path
-import zipfile
 import logging
+import zipfile
+from pathlib import Path
+from typing import List
 
 from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools.abc.bundler import Bundler
 from volsegtools._storage.data_set import info_from_file_path
+from volsegtools.abc.bundler import Bundler
 
 vst_logger = logging.getLogger("volsegtools")
 

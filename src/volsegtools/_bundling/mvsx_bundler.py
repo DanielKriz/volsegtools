@@ -1,10 +1,10 @@
 import collections
-import molviewspec as mvs
-from typing import List
-from pathlib import Path
 import itertools
 import logging
+from pathlib import Path
+from typing import List
 
+import molviewspec as mvs
 from molviewspec.mvsx_converter import tempfile
 
 from volsegtools._model.pipeline_state import PipelineContext

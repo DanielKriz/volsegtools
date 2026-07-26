@@ -5,40 +5,40 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
-from .null import Null
+from .continuous_interpolation import (
+    InterpolationBased,
+    TricubicInterpolation,
+    TrilinearInterpolation,
+    TriquinticInterpolation,
+)
 from .nearest_neighbor import (
     NearestNeighbor,
 )
+from .null import Null
 from .pooling import (
-    PoolingDownsamplingStrategy,
     AveragePooling,
-    MinPooling,
     MaxPooling,
+    MinPooling,
+    PoolingDownsamplingStrategy,
 )
 from .smoothing import (
-    Smoothing,
     SeparatedSmoothing,
+    Smoothing,
     StridedSmoothing,
-)
-from .continuous_interpolation import (
-    InterpolationBased,
-    TrilinearInterpolation,
-    TricubicInterpolation,
-    TriquinticInterpolation,
 )
 
 __all__ = [
-    "Null",
-    "NearestNeighbor",
-    "PoolingDownsamplingStrategy",
     "AveragePooling",
-    "MinPooling",
-    "MaxPooling",
-    "Smoothing",
-    "SeparatedSmoothing",
-    "StridedSmoothing",
     "InterpolationBased",
-    "TrilinearInterpolation",
+    "MaxPooling",
+    "MinPooling",
+    "NearestNeighbor",
+    "Null",
+    "PoolingDownsamplingStrategy",
+    "SeparatedSmoothing",
+    "Smoothing",
+    "StridedSmoothing",
     "TricubicInterpolation",
+    "TrilinearInterpolation",
     "TriquinticInterpolation",
 ]

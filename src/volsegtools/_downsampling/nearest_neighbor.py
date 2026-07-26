@@ -1,8 +1,8 @@
 import logging
-from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools._storage.data_set import Channel
-from volsegtools._processing.dask_backend import DaskBackend
 
+from volsegtools._model.pipeline_state import PipelineContext
+from volsegtools._processing.dask_backend import DaskBackend
+from volsegtools._storage.data_set import Channel
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")

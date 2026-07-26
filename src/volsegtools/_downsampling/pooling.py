@@ -1,11 +1,11 @@
 import logging
-import numpy as np
+
 import dask.array as da
+import numpy as np
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import Channel
-
 from volsegtools.abc.downsampling_strategy import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")

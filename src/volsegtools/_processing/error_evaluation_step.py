@@ -1,38 +1,39 @@
-from typing import List, Optional, Protocol, Tuple
+import datetime
+import itertools
+import json
+import logging
+import math
 from pathlib import Path
+from typing import List, Optional, Protocol, Tuple
+
+import dask.array as da
+import numpy as np
+import scipy
 from scipy.ndimage import gaussian_laplace
 from skimage.metrics import structural_similarity as ssim
 
-import dask.array as da
-import scipy
-import itertools
-import math
-import logging
-import datetime
-import numpy as np
-import json
-
-from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools.abc import PostProcessingStep
-from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._core.timer import Timer
+from volsegtools._model.pipeline_state import PipelineContext
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import DataSet
+from volsegtools.abc import PostProcessingStep
 
 vst_logger = logging.getLogger("volsegtools")
+
 
 class ErrorFunction(Protocol):
     def evaluate(
         self,
         new,
         old,
-    ) -> float:
-        ...
+    ) -> float: ...
 
-    def __call__(self, new, old) -> float: return self.evaluate(new, old)
+    def __call__(self, new, old) -> float:
+        return self.evaluate(new, old)
 
     @property
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
+
 
 class HFEN(ErrorFunction):
     def evaluate(
@@ -63,8 +64,8 @@ class HFEN(ErrorFunction):
         )
 
         diff = log_old - log_new
-        numerator = da.sqrt(da.sum(diff ** 2))
-        denominator = da.sqrt(da.sum(log_old ** 2))
+        numerator = da.sqrt(da.sum(diff**2))
+        denominator = da.sqrt(da.sum(log_old**2))
         denominator = da.where(denominator == 0, 1e-10, denominator)
 
         hfen_score = (numerator / denominator).compute()
@@ -108,11 +109,7 @@ class SSIM(ErrorFunction):
                 data_range = 1.0
 
             _, ssim_map = ssim(
-                block1,
-                block2,
-                data_range=float(data_range),
-                full=True,
-                win_size=5
+                block1, block2, data_range=float(data_range), full=True, win_size=5
             )
             return ssim_map
 
@@ -155,6 +152,7 @@ class MSE(ErrorFunction):
     def name(self) -> str:
         return "MSE"
 
+
 class MAE(ErrorFunction):
     def evaluate(
         self,
@@ -170,6 +168,7 @@ class MAE(ErrorFunction):
     def name(self) -> str:
         return "MAE"
 
+
 class RMSE(ErrorFunction):
     def evaluate(
         self,
@@ -184,6 +183,7 @@ class RMSE(ErrorFunction):
     def name(self) -> str:
         return "RMSE"
 
+
 class PSNR(ErrorFunction):
     def evaluate(
         self,
@@ -194,7 +194,9 @@ class PSNR(ErrorFunction):
         new = new.astype(np.float64)
         data_range = old.max() - old.min()
         mse = da.mean((old - new) ** 2)
-        return da.where(mse == 0, float('inf'), 20 * da.log10(data_range / da.sqrt(mse)))
+        return da.where(
+            mse == 0, float("inf"), 20 * da.log10(data_range / da.sqrt(mse))
+        )
 
     @property
     def name(self) -> str:
@@ -205,10 +207,12 @@ def mse(original, reconstructed):
     mse = da.mean((original - reconstructed) ** 2)
     return mse.compute()
 
+
 def rmse(original, reconstructed):
     mse = da.mean((original - reconstructed) ** 2)
     rmse = da.sqrt(mse)
     return rmse.compute()
+
 
 class ErrorEvaluationStep(PostProcessingStep):
     def __init__(
@@ -245,8 +249,7 @@ class ErrorEvaluationStep(PostProcessingStep):
     def calculate_new_chunks(self, channel, factor: float | Tuple[float, ...]):
         if isinstance(factor, float):
             return tuple(
-                tuple(math.ceil(ax * factor) for ax in axes)
-                for axes in channel.chunks
+                tuple(math.ceil(ax * factor) for ax in axes) for axes in channel.chunks
             )
         elif isinstance(factor, tuple):
             return tuple(
@@ -256,25 +259,18 @@ class ErrorEvaluationStep(PostProcessingStep):
         else:
             raise TypeError("Unsupported type for chunk calculation")
 
-
     def _upsample_data(self, original: da.Array, data: da.Array):
 
-        zoom = tuple(x/y for x,y in zip(original.shape, data.shape))
+        zoom = tuple(x / y for x, y in zip(original.shape, data.shape))
 
         def block_triquintic_zoom(block):
-            return scipy.ndimage.zoom(
-                block,
-                zoom=zoom,
-                order=3,
-                mode="reflect"
-            )
+            return scipy.ndimage.zoom(block, zoom=zoom, order=3, mode="reflect")
 
         return data.map_blocks(
             block_triquintic_zoom,
             dtype=data.dtype,
-            chunks = self.calculate_new_chunks(data, zoom),
+            chunks=self.calculate_new_chunks(data, zoom),
         )
-
 
     async def execute(
         self,
@@ -288,7 +284,7 @@ class ErrorEvaluationStep(PostProcessingStep):
         )
         resolution_to_data = {}
         for _, group in itertools.groupby(data_sets, lambda x: x.metadata.id):
-            resolution_to_data = { d.metadata.resolution: d for d in group }
+            resolution_to_data = {d.metadata.resolution: d for d in group}
 
         if len(resolution_to_data) <= 1:
             return data_sets
@@ -303,13 +299,13 @@ class ErrorEvaluationStep(PostProcessingStep):
                 data_set_id = data.data_set.metadata.id
                 data_set_resolution = data.data_set.metadata.resolution
                 task_id = f"{data_set_id}-{data_set_resolution}"
-                vst_logger.info("... evaluating '{}'".format(
-                    f'{task_id}-ch{data.metadata.id}',
-                ))
-
-                original_lattice = original_data.handle.get_lattice(
-                    DaskBackend
+                vst_logger.info(
+                    "... evaluating '{}'".format(
+                        f"{task_id}-ch{data.metadata.id}",
+                    )
                 )
+
+                original_lattice = original_data.handle.get_lattice(DaskBackend)
                 upsampled_lattice = self._upsample_data(
                     original_lattice,
                     data.handle.get_lattice(DaskBackend),
@@ -320,26 +316,30 @@ class ErrorEvaluationStep(PostProcessingStep):
                         "Shapes of original {} and upsampled {} arrays "
                         "do not match, skipping to next resolution"
                     )
-                    vst_logger.warning(warn_msg.format(
-                        original_lattice.shape,
-                        upsampled_lattice.shape,
-                    ))
+                    vst_logger.warning(
+                        warn_msg.format(
+                            original_lattice.shape,
+                            upsampled_lattice.shape,
+                        )
+                    )
                     continue
 
                 error_value = self.error_fn(
                     original_data.handle.get_lattice(DaskBackend),
                     upsampled_lattice,
                 )
-                errors.append({
-                    "id": data.data_set.metadata.id,
-                    "resolution": data.data_set.metadata.resolution,
-                    "type": data.data_set.metadata.kind,
-                    "data_id": data.metadata.id,
-                    "timestamp": f"{datetime.datetime.now()}",
-                    "label": self.label,
-                    "error_method": self.error_fn.name,
-                    "error": float(error_value),
-                })
+                errors.append(
+                    {
+                        "id": data.data_set.metadata.id,
+                        "resolution": data.data_set.metadata.resolution,
+                        "type": data.data_set.metadata.kind,
+                        "data_id": data.metadata.id,
+                        "timestamp": f"{datetime.datetime.now()}",
+                        "label": self.label,
+                        "error_method": self.error_fn.name,
+                        "error": float(error_value),
+                    }
+                )
 
         if self.output_path is not None:
             if self.output_path.exists():
@@ -353,6 +353,7 @@ class ErrorEvaluationStep(PostProcessingStep):
             print(json.dumps(errors, indent=2))
 
         return data_sets
+
 
 class ErrorEvaluationMultiStep(PostProcessingStep):
     def __init__(
@@ -388,8 +389,7 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
     def calculate_new_chunks(self, channel, factor: float | Tuple[float, ...]):
         if isinstance(factor, float):
             return tuple(
-                tuple(math.ceil(ax * factor) for ax in axes)
-                for axes in channel.chunks
+                tuple(math.ceil(ax * factor) for ax in axes) for axes in channel.chunks
             )
         elif isinstance(factor, tuple):
             return tuple(
@@ -399,33 +399,24 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
         else:
             raise TypeError("Unsupported type for chunk calculation")
 
-
     def _upsample_data(self, original: da.Array, data: da.Array):
 
-        zoom = tuple(x/y for x,y in zip(original.shape, data.shape))
+        zoom = tuple(x / y for x, y in zip(original.shape, data.shape))
 
         def block_triquintic_zoom(block):
-            return scipy.ndimage.zoom(
-                block,
-                zoom=zoom,
-                order=3,
-                mode="reflect"
-            )
+            return scipy.ndimage.zoom(block, zoom=zoom, order=3, mode="reflect")
 
         return data.map_blocks(
             block_triquintic_zoom,
             dtype=data.dtype,
-            chunks = self.calculate_new_chunks(data, zoom),
+            chunks=self.calculate_new_chunks(data, zoom),
         )
-
 
     async def execute(self, data_sets: List[DataSet]) -> List[DataSet]:
-        vst_logger.info(
-            "Started 'Error Evaluation Multi' post-processing step"
-        )
+        vst_logger.info("Started 'Error Evaluation Multi' post-processing step")
         resolution_to_data = {}
         for _, group in itertools.groupby(data_sets, lambda x: x.metadata.id):
-            resolution_to_data = { d.metadata.resolution: d for d in group }
+            resolution_to_data = {d.metadata.resolution: d for d in group}
 
         if len(resolution_to_data) <= 1:
             return data_sets
@@ -441,9 +432,7 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
                 data_set_resolution = data.data_set.metadata.resolution
                 task_id = f"{data_set_id}-{data_set_resolution}"
 
-                original_lattice = original_data.handle.get_lattice(
-                    DaskBackend
-                )
+                original_lattice = original_data.handle.get_lattice(DaskBackend)
                 upsampled_lattice = self._upsample_data(
                     original_lattice,
                     data.handle.get_lattice(DaskBackend),
@@ -454,39 +443,46 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
                         "Shapes of original {} and upsampled {} arrays "
                         "do not match, skipping to next resolution"
                     )
-                    vst_logger.warning(warn_msg.format(
-                        original_lattice.shape,
-                        upsampled_lattice.shape,
-                    ))
+                    vst_logger.warning(
+                        warn_msg.format(
+                            original_lattice.shape,
+                            upsampled_lattice.shape,
+                        )
+                    )
                     continue
 
                 for error_fn in self.error_functions:
-                    vst_logger.info("... evaluating '{}' with {}".format(
-                        f'{task_id}-ch{data.metadata.id}',
-                        error_fn.name
-                    ))
+                    vst_logger.info(
+                        "... evaluating '{}' with {}".format(
+                            f"{task_id}-ch{data.metadata.id}", error_fn.name
+                        )
+                    )
                     error_value = error_fn(
                         original_lattice,
                         upsampled_lattice,
                     )
-                    errors.append({
-                        "id": data.data_set.metadata.id,
-                        "resolution": data.data_set.metadata.resolution,
-                        "type": data.data_set.metadata.kind,
-                        "data_id": data.metadata.id,
-                        "timestamp": f"{datetime.datetime.now()}",
-                        "label": self.label,
-                        "error_method": error_fn.name,
-                        "error": float(error_value),
-                    })
-                    vst_logger.info("... evaluating '{}' with {} - DONE".format(
-                        f'{task_id}-ch{data.metadata.id}',
-                        error_fn.name
-                    ))
-                    Timer.push_event("Evaluation of '{}' with {}".format(
-                        f'{task_id}-ch{data.metadata.id}',
-                        error_fn.name
-                    ))
+                    errors.append(
+                        {
+                            "id": data.data_set.metadata.id,
+                            "resolution": data.data_set.metadata.resolution,
+                            "type": data.data_set.metadata.kind,
+                            "data_id": data.metadata.id,
+                            "timestamp": f"{datetime.datetime.now()}",
+                            "label": self.label,
+                            "error_method": error_fn.name,
+                            "error": float(error_value),
+                        }
+                    )
+                    vst_logger.info(
+                        "... evaluating '{}' with {} - DONE".format(
+                            f"{task_id}-ch{data.metadata.id}", error_fn.name
+                        )
+                    )
+                    Timer.push_event(
+                        "Evaluation of '{}' with {}".format(
+                            f"{task_id}-ch{data.metadata.id}", error_fn.name
+                        )
+                    )
 
         if self.output_path is not None:
             if self.output_path.exists():

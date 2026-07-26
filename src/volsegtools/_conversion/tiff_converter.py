@@ -1,15 +1,14 @@
+import logging
 from pathlib import Path
 from typing import List
 
 import dask.array as da
 import pyometiff as ome_tiff
-import logging
 
-from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._core import DataKind, Vector3
 from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
-
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")

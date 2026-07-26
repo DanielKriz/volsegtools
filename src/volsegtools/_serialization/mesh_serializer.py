@@ -1,11 +1,10 @@
-from typing import List
-from pathlib import Path
-
 import logging
+from pathlib import Path
+from typing import List
 
 from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools._storage import DataSet
 from volsegtools._processing import MeshBackend
+from volsegtools._storage import DataSet
 from volsegtools.abc import Serializer
 
 vst_logger = logging.getLogger("volsegtools")

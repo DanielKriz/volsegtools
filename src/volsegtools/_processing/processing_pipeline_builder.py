@@ -1,22 +1,21 @@
 import collections
 from pathlib import Path
 from typing import List
-import zarr.errors
 
+import zarr.errors
 from typing_extensions import Self
 
 from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core import DataKind, WorkingStore
 from volsegtools._downsampling.null import Null
 from volsegtools._processing.processing_pipeline import ProcessingPipeline
-
 from volsegtools.abc import (
-    Converter,
     Bundler,
+    Converter,
     DownsamplingStrategy,
     PostConversionStep,
     PostProcessingStep,
-    Serializer
+    Serializer,
 )
 
 

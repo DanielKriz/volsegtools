@@ -5,8 +5,9 @@ import numpy as np
 import zarr
 import zarr.storage
 
-from volsegtools._core.data_kind import DataKind
 from volsegtools._core.chunking_mode import ChunkingMode
+from volsegtools._core.data_kind import DataKind
+
 
 class Singleton(type):
     _instances = {}

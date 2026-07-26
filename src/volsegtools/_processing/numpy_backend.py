@@ -1,9 +1,10 @@
-import zarr
-import numpy as np
 from typing import Any
 
-from volsegtools.abc import ComputationBackend
+import numpy as np
+import zarr
+
 from volsegtools._model.metadata import DescriptiveStatistics
+from volsegtools.abc import ComputationBackend
 from volsegtools.typing import ZarrObject
 
 

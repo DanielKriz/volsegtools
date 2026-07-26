@@ -7,32 +7,30 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
+from .dask_backend import DaskBackend
+from .error_evaluation_step import ErrorEvaluationMultiStep, ErrorEvaluationStep
+from .mesh_backend import MeshBackend
+from .numpy_backend import NumPyBackend
 from .processing_pipeline import ProcessingPipeline
 from .processing_pipeline_builder import ProcessingPipelineBuilder, create_builder
-from .smoothing_step import SmoothingStep
-from .error_evaluation_step import ErrorEvaluationStep, ErrorEvaluationMultiStep
 from .size_evaluation_step import (
-    SizeEvaluationStep,
     JSONSizeReporter,
+    SizeEvaluationStep,
     StdoutSizeReporter,
 )
-
-from .dask_backend import DaskBackend
-from .numpy_backend import NumPyBackend
-from .mesh_backend import MeshBackend
+from .smoothing_step import SmoothingStep
 
 __all__ = [
+    "DaskBackend",
+    "ErrorEvaluationMultiStep",
+    "ErrorEvaluationStep",
+    "JSONSizeReporter",
+    "MeshBackend",
+    "NumPyBackend",
     "ProcessingPipeline",
     "ProcessingPipelineBuilder",
-    "create_builder",
-    "SmoothingStep",
-    "ErrorEvaluationStep",
-    "ErrorEvaluationMultiStep",
     "SizeEvaluationStep",
-    "JSONSizeReporter",
+    "SmoothingStep",
     "StdoutSizeReporter",
-
-    "DaskBackend",
-    "NumPyBackend",
-    "MeshBackend",
+    "create_builder",
 ]

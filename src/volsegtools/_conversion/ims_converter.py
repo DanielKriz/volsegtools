@@ -1,18 +1,17 @@
+import collections
+import logging
+import re
 from pathlib import Path
 from typing import List
 
 import dask.array as da
 import h5py as hdf
 import numpy as np
-import collections
-import re
-import logging
 
 from volsegtools._core import DataKind, Vector3, unit_from_str
-from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
-
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")

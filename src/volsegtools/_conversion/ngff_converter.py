@@ -1,14 +1,13 @@
-import ome_zarr.reader
-import ome_zarr.io
-
-from typing import List
 from pathlib import Path
+from typing import List
 
-from volsegtools._processing.dask_backend import DaskBackend
+import ome_zarr.io
+import ome_zarr.reader
+
 from volsegtools._core import DataKind, Vector3
 from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
-
 from volsegtools.abc import Converter
 
 

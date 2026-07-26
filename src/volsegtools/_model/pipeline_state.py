@@ -1,10 +1,12 @@
-from typing import Optional, List, Callable, Any
-import pydantic
-import enum
 import dataclasses
+import enum
+from typing import Any, Callable, List, Optional
+
+import pydantic
 
 from volsegtools._core.timer import Timer
 from volsegtools._core.working_store import WorkingStore
+
 
 class PipelineStageKind(enum.StrEnum):
     NOT_STARTED = "Not Started"
@@ -22,7 +24,7 @@ class PipelineStageKind(enum.StrEnum):
 
 
 @pydantic.dataclasses.dataclass()
-class PipelineState():
+class PipelineState:
     current_stage: PipelineStageKind
     msg: Optional[str]
 
@@ -48,6 +50,7 @@ class PipelineStateManager:
         self._state = dataclasses.replace(self._state, *kwargs)
         for cb in self._callbacks:
             cb(self.current)
+
 
 @dataclasses.dataclass()
 class PipelineContext:

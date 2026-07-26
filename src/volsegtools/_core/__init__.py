@@ -5,32 +5,32 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
-from .data_kind import DataKind
-from .vector import Vector3
 from .bounds import Bounds
-from .gaussian_kernel_3D import Gaussian3DKernel
-from .timer import Timer, TimerReporter, JSONTimerReporter
-from .unit_kind import UnitKind, unit_from_str, to_micrometer, to_angstrom, to_bytes
 from .chunking_mode import ChunkingMode
 from .computation_backend import ComputationBackend
+from .data_kind import DataKind
+from .gaussian_kernel_3D import Gaussian3DKernel
 from .kernel import ConvolutionKernel
+from .timer import JSONTimerReporter, Timer, TimerReporter
+from .unit_kind import UnitKind, to_angstrom, to_bytes, to_micrometer, unit_from_str
+from .vector import Vector3
 from .working_store import WorkingStore
 
 __all__ = [
-    "DataKind",
-    "Vector3",
     "Bounds",
-    "Gaussian3DKernel",
-    "to_bytes",
-    "Timer",
-    "TimerReporter",
-    "JSONTimerReporter",
-    "UnitKind",
-    "unit_from_str",
-    "to_micrometer",
-    "to_angstrom",
     "ChunkingMode",
     "ComputationBackend",
     "ConvolutionKernel",
+    "DataKind",
+    "Gaussian3DKernel",
+    "JSONTimerReporter",
+    "Timer",
+    "TimerReporter",
+    "UnitKind",
+    "Vector3",
     "WorkingStore",
+    "to_angstrom",
+    "to_bytes",
+    "to_micrometer",
+    "unit_from_str",
 ]

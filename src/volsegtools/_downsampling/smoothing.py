@@ -1,17 +1,18 @@
+import logging
+from typing import List
+
+import dask_image.ndfilters as dask_filter
 import numpy as np
 import scipy
-from typing import List
-import logging
-import dask_image.ndfilters as dask_filter
 
+from volsegtools._core import ConvolutionKernel, Gaussian3DKernel
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import Channel
-from volsegtools._core import Gaussian3DKernel, ConvolutionKernel
-
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
+
 
 class Smoothing(DownsamplingStrategy):
     # We have to choose some reasonable size of the chunks with which
@@ -89,10 +90,7 @@ class SeparatedSmoothing(DownsamplingStrategy):
 
         def conv_block(block, axis):
             return scipy.ndimage.convolve1d(
-                block,
-                weights=kernel,
-                axis=axis,
-                mode='mirror'
+                block, weights=kernel, axis=axis, mode="mirror"
             )
 
         current_data = data.handle.get_lattice(DaskBackend)
@@ -102,12 +100,12 @@ class SeparatedSmoothing(DownsamplingStrategy):
         for step in range(steps):
             downsampled_data = current_data
             for axis in [0, 1, 2]:
-                depth = {x : self.radius if x == axis else 0 for x in range(3) }
+                depth = {x: self.radius if x == axis else 0 for x in range(3)}
                 downsampled_data = downsampled_data.map_overlap(
                     conv_block,
                     axis=axis,
                     depth=depth,
-                    boundary='reflect',
+                    boundary="reflect",
                     dtype=current_data.dtype,
                 )
             downsampled_data = downsampled_data[::2, ::2, ::2]

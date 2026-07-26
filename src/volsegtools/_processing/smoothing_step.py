@@ -1,22 +1,21 @@
+import logging
 from typing import Callable, List, Optional
+
 import numpy as np
 import scipy
-import logging
 
+from volsegtools._core.data_kind import DataKind
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools.abc import PostProcessingStep
-from volsegtools._core.data_kind import DataKind
 from volsegtools._storage.data_set import DataSet
-
+from volsegtools.abc import PostProcessingStep
 
 vst_logger = logging.getLogger("volsegtools")
 
+
 class SmoothingStep(PostProcessingStep):
     def __init__(
-        self,
-        appliable_kinds: List[DataKind] = [],
-        filter_fn: Optional[Callable] = None
+        self, appliable_kinds: List[DataKind] = [], filter_fn: Optional[Callable] = None
     ):
         self.appliable_kinds = appliable_kinds
         self.filter_fn = filter_fn
@@ -38,10 +37,7 @@ class SmoothingStep(PostProcessingStep):
 
         def smooth_block(block, axis):
             return scipy.ndimage.convolve1d(
-                block,
-                weights=kernel,
-                axis=axis,
-                mode='mirror'
+                block, weights=kernel, axis=axis, mode="mirror"
             )
 
         results = []
@@ -55,12 +51,12 @@ class SmoothingStep(PostProcessingStep):
                 vst_logger.info(f"... smoothing '{task_id}-ch{id}'")
                 data = channel.handle.get_lattice(DaskBackend)
                 for axis in [0, 1, 2]:
-                    depth = { x: 5 if x == axis else 0 for x in range(3) }
+                    depth = {x: 5 if x == axis else 0 for x in range(3)}
                     smooth_data = data.map_overlap(
                         smooth_block,
                         axis=axis,
                         depth=depth,
-                        boundary='reflect',
+                        boundary="reflect",
                         dtype=data.dtype,
                     )
                     channel.set_data(smooth_data, DaskBackend)

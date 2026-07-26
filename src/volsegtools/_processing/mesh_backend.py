@@ -1,10 +1,10 @@
-import zarr
-import trimesh
-
 from typing import Any
 
-from volsegtools.abc import ComputationBackend
+import trimesh
+import zarr
+
 from volsegtools._model.metadata import DescriptiveStatistics
+from volsegtools.abc import ComputationBackend
 from volsegtools.typing import ZarrObject
 
 

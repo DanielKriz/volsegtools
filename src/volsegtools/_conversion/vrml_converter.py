@@ -1,14 +1,13 @@
-from typing import List
-from pathlib import Path
-
-import tempfile
-import vrmlxpy as vrml
 import json
+import tempfile
+from pathlib import Path
+from typing import List
+
+import vrmlxpy as vrml
 
 from volsegtools._conversion.mesh_converter import MeshConverter
-from volsegtools._storage import DataSet
 from volsegtools._model import PipelineContext
-
+from volsegtools._storage import DataSet
 from volsegtools.abc import Converter
 
 
