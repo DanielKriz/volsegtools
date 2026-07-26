@@ -5,8 +5,8 @@ import trimesh
 import logging
 
 from volsegtools._processing.mesh_backend import MeshBackend
-from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model.metadata import DataSetInfo
+from volsegtools._core import DataKind, Vector3
+from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools.abc import Converter
 from volsegtools._storage import DataSet
 
@@ -29,7 +29,11 @@ class MeshConverter(Converter):
         # TODO: we could include some algorithm for conversion of mesh to volume
         raise RuntimeError("Cannot convert mesh to volume")
 
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
         mesh_data = trimesh.load_mesh(input_path)
 
@@ -43,7 +47,7 @@ class MeshConverter(Converter):
             kind=DataKind.SEGMENTATION_MESH,
             lattice_shape=Vector3(0, 0, 0),
         )
-        data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
+        data_set = DataSet(context.working_store, data_set_info)
         frame = data_set.add_time_frame()
         mesh = frame.add_mesh(0)
         mesh.set_data(mesh_data, MeshBackend)

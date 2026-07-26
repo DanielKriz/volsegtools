@@ -1,6 +1,10 @@
-import volsegtools as vst
+import logging
 
-class Null(vst.abc.DownsamplingStrategy):
+from volsegtools.abc import DownsamplingStrategy
+
+vst_logger = logging.getLogger("volsegtools")
+
+class Null(DownsamplingStrategy):
     def execute(self, _):
-        vst.logger.info("Using the 'Null' downsampling strategy")
+        vst_logger.info("Using the 'Null' downsampling strategy")
         yield from []

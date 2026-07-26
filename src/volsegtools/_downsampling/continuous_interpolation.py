@@ -3,13 +3,15 @@ from typing import List
 import logging
 import math
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import Channel
-import volsegtools as vst
+
+from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
 
-class InterpolationBased(vst.abc.DownsamplingStrategy):
+class InterpolationBased(DownsamplingStrategy):
     TRILINEAR_FACTOR = 1
     TRICUBIC_FACTOR = 3
     TRIQUINTIC_FACTOR = 5
@@ -48,7 +50,7 @@ class InterpolationBased(vst.abc.DownsamplingStrategy):
             for axes in channel.chunks
         )
 
-    def execute(self, data: Channel):
+    def execute(self, data: Channel, context: PipelineContext):
         match self.order:
             case 1:
                 vst_logger.info("Using the 'Trilinear' downsampling strategy")

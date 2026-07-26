@@ -5,8 +5,8 @@ from typing import List
 from pathlib import Path
 
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model import DataSetInfo
+from volsegtools._core import DataKind, Vector3
+from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._storage import DataSet
 
 from volsegtools.abc import Converter
@@ -24,7 +24,11 @@ class NGFFConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+    async def convert_volume(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         nodes = ome_zarr.reader.Reader(ome_zarr.io.ZarrLocation(input_path))()
         data_node = next(nodes)
         metadata = data_node.metadata
@@ -62,7 +66,7 @@ class NGFFConverter(Converter):
                 data_arr.shape[axis_order["z"]],
             ),
         )
-        data_set = DataSet(WorkingStore.instance.data_store, info)
+        data_set = DataSet(context.working_store, info)
 
         # If we have time frames then we have to iterate over them
         if data_arr.ndim > 4:
@@ -80,11 +84,15 @@ class NGFFConverter(Converter):
 
         return [data_set]
 
-    async def collect_annotations(self, input_path) -> None:
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
+        raise await self.convert_volume(input_path, context)
+
+    async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError
 
-    async def collect_metadata(self, input_path) -> None:
+    async def collect_metadata(self, input_path, context) -> None:
         raise NotImplementedError
-
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
-        raise await self.convert_volume(input_path)

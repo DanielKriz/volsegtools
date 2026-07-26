@@ -1,12 +1,15 @@
 from typing import List
 from pathlib import Path
+
 import tempfile
 import vrmlxpy as vrml
 import json
 
 from volsegtools._conversion.mesh_converter import MeshConverter
-from volsegtools.abc import Converter
 from volsegtools._storage import DataSet
+from volsegtools._model import PipelineContext
+
+from volsegtools.abc import Converter
 
 
 class VRMLConverter(Converter):
@@ -65,10 +68,14 @@ class VRMLConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+    async def convert_volume(self, input_path: Path, context) -> List[DataSet]:
         raise RuntimeError("This converter does not support volumes!")
 
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         tmp_config = tempfile.NamedTemporaryFile()
         tmp_synonyms = tempfile.NamedTemporaryFile()
         tmp_out = tempfile.NamedTemporaryFile(suffix=".stl")
@@ -90,8 +97,8 @@ class VRMLConverter(Converter):
         mesh_converter = MeshConverter()
         return await mesh_converter.convert_segmentation(Path(tmp_out.name))
 
-    async def collect_annotations(self, input_path) -> None:
+    async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError
 
-    async def collect_metadata(self, input_path) -> None:
+    async def collect_metadata(self, input_path, context) -> None:
         raise NotImplementedError

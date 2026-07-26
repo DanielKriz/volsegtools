@@ -1,17 +1,24 @@
 from typing import List
 from pathlib import Path
+
 import mrcfile
 import logging
 
-
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import DaskBackend
+from volsegtools._storage.data_set import DataSet
 from volsegtools.abc import Serializer
 
 vst_logger = logging.getLogger("volsegtools")
 
 
 class MRCSerializer(Serializer):
-    async def serialize(self, data_set, output_path: Path) -> List[Path]:
+    async def serialize(
+        self,
+        data_set: DataSet,
+        output_path: Path,
+        context: PipelineContext,
+    ) -> List[Path]:
         output_files = []
 
         for channel in data_set.flat_channel_iter():

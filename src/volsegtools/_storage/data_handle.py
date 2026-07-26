@@ -9,7 +9,8 @@ from volsegtools._core import DataKind, ComputationBackend, WorkingStore
 class DataHandle:
     def __init__(
         self,
-        store: zarr.storage.StoreLike,
+        # store: zarr.storage.StoreLike,
+        store: WorkingStore,
         zarr_path: Path,
         data_kind: DataKind,
     ):
@@ -28,11 +29,11 @@ class DataHandle:
     @property
     def zarr_object(self) -> Union[zarr.Array, zarr.Group]:
         if self._zarr_object is None:
-            self._zarr_object = zarr.open_group(self.store, path=str(self.zarr_path))
+            self._zarr_object = zarr.open_group(self.store.data_store, path=str(self.zarr_path))
         return self._zarr_object
 
     def store_data(self, data, backend, compressor=None):
-        group = WorkingStore.instance.root_group.require_group(str(self.zarr_path))
+        group = self.store.root_group.require_group(str(self.zarr_path))
         if isinstance(data, trimesh.Trimesh):
             self.require_kind(DataKind.SEGMENTATION_MESH)
             backend.store_to_zarr(data, group)

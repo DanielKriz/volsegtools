@@ -7,6 +7,7 @@ import logging
 
 from molviewspec.mvsx_converter import tempfile
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._storage.data_set import info_from_file_path
 from volsegtools.abc.bundler import Bundler
 
@@ -37,7 +38,12 @@ X11_COLOR_NAMES = [
 class MVSXBundler(Bundler):
     """Bundler for the MVSX format."""
 
-    def bundle(self, data_paths: List[Path], output_path: Path) -> List[Path]:
+    def bundle(
+        self,
+        data_paths: List[Path],
+        output_path: Path,
+        context: PipelineContext,
+    ) -> List[Path]:
         parsed_paths = [info_from_file_path(x) for x in data_paths]
 
         data_per_resolution = collections.defaultdict(list)

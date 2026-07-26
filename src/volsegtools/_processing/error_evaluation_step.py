@@ -1,16 +1,18 @@
-import dask.array as da
 from typing import List, Optional, Protocol, Tuple
 from pathlib import Path
-import scipy
 from scipy.ndimage import gaussian_laplace
+from skimage.metrics import structural_similarity as ssim
+
+import dask.array as da
+import scipy
 import itertools
 import math
 import logging
 import datetime
 import numpy as np
 import json
-from skimage.metrics import structural_similarity as ssim
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools.abc import PostProcessingStep
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._core.timer import Timer
@@ -274,7 +276,11 @@ class ErrorEvaluationStep(PostProcessingStep):
         )
 
 
-    async def execute(self, data_sets: List[DataSet]) -> List[DataSet]:
+    async def execute(
+        self,
+        data_sets: List[DataSet],
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info(
             "Started 'Error Evaluation - {}' post-processing step".format(
                 self.error_fn.name

@@ -22,11 +22,14 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+# TODO: Remove the Singleton
+# TODO: Make it possible to share existing store
+# TODO: Rename to 'Workspace'
 # TODO: There is huge chance, that we do not need this...
-class WorkingStore(metaclass=Singleton):
+class WorkingStore:
     def __init__(self, store_path: Path):
         self.data_store = zarr.storage.LocalStore(root=store_path)
-        self.root_group = zarr.create_group(store=self.data_store)
+        self.root_group = zarr.open_group(store=self.data_store, mode="a")
 
         self.volume_dtype = np.float64
         self.is_volume_dtype_set = False

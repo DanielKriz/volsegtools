@@ -1,8 +1,10 @@
-import json
 from pathlib import Path
 from typing import List, Protocol
+
+import json
 import logging
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._storage.data_set import DataSet
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools.abc.post_processing_step import PostProcessingStep
@@ -84,7 +86,11 @@ class SizeEvaluationStep(PostProcessingStep):
         self.reporter = reporter
         self.label = label
 
-    async def execute(self, data_sets: List[DataSet]) -> List[DataSet]:
+    async def execute(
+        self,
+        data_sets: List[DataSet],
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info("Started 'Size Evaluation' post-processing step")
 
         for ds in data_sets:

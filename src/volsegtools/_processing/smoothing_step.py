@@ -3,6 +3,7 @@ import numpy as np
 import scipy
 import logging
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools.abc import PostProcessingStep
 from volsegtools._core.data_kind import DataKind
@@ -26,7 +27,11 @@ class SmoothingStep(PostProcessingStep):
         kernel = kernel / kernel.sum()
         return kernel
 
-    async def execute(self, data_sets: List[DataSet]) -> List[DataSet]:
+    async def execute(
+        self,
+        data_sets: List[DataSet],
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info("Started 'Smoothing' post-processing step")
 
         kernel = self.calculate_convolution_kernel()

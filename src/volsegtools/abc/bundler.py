@@ -1,6 +1,7 @@
 from typing import List, Protocol
 from pathlib import Path
 
+from volsegtools._model import PipelineContext
 
 class Bundler(Protocol):
     """Bundles a collection of data sets into an another artifact.
@@ -9,7 +10,12 @@ class Bundler(Protocol):
     artifacts, not just one.
     """
 
-    def bundle(self, data_paths: List[Path], output_path: Path) -> List[Path]:
+    def bundle(
+        self,
+        data_paths: List[Path],
+        output_path: Path,
+        context: PipelineContext,
+    ) -> List[Path]:
         """Bundles provided files into an another artifact.
 
         Parameters

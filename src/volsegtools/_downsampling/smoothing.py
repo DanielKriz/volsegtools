@@ -4,15 +4,16 @@ from typing import List
 import logging
 import dask_image.ndfilters as dask_filter
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import Channel
-from volsegtools._core.gaussian_kernel_3D import Gaussian3DKernel
+from volsegtools._core import Gaussian3DKernel, ConvolutionKernel
 
-import volsegtools as vst
+from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
 
-class Smoothing(vst.abc.DownsamplingStrategy):
+class Smoothing(DownsamplingStrategy):
     # We have to choose some reasonable size of the chunks with which
     # we will be working here. This has been chosen because for floats
     # it has around 70MB, the chunk size should be somewhere between
@@ -32,7 +33,7 @@ class Smoothing(vst.abc.DownsamplingStrategy):
     def calculate_steps(self, channel: Channel) -> int:
         return len(self.calculate_approx_downsampled_sizes(channel))
 
-    def execute(self, data: Channel):
+    def execute(self, data: Channel, context: PipelineContext):
         vst_logger.info("Using the 'Smoothing' downsampling strategy")
 
         if 1 in data.handle.shape:
@@ -57,7 +58,7 @@ class Smoothing(vst.abc.DownsamplingStrategy):
             yield current_data
 
 
-class SeparatedSmoothing(vst.abc.DownsamplingStrategy):
+class SeparatedSmoothing(DownsamplingStrategy):
     def __init__(self, size: int, sigma: float):
         self.radius = int(size * sigma + 0.5)
         self.sigma = sigma
@@ -83,7 +84,7 @@ class SeparatedSmoothing(vst.abc.DownsamplingStrategy):
         kernel = kernel / kernel.sum()
         return kernel
 
-    def execute(self, data: Channel):
+    def execute(self, data: Channel, context: PipelineContext):
         kernel = self.calculate_convolution_kernel()
 
         def conv_block(block, axis):
@@ -116,8 +117,8 @@ class SeparatedSmoothing(vst.abc.DownsamplingStrategy):
             yield current_data
 
 
-class StridedSmoothing(vst.abc.DownsamplingStrategy):
-    def __init__(self, kernel: vst.abc.ConvolutionKernel, stride=2):
+class StridedSmoothing(DownsamplingStrategy):
+    def __init__(self, kernel: ConvolutionKernel, stride=2):
         self.kernel = kernel
         self.stride = stride
 

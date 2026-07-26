@@ -1,13 +1,19 @@
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol, List
 
+from volsegtools._model import PipelineContext
+from volsegtools._storage.data_set import DataSet
 
 class Converter(Protocol):
     """Converts the contents of some file format into the internal data
     structure that is then going to be used further in the processing.
     """
 
-    async def convert_volume(self, input_path: Path) -> Any:
+    async def convert_volume(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+        ) -> List[DataSet]:
         """Transforms volumetric data into a zarr array.
 
         Parameters
@@ -21,7 +27,11 @@ class Converter(Protocol):
         """
         ...
 
-    async def convert_segmentation(self, input_path: Path) -> Any:
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         """Transforms the segmentation data into a zarr array.
 
         Parameters
@@ -31,7 +41,11 @@ class Converter(Protocol):
         """
         ...
 
-    async def collect_metadata(self, input_path) -> Any:
+    async def collect_metadata(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         """Collects metadata from a file.
 
         Parameters
@@ -44,7 +58,11 @@ class Converter(Protocol):
         """
         ...
 
-    async def collect_annotations(self, input_path) -> Any:
+    async def collect_annotations(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         """Collects annotations from a file.
 
         Parameters

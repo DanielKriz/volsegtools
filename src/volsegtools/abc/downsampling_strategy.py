@@ -1,10 +1,16 @@
 from typing import Any, Protocol
 
+from volsegtools._model import PipelineContext
+
 class DownsamplingStrategy(Protocol):
     """Downsamples given data."""
     MIN_SIZE_THRESHOLD = 5_000_000  # 5 MB
 
-    def execute(self, data) -> Any:
+    def execute(
+        self,
+        data_set,
+        context: PipelineContext,
+    ) -> Any:
         """Executes give downsampling strategy on given data.
 
         It shall be implemented as a generator, where each yield represents

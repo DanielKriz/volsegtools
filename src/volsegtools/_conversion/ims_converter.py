@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 from typing import List
 
@@ -7,10 +6,11 @@ import h5py as hdf
 import numpy as np
 import collections
 import re
+import logging
 
-from volsegtools._core import DataKind, Vector3, unit_from_str, WorkingStore
+from volsegtools._core import DataKind, Vector3, unit_from_str
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._model import DataSetInfo
+from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._storage import DataSet
 
 from volsegtools.abc import Converter
@@ -123,7 +123,11 @@ class ImarisConverter(Converter):
             100 * ((info["ExtMax2"] - info["ExtMin2"]) / info["Z"]),
         )
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+    async def convert_volume(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         if not input_path.exists():
             raise RuntimeError(
                 f"You have to provide a valid file, {input_path} does not exists"
@@ -159,7 +163,7 @@ class ImarisConverter(Converter):
             ),
         )
 
-        data_set = DataSet(WorkingStore.instance.data_store, info)
+        data_set = DataSet(context.working_store, info)
 
         encountered_channel_ids = []
 
@@ -195,11 +199,15 @@ class ImarisConverter(Converter):
 
         return [data_set]
 
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
-        return await self.convert_volume(input_path)
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
+        return await self.convert_volume(input_path, context)
 
-    async def collect_annotations(self, input_path) -> None:
+    async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError
 
-    async def collect_metadata(self, input_path) -> None:
+    async def collect_metadata(self, input_path, context) -> None:
         raise NotImplementedError

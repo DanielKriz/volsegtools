@@ -7,10 +7,10 @@ import logging
 import pydantic
 
 
-import volsegtools as vst
 from volsegtools._conversion.converter_map import ConverterMap
 from volsegtools._core import DataKind, Timer, Vector3, WorkingStore
 from volsegtools._downsampling.null import Null
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._model import (
     PipelineStageKind,
@@ -24,6 +24,7 @@ from volsegtools.abc import (
     PostConversionStep,
     Bundler,
     Serializer,
+    ProcessingPipeline,
 )
 
 vst_logger = logging.getLogger("volsegtools")
@@ -34,7 +35,7 @@ def _flatten(list_of_lists: List[List]) -> List:
     return [x for xs in list_of_lists for x in xs]
 
 
-class ProcessingPipeline(vst.abc.ProcessingPipeline):
+class ProcessingPipeline(ProcessingPipeline):
     DEFAULT_WORK_DIR = Path(".vst_work_dir")
 
     def __init__(
@@ -59,7 +60,6 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         self._segmentation_converter_map = segmentation_converter_map
 
         self._output_dir = output_dir if output_dir is not None else Path()
-        self._data = WorkingStore.instance
 
         self._serializer_map = {
             DataKind.VOLUME: volume_serializer,
@@ -72,6 +72,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
             self._work_dir = ProcessingPipeline.DEFAULT_WORK_DIR
         else:
             self._work_dir = work_dir
+        self.working_store = WorkingStore(work_dir)
 
         self._post_processing_steps = post_processing_steps
         self._post_conversion_steps = post_conversion_steps
@@ -82,6 +83,17 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         self._state = PipelineState(
             current_stage=PipelineStageKind.NOT_STARTED,
             msg="The pipeline has not yet started",
+        )
+
+        self.state__ = PipelineStateManager(self, PipelineState(
+            current_stage=PipelineStageKind.NOT_STARTED,
+            msg="The pipeline has not yet started",
+        ))
+
+        self.context = PipelineContext(
+            timer = Timer(),
+            working_store = self.working_store,
+            state = self.state__,
         )
 
     @staticmethod
@@ -184,7 +196,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         for path in paths:
             converter = self._volume_converter_map["".join(path.suffixes)]
             self._state.msg = f"Converting '{path}'"
-            volumes += await converter.convert_volume(path)
+            volumes += await converter.convert_volume(path, self.context)
             Timer.push_event(f"Finished converting {path}")
 
         return volumes
@@ -202,7 +214,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         for path in paths:
             converter = self._segmentation_converter_map["".join(path.suffixes)]
             self._state.msg = f"Converting '{path}'"
-            segmentations += await converter.convert_segmentation(path)
+            segmentations += await converter.convert_segmentation(path, self.context)
 
         return segmentations
 
@@ -219,7 +231,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         self, volumes, segmentations, metadata, annotations
     ):
         for step in self._post_conversion_steps:
-            await step(volumes, segmentations, metadata, annotations)
+            await step(volumes, segmentations, metadata, annotations, self.context)
 
     @pipeline_stage("Downsampling")
     async def downsample(self, data_set: DataSet) -> List[DataSet]:
@@ -235,12 +247,12 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         for channel in data_set.flat_channel_iter():
             frame = channel.parent.metadata.id
             for resolution, downsampled_data in enumerate(
-                self._downsampling_strategy.execute(channel),
+                self._downsampling_strategy.execute(channel, self.context),
                 start=1,  # 0 is reserved for the original data resolution
             ):
                 if resolution not in resulting_data_sets.keys():
                     resulting_data_sets[resolution] = DataSet(
-                        WorkingStore.instance.data_store
+                        self.context.working_store
                     )
                     resulting_data_sets[resolution].update_metadata(data_set)
                     resulting_data_sets[resolution].metadata.resolution = resolution
@@ -265,7 +277,7 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
     async def apply_post_processing_steps(self, data_set) -> List[DataSet]:
         processed_data = data_set
         for step in self._post_processing_steps:
-            processed_data = await step.execute(processed_data)
+            processed_data = await step.execute(processed_data, self.context)
         return processed_data
 
     @pipeline_stage("Serialization")
@@ -276,10 +288,10 @@ class ProcessingPipeline(vst.abc.ProcessingPipeline):
         if serializer is None:
             raise RuntimeError(f"Could not find serializer for '{kind}'")
 
-        return await serializer.serialize(data_set, self._work_dir)
+        return await serializer.serialize(data_set, self._work_dir, self.context)
 
     @pipeline_stage("Bundling")
     async def bundle(self, files: List[Path]):
         if self._bundler is None:
             raise RuntimeError("Cannot bundle without any bundler!")
-        return self._bundler.bundle(files, self._output_dir)
+        return self._bundler.bundle(files, self._output_dir, self.context)

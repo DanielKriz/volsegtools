@@ -7,9 +7,9 @@ import ciftools.serialization
 
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools.abc import Converter
-from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model.metadata import DataSetInfo
+from volsegtools._core import DataKind, Vector3
 from volsegtools._storage import DataSet
+from volsegtools._model import DataSetInfo, PipelineContext
 
 vst_logger = logging.getLogger("volsegtools")
 
@@ -26,7 +26,11 @@ class CIFConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+    async def convert_volume(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         with open(input_path, "rb") as file:
@@ -74,21 +78,25 @@ class CIFConverter(Converter):
                 ),
             )
 
-            data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
+            data_set = DataSet(context.working_store, data_set_info)
             frame = data_set.add_time_frame()
             channel = frame.add_channel(0)
             channel.set_data(data, DaskBackend)
 
         return [data_set] if data_set is not None else []
 
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
-        data_sets = await self.convert_volume(input_path)
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
+        data_sets = await self.convert_volume(input_path, context)
         for ds in data_sets:
             ds.metadata.kind = DataKind.SEGMENTATION_VOLUME
         return data_sets
 
-    async def collect_annotations(self, input_path) -> None:
+    async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError
 
-    async def collect_metadata(self, input_path) -> None:
+    async def collect_metadata(self, input_path, context) -> None:
         raise NotImplementedError

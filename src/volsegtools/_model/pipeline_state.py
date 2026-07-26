@@ -49,6 +49,7 @@ class PipelineStateManager:
         for cb in self._callbacks:
             cb(self.current)
 
+@dataclasses.dataclass()
 class PipelineContext:
     timer: Timer
     working_store: WorkingStore

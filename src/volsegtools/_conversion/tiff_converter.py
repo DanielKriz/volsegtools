@@ -6,8 +6,8 @@ import pyometiff as ome_tiff
 import logging
 
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model import DataSetInfo
+from volsegtools._core import DataKind, Vector3
+from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._storage import DataSet
 
 from volsegtools.abc import Converter
@@ -27,7 +27,11 @@ class TIFFConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
+    async def convert_volume(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         reader = ome_tiff.OMETIFFReader(fpath=input_path)
@@ -69,7 +73,7 @@ class TIFFConverter(Converter):
             ),
         )
 
-        data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
+        data_set = DataSet(context.working_store, data_set_info)
         if data_array.ndim == 5:
             # There are multiple frames
             raise NotImplementedError()
@@ -87,11 +91,15 @@ class TIFFConverter(Converter):
 
         return [data_set]
 
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         raise NotImplementedError()
 
-    async def collect_annotations(self, input_path) -> None:
+    async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError()
 
-    async def collect_metadata(self, input_path) -> None:
+    async def collect_metadata(self, input_path, context) -> None:
         raise NotImplementedError()

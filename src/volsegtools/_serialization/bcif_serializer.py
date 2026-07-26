@@ -1,20 +1,27 @@
 from pathlib import Path
 from typing import Collection, List
-
-import ciftools
-import ciftools.serialization
-import numpy as np
 from ciftools.binary.encoder import BYTE_ARRAY
 from ciftools.models.writer import CIFCategoryDesc as CategoryDesc
 from ciftools.models.writer import CIFFieldDesc as Field
 
-from volsegtools._storage import Channel
+import ciftools
+import ciftools.serialization
+import numpy as np
+
+from volsegtools._model.pipeline_state import PipelineContext
+from volsegtools._storage import Channel, DataSet
 from volsegtools._processing import NumPyBackend
+
 from volsegtools.abc import Serializer
 
 
 class BCIFSerializer(Serializer):
-    async def serialize(self, data_set, output_path: Path) -> List[Path]:
+    async def serialize(
+        self,
+        data_set: DataSet,
+        output_path: Path,
+        context: PipelineContext,
+    ) -> List[Path]:
         # This is currently working only for volumes!
         output_files = []
         for channel in data_set.flat_channel_iter():

@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import dask.array as da
 
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.data_set import Channel
 
@@ -28,7 +29,7 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy):
         self.block_size = block_size
         self.padding_mode = padding_mode
 
-    def execute(self, channel: Channel):
+    def execute(self, channel: Channel, context: PipelineContext):
         match self.operation:
             case np.mean:
                 vst_logger.info("Using the 'Mean' downsampling strategy")

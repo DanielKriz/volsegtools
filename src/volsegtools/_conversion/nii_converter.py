@@ -4,9 +4,9 @@ from typing import List
 import logging
 import nibabel as nib
 
-from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._core import DataKind, Vector3, WorkingStore
-from volsegtools._model import DataSetInfo
+from volsegtools._processing.numpy_backend import NumPyBackend
+from volsegtools._core import DataKind, Vector3
+from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._storage import DataSet
 
 from volsegtools.abc import Converter
@@ -28,11 +28,18 @@ class NiiConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path) -> List[DataSet]:
-        # TODO: we could include some algorithm for conversion of mesh to volume
+    async def convert_volume(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         raise RuntimeError("Cannot convert mesh to volume")
 
-    async def convert_segmentation(self, input_path: Path) -> List[DataSet]:
+    async def convert_segmentation(
+        self,
+        input_path: Path,
+        context: PipelineContext,
+    ) -> List[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
         nibabel_img = nib.load(str(input_path))
@@ -48,15 +55,15 @@ class NiiConverter(Converter):
             kind=DataKind.SEGMENTATION_VOLUME,
             lattice_shape=Vector3(data.shape[0], data.shape[1], data.shape[2]),
         )
-        data_set = DataSet(WorkingStore.instance.data_store, data_set_info)
+        data_set = DataSet(context.working_store, data_set_info)
         frame = data_set.add_time_frame()
         channel = frame.add_channel(0)
         channel.set_data(data, NumPyBackend)
 
         return [data_set]
 
-    async def collect_annotations(self, input_path) -> None:
+    async def collect_annotations(self, input_path, context) -> None:
         raise NotImplementedError
 
-    async def collect_metadata(self, input_path) -> None:
+    async def collect_metadata(self, input_path, context) -> None:
         raise NotImplementedError

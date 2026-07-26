@@ -1,6 +1,6 @@
 import numpy as np
 
-from volsegtools.abc import ConvolutionKernel
+from volsegtools._core.kernel import ConvolutionKernel
 
 
 class Gaussian3DKernel(ConvolutionKernel):

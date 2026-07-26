@@ -12,13 +12,14 @@ from volsegtools._model import (
     ChannelInfo,
     MeshInfo,
 )
-from volsegtools._core import ComputationBackend
+from volsegtools._core.computation_backend import ComputationBackend
+from volsegtools._core.working_store import WorkingStore
 from volsegtools._storage.data_handle import DataHandle
 
 
 class DataSet:
     def __init__(
-        self, store: zarr.storage.StoreLike, metadata: Optional[DataSetInfo] = None
+        self, store: WorkingStore, metadata: Optional[DataSetInfo] = None
     ):
         self.store = store
         if metadata:

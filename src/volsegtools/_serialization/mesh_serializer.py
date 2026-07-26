@@ -1,7 +1,9 @@
-import logging
 from typing import List
 from pathlib import Path
 
+import logging
+
+from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._storage import DataSet
 from volsegtools._processing import MeshBackend
 from volsegtools.abc import Serializer
@@ -34,7 +36,12 @@ class MeshSerializer(Serializer):
     def __init__(self, mesh_serialization_fn):
         self.serialization_fn = mesh_serialization_fn
 
-    async def serialize(self, data_set: DataSet, output_path: Path) -> List[Path]:
+    async def serialize(
+        self,
+        data_set: DataSet,
+        output_path: Path,
+        context: PipelineContext,
+    ) -> List[Path]:
         output_files = []
 
         for frame in data_set.time_frames:
