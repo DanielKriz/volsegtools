@@ -51,7 +51,7 @@ class MVSXBundler(Bundler):
 
         output_file_paths = []
 
-        for resolution in data_per_resolution.keys():
+        for resolution in data_per_resolution:
             builder = mvs.create_builder()
 
             data_set_id = data_per_resolution[resolution][0].data_set

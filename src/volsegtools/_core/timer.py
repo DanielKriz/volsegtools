@@ -248,6 +248,4 @@ class JSONTimerReporter:
         with open(self.output_path, "w") as file:
             file.write(json.dumps(records, indent=2))
 
-        vst_logger.info(
-            f"Finished writing timer report into {self.output_path}"
-        )
+        vst_logger.info(f"Finished writing timer report into {self.output_path}")

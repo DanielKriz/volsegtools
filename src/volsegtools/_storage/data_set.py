@@ -36,13 +36,11 @@ class DataSet:
         return root / self.metadata.id / f"resolution_{self.metadata.resolution}"
 
     def __iter__(self):
-        for frame in self.time_frames:
-            yield frame
+        yield from self.time_frames
 
     def flat_channel_iter(self):
         for frame in self.time_frames:
-            for channel in frame:
-                yield channel
+            yield from frame
 
     def add_time_frame(self, id=-1):
         if id == -1:
@@ -98,8 +96,7 @@ class TimeFrame:
         return self.meshes[-1]
 
     def __iter__(self):
-        for channel in self.channels:
-            yield channel
+        yield from self.channels
 
     def __str__(self):
         return f"TimerFrame({self.metadata}, {self.channels}, {self.meshes})"

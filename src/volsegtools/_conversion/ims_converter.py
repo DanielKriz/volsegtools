@@ -30,7 +30,7 @@ def _type_cast_attrs(attrs):
     def to_str(x):
         return x.tobytes().decode("utf-8")
 
-    attrs_dict = {k: to_str(attrs[k]) for k in attrs.keys()}
+    attrs_dict = {k: to_str(attrs[k]) for k in attrs}
 
     attrs_dict["ExtMax0"] = float(attrs_dict["ExtMax0"])
     attrs_dict["ExtMax1"] = float(attrs_dict["ExtMax1"])
@@ -67,9 +67,7 @@ def _find_all_channels(ch_list: list, info: dict):
                     y["Data"],
                 )
             )
-            vst_logger.debug(
-                f"Added new channel: {_channel_to_str(ch_list[-1])}"
-            )
+            vst_logger.debug(f"Added new channel: {_channel_to_str(ch_list[-1])}")
 
     return _find_all
 
@@ -134,7 +132,7 @@ class ImarisConverter(Converter):
 
         file = hdf.File(input_path, "r")
 
-        dataset_info = dict()
+        dataset_info = {}
         file.visititems(_find_image_info(dataset_info))
         voxel_size = ImarisConverter.calculate_voxel_size(dataset_info)
 
@@ -166,7 +164,7 @@ class ImarisConverter(Converter):
         encountered_channel_ids = []
 
         for channel_info in channels:
-            if not channel_info.resolution == 0:
+            if channel_info.resolution != 0:
                 continue
 
             metadata = channel_info.metadata

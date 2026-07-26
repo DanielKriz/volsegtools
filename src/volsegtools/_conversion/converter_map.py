@@ -10,7 +10,7 @@ class UnsupportedCompressionError(Exception):
 
 class ConverterMap:
     def __init__(self) -> None:
-        self._suffix_to_converter_map: dict[str, Converter] = dict()
+        self._suffix_to_converter_map: dict[str, Converter] = {}
 
     def set_converter(
         self,
@@ -19,12 +19,11 @@ class ConverterMap:
         force=False,
     ) -> None:
         for suffix in self.split_suffixes(suffixes):
-            if suffix in self._suffix_to_converter_map.keys():
-                if not force:
-                    warnings.warn(
-                        f"Overwriting converter for suffix: {suffix}",
-                        RuntimeWarning,
-                    )
+            if suffix in self._suffix_to_converter_map and not force:
+                warnings.warn(
+                    f"Overwriting converter for suffix: {suffix}",
+                    RuntimeWarning,
+                )
             self._suffix_to_converter_map[suffix] = converter
 
             if converter.supports_compression:
@@ -47,10 +46,10 @@ class ConverterMap:
         suffix = suffix.strip(".")
         try:
             return self._suffix_to_converter_map[suffix]
-        except KeyError as err:
-            if suffix.endswith("gz") or suffix.endswith("bz2"):
+        except KeyError:
+            if suffix.endswith(("gz", "bz2")):
                 raise UnsupportedCompressionError()
-            raise err
+            raise
 
     def __getitem__(self, suffix) -> Converter:
         return self.get_converter(suffix)

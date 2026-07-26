@@ -108,7 +108,7 @@ class ProcessingPipelineBuilder:
     def build(self) -> ProcessingPipeline:
         """Builds the resulting preprocessor."""
 
-        if all([x is None for x in self._serializer_map.values()]):
+        if all(x is None for x in self._serializer_map.values()):
             raise RuntimeError("Atleast one serializer must set")
 
         return ProcessingPipeline(

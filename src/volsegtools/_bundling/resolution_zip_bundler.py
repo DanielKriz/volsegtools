@@ -26,7 +26,7 @@ class ResolutionZipBundler(Bundler):
 
         output_file_paths = []
 
-        for resolution in data_per_resolution.keys():
+        for resolution in data_per_resolution:
             data_set_id = data_per_resolution[resolution][0].data_set
 
             archive_path = output_path / Path(f"{data_set_id}_r{resolution}.zip")
