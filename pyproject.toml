@@ -67,6 +67,61 @@ dev = [
 ]
 
 # -----------------------------------------------------------------------------
+# Ruff Tool configuration
+# -----------------------------------------------------------------------------
+
+[tool.ruff]
+target-version = "py313"
+line-length = 90 # Does not adhere to PEP-8
+src = ["src"]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 90
+
+# Lots come from: https://pydevtools.com/handbook/how-to/how-to-configure-recommended-ruff-defaults/
+[tool.ruff.lint]
+select = [
+    "F",      # Pyflakes rules
+    "W",      # PyCodeStyle warnings
+    "E",      # PyCodeStyle errors
+    "I",      # Sort imports properly
+    "UP",     # Warn if certain things can changed due to newer Python versions
+    "C4",     # Catch incorrect use of comprehensions, dict, list, etc
+    "FA",     # Enforce from __future__ import annotations
+    "ISC",    # Good use of string concatenation
+    "ICN",    # Use common import conventions
+    "RET",    # Good return practices
+    "SIM",    # Common simplification rules
+    "TID",    # Some good import practices
+    "TC",     # Enforce importing certain types in a TYPE_CHECKING block
+    "PTH",    # Use pathlib instead of os.path
+    "NPY",    # Some numpy-specific things
+    "FURB",   # Suggest more idiomatic Python patterns
+    "B",      # flake8-bugbear
+    "PIE",    # flake8-pie
+    "RUF",    # Ruff-specific rules
+    "N",      # naming
+    "S",      # Security
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+# -----------------------------------------------------------------------------
 # Bumpver Tool Configuration
 # -----------------------------------------------------------------------------
 
