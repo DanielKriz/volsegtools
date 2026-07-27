@@ -263,7 +263,18 @@ def run(
             case_sensitive=False,
         ),
     ] = BundlingKind.NULL,
-):
+    size_limit: Annotated[
+        vst.Bytes,
+        typer.Option(
+            "--size-limit",
+            "-l",
+            metavar="SIZE",
+            parser=vst.Bytes.parse,
+            help="Lower limit for keeping resolutions in bytes.",
+            case_sensitive=False,
+        ),
+    ] = vst.Bytes("5MiB"),
+) -> None:
 
     if segmentation_source is None:
         segmentation_source = []
@@ -292,6 +303,12 @@ def run(
     if overwrite_tmp and local_store_path.exists():
         shutil.rmtree(local_store_path)
 
+    vst.logger.info((
+        f"Lower size limit for downsampling: {size_limit} bytes"
+        f" ({size_limit / 1024} KiB"
+        f" / {size_limit / 1024**2} MiB)"
+    ))
+
     builder = vst.create_builder()
     (
         builder.add_volume_converter(vst.MRCConverter())
@@ -318,6 +335,7 @@ def run(
         )
         .set_output_dir(output_path)
         .keep_original(keep_original)
+        .set_downsampling_size_threshold(size_limit)
     )
 
     try:

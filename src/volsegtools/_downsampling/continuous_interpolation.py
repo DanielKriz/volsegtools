@@ -8,6 +8,7 @@ import scipy
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.channel import Channel
+from volsegtools._downsampling.common import calculate_steps
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
@@ -33,20 +34,8 @@ class InterpolationBased(DownsamplingStrategy[Channel]):
         self.factor = 1 / inv_factor
         self.inv_factor = inv_factor
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
-        bytes_count = channel.handle.nbytes
-        sizes = []
-        while bytes_count > super().MIN_SIZE_THRESHOLD:
-            bytes_count /= 8
-            if bytes_count < super().MIN_SIZE_THRESHOLD:
-                break
-            sizes.append(bytes_count)
-        return sizes
-
-    def calculate_steps(self, channel: Channel) -> int:
-        return len(self.calculate_approx_downsampled_sizes(channel))
-
     def calculate_new_chunks(self, channel, factor: float):
+        # TODO: try floor
         return tuple(
             tuple(math.ceil(ax / factor) for ax in axes) for axes in channel.chunks
         )
@@ -71,7 +60,7 @@ class InterpolationBased(DownsamplingStrategy[Channel]):
                 block, zoom=zoom_factor, order=order, mode="reflect"
             )
 
-        steps = self.calculate_steps(data)
+        steps = calculate_steps(data, context.size_threshold)
         for _ in range(steps):
             current_data = current_data.map_blocks(
                 block_zoom,

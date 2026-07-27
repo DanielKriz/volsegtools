@@ -6,8 +6,7 @@ import enum
 
 import pydantic
 
-from volsegtools._core.timer import Timer
-from volsegtools._core.working_store import WorkingStore
+from volsegtools._core import Bytes, Timer, WorkingStore
 
 
 class PipelineStageKind(enum.StrEnum):
@@ -59,3 +58,4 @@ class PipelineContext:
     timer: Timer
     working_store: WorkingStore
     state: PipelineStateManager
+    size_threshold: Bytes

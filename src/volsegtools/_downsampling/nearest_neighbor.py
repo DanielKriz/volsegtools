@@ -2,6 +2,7 @@ from collections.abc import Iterator
 
 import logging
 
+from volsegtools._downsampling.common import calculate_steps
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.channel import Channel
@@ -24,6 +25,6 @@ class NearestNeighbor(DownsamplingStrategy[Channel]):
         vst_logger.info("Using the 'Neareast Neighbor' downsampling strategy")
         lattice = data.handle.get_lattice(DaskBackend)
 
-        while lattice.nbytes > super().MIN_SIZE_THRESHOLD:
+        for _ in range(calculate_steps(data, context.size_threshold, self.factor)):
             lattice = lattice[:: self.factor, :: self.factor, :: self.factor]
             yield lattice

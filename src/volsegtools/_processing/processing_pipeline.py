@@ -5,7 +5,7 @@ import itertools
 import logging
 
 from volsegtools._conversion.converter_map import ConverterMap
-from volsegtools._core import DataKind, Timer, Vector3, WorkingStore
+from volsegtools._core import DataKind, Timer, Vector3, WorkingStore, Bytes
 from volsegtools._downsampling.null import Null
 from volsegtools._model import (
     PipelineStageKind,
@@ -33,6 +33,7 @@ def _flatten(list_of_lists: list[list]) -> list:
 
 class ProcessingPipeline(ProcessingPipeline):
     DEFAULT_WORK_DIR = Path(".vst_work_dir")
+    DEFAULT_SIZE_THRESHOLD = Bytes("5MiB")
 
     # It is safe to ignore the B008 error here, because the Null downsampling
     # strategy does not contain any state. Thus, it is safe to share it between
@@ -52,6 +53,7 @@ class ProcessingPipeline(ProcessingPipeline):
         work_dir: Path | None = None,
         output_dir: Path | None = None,
         keep_original: bool = False,
+        size_threshold: int = DEFAULT_SIZE_THRESHOLD,
     ):
         # The conversion and bundling are required stages
         if post_conversion_steps is None:
@@ -103,6 +105,7 @@ class ProcessingPipeline(ProcessingPipeline):
             timer=Timer(),
             working_store=self.working_store,
             state=self.state__,
+            size_threshold=size_threshold,
         )
 
     @property

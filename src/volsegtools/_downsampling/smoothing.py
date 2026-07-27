@@ -10,6 +10,7 @@ from volsegtools._core import ConvolutionKernel, Gaussian3DKernel
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.channel import Channel
+from volsegtools._downsampling.common import calculate_steps
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
@@ -21,19 +22,6 @@ class Smoothing(DownsamplingStrategy[Channel]):
     # it has around 70MB, the chunk size should be somewhere between
     # 50-150MB on modern processors.
     CHUNKS = (256, 256, 256)
-
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
-        bytes_count = channel.handle.nbytes
-        sizes = []
-        while bytes_count > super().MIN_SIZE_THRESHOLD:
-            bytes_count /= 8
-            if bytes_count < super().MIN_SIZE_THRESHOLD:
-                break
-            sizes.append(bytes_count)
-        return sizes
-
-    def calculate_steps(self, channel: Channel) -> int:
-        return len(self.calculate_approx_downsampled_sizes(channel))
 
     def execute(
         self,
@@ -47,7 +35,7 @@ class Smoothing(DownsamplingStrategy[Channel]):
 
         current_data = data.handle.get_lattice(DaskBackend)
 
-        steps = self.calculate_steps(data)
+        steps = calculate_steps(data, context.size_threshold)
         vst_logger.info(f"Calculated downsampling steps: {steps}")
         for step in range(steps):
             vst_logger.info(f"Downsampling step {step + 1}/{steps}")
@@ -71,19 +59,6 @@ class SeparatedSmoothing(DownsamplingStrategy[Channel]):
 
     CHUNKS = (256, 256, 256)
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
-        bytes_count = channel.handle.nbytes
-        sizes = []
-        while bytes_count > super().MIN_SIZE_THRESHOLD:
-            bytes_count /= 8
-            if bytes_count < super().MIN_SIZE_THRESHOLD:
-                break
-            sizes.append(bytes_count)
-        return sizes
-
-    def calculate_steps(self, channel: Channel) -> int:
-        return len(self.calculate_approx_downsampled_sizes(channel))
-
     def calculate_convolution_kernel(self):
         x = np.arange(-self.radius, self.radius + 1)
         kernel = np.exp(-(x**2) / (2 * self.sigma**2))
@@ -103,7 +78,7 @@ class SeparatedSmoothing(DownsamplingStrategy[Channel]):
 
         current_data = data.handle.get_lattice(DaskBackend)
 
-        steps = self.calculate_steps(data)
+        steps = calculate_steps(data, context.size_threshold)
         vst_logger.info(f"Calculated downsampling steps: {steps}")
         for step in range(steps):
             downsampled_data = current_data
@@ -130,19 +105,6 @@ class StridedSmoothing(DownsamplingStrategy[Channel]):
 
     CHUNKS = (256, 256, 256)
 
-    def calculate_approx_downsampled_sizes(self, channel: Channel) -> list[float]:
-        bytes_count = channel.handle.nbytes
-        sizes = []
-        while bytes_count > super().MIN_SIZE_THRESHOLD:
-            bytes_count /= 8
-            if bytes_count < super().MIN_SIZE_THRESHOLD:
-                break
-            sizes.append(bytes_count)
-        return sizes
-
-    def calculate_steps(self, channel: Channel) -> int:
-        return len(self.calculate_approx_downsampled_sizes(channel))
-
     def execute(
         self,
         data: Channel,
@@ -157,7 +119,7 @@ class StridedSmoothing(DownsamplingStrategy[Channel]):
 
         current_data = data.handle.get_lattice(DaskBackend)
 
-        steps = self.calculate_steps(data)
+        steps = calculate_steps(data, context.size_threshold)
         vst_logger.info(f"Calculated downsampling steps: {steps}")
         for step in range(steps):
             downsampled_data = current_data

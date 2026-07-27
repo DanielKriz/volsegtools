@@ -6,7 +6,7 @@ import collections
 import zarr.errors
 
 from volsegtools._conversion.converter_map import ConverterMap
-from volsegtools._core import DataKind, WorkingStore
+from volsegtools._core import DataKind, WorkingStore, Bytes
 from volsegtools._downsampling.null import Null
 from volsegtools._processing.processing_pipeline import ProcessingPipeline
 from volsegtools.abc import (
@@ -35,6 +35,7 @@ class ProcessingPipelineBuilder:
         self._segmentation_converter_map = ConverterMap()
         self._bundler = None
         self._keep_original = False
+        self._threshold = ProcessingPipeline.DEFAULT_SIZE_THRESHOLD
 
     def _mend_suffixes(self, converter, suffixes=None, preserve_builtin=False):
         if preserve_builtin:
@@ -111,6 +112,10 @@ class ProcessingPipelineBuilder:
         self._output_dir = file_path
         return self
 
+    def set_downsampling_size_threshold(self, threshold: Bytes) -> Self:
+        self._threshold = threshold
+        return self
+
     def build(self) -> ProcessingPipeline:
         """Builds the resulting preprocessor."""
 
@@ -137,6 +142,7 @@ class ProcessingPipelineBuilder:
             work_dir=self._work_dir,
             output_dir=self._output_dir,
             keep_original=self._keep_original,
+            size_threshold=self._threshold,
         )
 
 

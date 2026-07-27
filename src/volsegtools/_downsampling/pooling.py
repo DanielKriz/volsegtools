@@ -55,7 +55,8 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy[Channel]):
         }
 
         resolution = 1
-        while lattice.nbytes > super().MIN_SIZE_THRESHOLD:
+        print("BLOCK SIZE:", self.block_size)
+        while lattice.nbytes > context.size_threshold:
             log_msg = "... downsampling '{}' for resolution number {}"
             vst_logger.info(log_msg.format(data.data_set.metadata.id, resolution))
 

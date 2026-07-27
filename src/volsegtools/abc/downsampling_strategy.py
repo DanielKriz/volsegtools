@@ -12,8 +12,6 @@ TData = TypeVar("TData", bound=DataType)
 class DownsamplingStrategy(Protocol[TData]):
     """Downsamples given data."""
 
-    MIN_SIZE_THRESHOLD = 5_000_000  # 5 MB
-
     def execute(
         self,
         data: TData,
