@@ -104,6 +104,7 @@ class ProcessingPipeline(ProcessingPipeline):
         self.context = PipelineContext(
             timer=Timer(),
             working_store=self.working_store,
+            output_dir=self._output_dir,
             state=self.state__,
             size_threshold=size_threshold,
         )
@@ -321,7 +322,11 @@ class ProcessingPipeline(ProcessingPipeline):
         if serializer is None:
             raise RuntimeError(f"Could not find serializer for '{kind}'")
 
-        return await serializer.serialize(data_set, self._work_dir, self.context)
+        return await serializer.serialize(
+            data_set,
+            self._output_dir,
+            self.context,
+        )
 
     @pipeline_stage("Bundling")
     async def bundle(self, files: list[Path]):

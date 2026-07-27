@@ -3,8 +3,7 @@ from pathlib import Path
 import collections
 import itertools
 import logging
-
-from molviewspec.mvsx_converter import tempfile
+import zipfile
 
 import molviewspec as mvs
 
@@ -61,6 +60,7 @@ class MVSXBundler(Bundler):
                 f"Bundling Data set '{data_set_id}' with resolution {resolution}"
             )
 
+            files = []
             for idx, info in enumerate(data_per_resolution[resolution]):
                 vst_logger.info(f"... Adding {info.file_path.name}")
 
@@ -72,8 +72,9 @@ class MVSXBundler(Bundler):
                     case _:
                         raise RuntimeError("Unsuported volume format")
 
+                files.append(info.file_path.resolve())
                 volume = (
-                    builder.download(url=str(info.file_path))
+                    builder.download(url=f"assets/{info.file_path.name}")
                     .parse(format=format)
                     .volume()
                 )
@@ -81,22 +82,16 @@ class MVSXBundler(Bundler):
                     type="isosurface", relative_isovalue=2, show_wireframe=False
                 ).color(color=X11_COLOR_NAMES[idx % len(X11_COLOR_NAMES)])
 
+            state = mvs.MVSJ(data=builder.get_state()).dumps()
+
             archive_path = output_path / Path(f"{data_set_id}_r{resolution}.mvsx")
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("index.mvsj", state)
+                archive.mkdir("assets")
+                for file in files:
+                    archive.write(str(file), arcname=f"assets/{file.name}")
 
-            # At the moment we have to create a temporary file to use the mvs
-            # API for creation of MVSX
-            with tempfile.NamedTemporaryFile(mode="w", delete=True) as tmp_file:
-                state = mvs.MVSJ(data=builder.get_state()).dumps()
-                tmp_file.write(state)
-                # We have to make sure that the file is written before using it.
-                tmp_file.flush()
-
-                mvs.mvsj_to_mvsx(
-                    tmp_file.name,
-                    archive_path,
-                    download_external=True,
-                )
-                output_file_paths.append(archive_path)
-                vst_logger.info(f"Created MVSX archive at: {archive_path}")
+            output_file_paths.append(archive_path)
+            vst_logger.info(f"Created MVSX archive at: {archive_path}")
 
         return output_file_paths

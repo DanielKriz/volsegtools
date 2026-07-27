@@ -31,7 +31,7 @@ class MRCSerializer(Serializer):
             output_file_path = output_path / file_name
             vst_logger.info(f"... serialized into {output_file_path}")
 
-            with mrcfile.new(output_file_path) as mrc:
+            with mrcfile.new(output_file_path, overwrite=True) as mrc:
                 mrc.header.mapc = data_set.metadata.axis_order.x + 1
                 mrc.header.mapr = data_set.metadata.axis_order.y + 1
                 mrc.header.maps = data_set.metadata.axis_order.z + 1

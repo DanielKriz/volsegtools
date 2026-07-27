@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import dataclasses
@@ -57,5 +58,6 @@ class PipelineStateManager:
 class PipelineContext:
     timer: Timer
     working_store: WorkingStore
+    output_dir: Path
     state: PipelineStateManager
     size_threshold: Bytes
