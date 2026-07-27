@@ -41,6 +41,15 @@ dev = [
     "pytest"
 ]
 
+[dependency-groups]
+dev = [
+    "bumpver>=2026.1132",
+    "mypy>=1.19.1",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "ruff>=0.16.0",
+]
+
 [project.scripts]
 molstar-preprocessor = 'volsegtools._cli:app'
 
