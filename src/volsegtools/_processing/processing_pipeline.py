@@ -51,6 +51,7 @@ class ProcessingPipeline(ProcessingPipeline):
         bundler: Bundler | None = None,
         work_dir: Path | None = None,
         output_dir: Path | None = None,
+        keep_original: bool = False,
     ):
         # The conversion and bundling are required stages
         if post_conversion_steps is None:
@@ -81,6 +82,8 @@ class ProcessingPipeline(ProcessingPipeline):
         self._post_conversion_steps = post_conversion_steps
         self._bundler = bundler
 
+        self._keep_original = keep_original
+
         self._callbacks = []
 
         self._state = PipelineState(
@@ -101,6 +104,10 @@ class ProcessingPipeline(ProcessingPipeline):
             working_store=self.working_store,
             state=self.state__,
         )
+
+    @property
+    def keep_original(self) -> bool:
+        return self._keep_original
 
     @staticmethod
     def pipeline_stage(kind: PipelineStageKind | str):
@@ -187,9 +194,11 @@ class ProcessingPipeline(ProcessingPipeline):
                 )
             ]
         )
-        downsampled_data = list(
-            filter(lambda x: x.metadata.resolution != 0, _flatten(downsampled_data))
-        )
+        if not self.keep_original:
+            downsampled_data = list(filter(
+                lambda x: x.metadata.resolution != 0,
+                _flatten(downsampled_data)
+            ))
 
         if self._post_processing_steps != []:
             downsampled_data = await self.apply_post_processing_steps(downsampled_data)

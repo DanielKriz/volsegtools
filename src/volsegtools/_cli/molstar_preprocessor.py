@@ -220,6 +220,12 @@ def run(
             help="List available downsampling strategies and exit.",
         ),
     ] = False,
+    keep_original: Annotated[
+        bool,
+        typer.Option(
+            help="Keep original resolution and include it in the results",
+        ),
+    ] = False,
     volume_serializer: Annotated[
         SerializerKind,
         typer.Option(
@@ -311,6 +317,7 @@ def run(
             DataKind.SEGMENTATION_MESH, get_serializer(segmentation_mesh_serializer)
         )
         .set_output_dir(output_path)
+        .keep_original(keep_original)
     )
 
     try:
