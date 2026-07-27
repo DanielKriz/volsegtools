@@ -61,11 +61,6 @@ molstar-preprocessor = 'volsegtools._cli:app'
 [tool.hatch.build.targets.wheel]
 packages = ["src/volsegtools"]
 
-[dependency-groups]
-dev = [
-    "pre-commit>=4.3.0",
-]
-
 # -----------------------------------------------------------------------------
 # Ruff Tool configuration
 # -----------------------------------------------------------------------------
