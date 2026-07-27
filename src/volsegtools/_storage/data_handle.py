@@ -56,11 +56,7 @@ class DataHandle:
             )
             backend.store_to_zarr(data, arr)
 
-    def require_kind(
-        self,
-        *allowed_kinds: DataKind,
-        inverse: bool = False
-    ) -> None:
+    def require_kind(self, *allowed_kinds: DataKind, inverse: bool = False) -> None:
         result = self.data_kind not in allowed_kinds
         result = not result if inverse else result
         if result:

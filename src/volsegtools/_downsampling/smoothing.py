@@ -7,10 +7,10 @@ import numpy as np
 import scipy
 
 from volsegtools._core import ConvolutionKernel, Gaussian3DKernel
+from volsegtools._downsampling.common import calculate_steps
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.channel import Channel
-from volsegtools._downsampling.common import calculate_steps
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
@@ -23,11 +23,7 @@ class Smoothing(DownsamplingStrategy[Channel]):
     # 50-150MB on modern processors.
     CHUNKS = (256, 256, 256)
 
-    def execute(
-        self,
-        data: Channel,
-        context: PipelineContext
-    ) -> Iterator[Channel]:
+    def execute(self, data: Channel, context: PipelineContext) -> Iterator[Channel]:
         vst_logger.info("Using the 'Smoothing' downsampling strategy")
 
         if 1 in data.handle.shape:
@@ -64,11 +60,7 @@ class SeparatedSmoothing(DownsamplingStrategy[Channel]):
         kernel = np.exp(-(x**2) / (2 * self.sigma**2))
         return kernel / kernel.sum()
 
-    def execute(
-        self,
-        data: Channel,
-        context: PipelineContext
-    ) -> Iterator[Channel]:
+    def execute(self, data: Channel, context: PipelineContext) -> Iterator[Channel]:
         kernel = self.calculate_convolution_kernel()
 
         def conv_block(block, axis):

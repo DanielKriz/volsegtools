@@ -5,7 +5,7 @@ import itertools
 import logging
 
 from volsegtools._conversion.converter_map import ConverterMap
-from volsegtools._core import DataKind, Timer, Vector3, WorkingStore, Bytes
+from volsegtools._core import Bytes, DataKind, Timer, Vector3, WorkingStore
 from volsegtools._downsampling.null import Null
 from volsegtools._model import (
     PipelineStageKind,
@@ -40,7 +40,7 @@ class ProcessingPipeline(ProcessingPipeline):
     # instances.
     def __init__(
         self,
-        downsampling_strategy=Null(), # noqa: B008
+        downsampling_strategy=Null(),  # noqa: B008
         volume_converter_map: ConverterMap | None = None,
         segmentation_converter_map: ConverterMap | None = None,
         volume_serializer: Serializer | None = None,
@@ -192,18 +192,18 @@ class ProcessingPipeline(ProcessingPipeline):
         downsampled_data = await asyncio.gather(
             *[
                 self.downsample(handle)
-                for handle in itertools.chain(
-                    converted_volumes, converted_segmentations
-                )
+                for handle in itertools.chain(converted_volumes, converted_segmentations)
             ]
         )
 
         downsampled_data = _flatten(downsampled_data)
         if not self.keep_original:
-            downsampled_data = list(filter(
-                lambda x: x.metadata.resolution != 0,
-                downsampled_data,
-            ))
+            downsampled_data = list(
+                filter(
+                    lambda x: x.metadata.resolution != 0,
+                    downsampled_data,
+                )
+            )
 
         if self._post_processing_steps != []:
             downsampled_data = await self.apply_post_processing_steps(downsampled_data)
@@ -286,9 +286,7 @@ class ProcessingPipeline(ProcessingPipeline):
                 start=1,  # 0 is reserved for the original data resolution
             ):
                 if resolution not in resulting_data_sets:
-                    resulting_data_sets[resolution] = DataSet(
-                        self.context.working_store
-                    )
+                    resulting_data_sets[resolution] = DataSet(self.context.working_store)
                     resulting_data_sets[resolution].update_metadata(data_set)
                     resulting_data_sets[resolution].metadata.resolution = resolution
                     resulting_data_sets[resolution].metadata.lattice_shape = Vector3(

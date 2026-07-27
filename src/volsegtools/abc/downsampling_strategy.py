@@ -9,6 +9,7 @@ from volsegtools._storage import Channel
 DataType = Channel | trimesh.Trimesh
 TData = TypeVar("TData", bound=DataType)
 
+
 class DownsamplingStrategy(Protocol[TData]):
     """Downsamples given data."""
 

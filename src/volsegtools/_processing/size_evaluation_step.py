@@ -36,9 +36,7 @@ class StdoutSizeReporter(SizeReporter):
             + self.DOT_CHARACTER_PADDING
         )
 
-        print(
-            ("Size in bytes:      {:" + str(digit_cnt) + ".5f}B").format(size_in_bytes)
-        )
+        print(("Size in bytes:      {:" + str(digit_cnt) + ".5f}B").format(size_in_bytes))
         print(
             ("Size in mega bytes: {:" + str(digit_cnt) + ".5f}MB").format(
                 size_in_bytes / 1_000_000
@@ -84,8 +82,8 @@ class SizeEvaluationStep(PostProcessingStep):
     # not contain any state. Thus, the instance can be shared between calls.
     def __init__(
         self,
-        reporter: SizeReporter = StdoutSizeReporter(), # noqa: B008
-        label: str = ""
+        reporter: SizeReporter = StdoutSizeReporter(),  # noqa: B008
+        label: str = "",
     ):
         self.reporter = reporter
         self.label = label

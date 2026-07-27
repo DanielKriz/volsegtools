@@ -19,6 +19,7 @@ from .working_store import WorkingStore
 
 __all__ = [
     "Bounds",
+    "Bytes",
     "ChunkingMode",
     "ComputationBackend",
     "ConvolutionKernel",

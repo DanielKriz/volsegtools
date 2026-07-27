@@ -9,6 +9,7 @@ from volsegtools._storage.mesh import Mesh
 if TYPE_CHECKING:
     from .volsegtools._storage.data_set import DataSet
 
+
 class TimeFrame:
     def __init__(self, parent: DataSet, id):
         self.parent = parent
@@ -40,4 +41,3 @@ class TimeFrame:
 
     def __repr__(self):
         return self.__str__()
-

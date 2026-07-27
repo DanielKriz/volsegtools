@@ -9,10 +9,6 @@ vst_logger = logging.getLogger("volsegtools")
 
 
 class Null(DownsamplingStrategy[TData]):
-    def execute(
-        self,
-        data: TData,
-        context: PipelineContext
-    ) -> Iterator[TData]:
+    def execute(self, data: TData, context: PipelineContext) -> Iterator[TData]:
         vst_logger.info("Using the 'Null' downsampling strategy")
         yield from []

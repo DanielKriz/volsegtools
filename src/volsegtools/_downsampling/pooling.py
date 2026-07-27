@@ -31,11 +31,7 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy[Channel]):
         self.block_size = block_size
         self.padding_mode = padding_mode
 
-    def execute(
-        self,
-        data: Channel,
-        context: PipelineContext
-    ) -> Iterator[Channel]:
+    def execute(self, data: Channel, context: PipelineContext) -> Iterator[Channel]:
         match self.operation:
             case np.mean:
                 vst_logger.info("Using the 'Mean' downsampling strategy")

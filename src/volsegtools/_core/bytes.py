@@ -1,14 +1,15 @@
-from typing import Self
+from typing import ClassVar, Self
 
 import re
 
+
 class Bytes(int):
-    VALUE_PATTERN = re.compile(
+    VALUE_PATTERN: ClassVar[re.Pattern] = re.compile(
         r"^\s*(?P<value>\d+(?:\.\d+)?)\s*(?P<unit>[kmgt]?i?b)?\s*$",
         re.IGNORECASE,
     )
 
-    MULTIPLIERS_MAP = {
+    MULTIPLIERS_MAP: ClassVar[dict[str | None, int]] = {
         None: 1,
         "b": 1,
         "kb": 1_000,

@@ -5,10 +5,10 @@ import math
 
 import scipy
 
+from volsegtools._downsampling.common import calculate_steps
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.channel import Channel
-from volsegtools._downsampling.common import calculate_steps
 from volsegtools.abc import DownsamplingStrategy
 
 vst_logger = logging.getLogger("volsegtools")
@@ -40,11 +40,7 @@ class InterpolationBased(DownsamplingStrategy[Channel]):
             tuple(math.ceil(ax / factor) for ax in axes) for axes in channel.chunks
         )
 
-    def execute(
-        self,
-        data: Channel,
-        context: PipelineContext
-    ) -> Iterator[Channel]:
+    def execute(self, data: Channel, context: PipelineContext) -> Iterator[Channel]:
         match self.order:
             case 1:
                 vst_logger.info("Using the 'Trilinear' downsampling strategy")

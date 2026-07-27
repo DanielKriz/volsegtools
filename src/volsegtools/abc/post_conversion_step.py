@@ -22,6 +22,4 @@ class PostConversionStep(Protocol):
         annotations: list[Any],
         context: PipelineContext,
     ) -> list[DataSet]:
-        return await self.execute(
-            volumes, segmentations, metadata, annotations, context
-        )
+        return await self.execute(volumes, segmentations, metadata, annotations, context)

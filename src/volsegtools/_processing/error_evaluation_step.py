@@ -194,9 +194,7 @@ class PSNR(ErrorFunction):
         new = new.astype(np.float64)
         data_range = old.max() - old.min()
         mse = da.mean((old - new) ** 2)
-        return da.where(
-            mse == 0, float("inf"), 20 * da.log10(data_range / da.sqrt(mse))
-        )
+        return da.where(mse == 0, float("inf"), 20 * da.log10(data_range / da.sqrt(mse)))
 
     @property
     def name(self) -> str:

@@ -22,9 +22,7 @@ class WorkingStore:
         self.is_segmentation_dtype_set = False
 
         self._volume_data_group = self.root_group.require_group("volume_data")
-        self._segmentation_data_group = self.root_group.require_group(
-            "segmentation_data"
-        )
+        self._segmentation_data_group = self.root_group.require_group("segmentation_data")
 
     @property
     def metadata(self):

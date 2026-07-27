@@ -17,11 +17,7 @@ class NearestNeighbor(DownsamplingStrategy[Channel]):
             raise RuntimeError("factor has to be atleast 2")
         self.factor = factor
 
-    def execute(
-        self,
-        data: Channel,
-        context: PipelineContext
-    ) -> Iterator[Channel]:
+    def execute(self, data: Channel, context: PipelineContext) -> Iterator[Channel]:
         vst_logger.info("Using the 'Neareast Neighbor' downsampling strategy")
         lattice = data.handle.get_lattice(DaskBackend)
 

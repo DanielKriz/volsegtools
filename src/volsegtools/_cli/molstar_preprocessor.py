@@ -303,11 +303,11 @@ def run(
     if overwrite_tmp and local_store_path.exists():
         shutil.rmtree(local_store_path)
 
-    vst.logger.info((
+    vst.logger.info(
         f"Lower size limit for downsampling: {size_limit} bytes"
         f" ({size_limit / 1024} KiB"
         f" / {size_limit / 1024**2} MiB)"
-    ))
+    )
 
     builder = vst.create_builder()
     (

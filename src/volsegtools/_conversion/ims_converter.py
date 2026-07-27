@@ -158,9 +158,7 @@ class ImarisConverter(Converter):
             resolution=0,
             axis_order=Vector3(0, 1, 2),
             voxel_size=voxel_size,
-            origin=Vector3(
-                metadata["ExtMin0"], metadata["ExtMin1"], metadata["ExtMin2"]
-            ),
+            origin=Vector3(metadata["ExtMin0"], metadata["ExtMin1"], metadata["ExtMin2"]),
             id=input_path.name,
             kind=DataKind.VOLUME,
             lattice_shape=Vector3(

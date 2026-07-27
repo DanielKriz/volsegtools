@@ -6,7 +6,7 @@ import collections
 import zarr.errors
 
 from volsegtools._conversion.converter_map import ConverterMap
-from volsegtools._core import DataKind, WorkingStore, Bytes
+from volsegtools._core import Bytes, DataKind, WorkingStore
 from volsegtools._downsampling.null import Null
 from volsegtools._processing.processing_pipeline import ProcessingPipeline
 from volsegtools.abc import (
@@ -129,15 +129,11 @@ class ProcessingPipelineBuilder:
             post_processing_steps=self._post_processing_steps,
             post_conversion_steps=self._post_conversion_steps,
             volume_serializer=self._serializer_map[DataKind.VOLUME],
-            segmentation_mask_serializer=self._serializer_map[
-                DataKind.SEGMENTATION_MASK
-            ],
+            segmentation_mask_serializer=self._serializer_map[DataKind.SEGMENTATION_MASK],
             segmentation_volume_serializer=self._serializer_map[
                 DataKind.SEGMENTATION_VOLUME
             ],
-            segmentation_mesh_serializer=self._serializer_map[
-                DataKind.SEGMENTATION_MESH
-            ],
+            segmentation_mesh_serializer=self._serializer_map[DataKind.SEGMENTATION_MESH],
             bundler=self._bundler,
             work_dir=self._work_dir,
             output_dir=self._output_dir,

@@ -27,6 +27,7 @@ from ._conversion import (
 )
 from ._core import (
     Bounds,
+    Bytes,
     ChunkingMode,
     DataKind,
     Gaussian3DKernel,
@@ -103,6 +104,7 @@ __all__ = [
     "AveragePooling",
     "BCIFSerializer",
     "Bounds",
+    "Bytes",
     "CIFConverter",
     "Channel",
     "ChannelInfo",
