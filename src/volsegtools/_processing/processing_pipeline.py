@@ -194,10 +194,12 @@ class ProcessingPipeline(ProcessingPipeline):
                 )
             ]
         )
+
+        downsampled_data = _flatten(downsampled_data)
         if not self.keep_original:
             downsampled_data = list(filter(
                 lambda x: x.metadata.resolution != 0,
-                _flatten(downsampled_data)
+                downsampled_data,
             ))
 
         if self._post_processing_steps != []:
