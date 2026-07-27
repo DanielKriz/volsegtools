@@ -116,6 +116,12 @@ select = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [ "BLE001", "ANN", "S" ]
 
+[tool.ruff.lint.isort]
+known-first-party = ["volsegtools"]
+combine-as-imports = true
+from-first = true
+lines-between-types = 1
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
