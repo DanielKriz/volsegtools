@@ -113,6 +113,9 @@ select = [
     "S",      # Security
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [ "BLE001", "ANN", "S" ]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
