@@ -53,6 +53,10 @@ dev = [
 [project.scripts]
 molstar-preprocessor = 'volsegtools._cli:app'
 
+# -----------------------------------------------------------------------------
+# Hatchling Tool configuration
+# -----------------------------------------------------------------------------
+
 # Enable the "src" layout of the project
 [tool.hatch.build.targets.wheel]
 packages = ["src/volsegtools"]
@@ -61,6 +65,10 @@ packages = ["src/volsegtools"]
 dev = [
     "pre-commit>=4.3.0",
 ]
+
+# -----------------------------------------------------------------------------
+# Bumpver Tool Configuration
+# -----------------------------------------------------------------------------
 
 [tool.bumpver]
 current_version = "0.1.3"
