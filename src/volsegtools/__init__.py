@@ -94,7 +94,7 @@ from ._storage import (
     info_from_file_path,
 )
 
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 
 import logging
 
