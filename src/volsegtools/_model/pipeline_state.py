@@ -27,7 +27,7 @@ class PipelineStageKind(enum.StrEnum):
 
 @pydantic.dataclasses.dataclass()
 class PipelineState:
-    current_stage: PipelineStageKind
+    stage: PipelineStageKind
     msg: str | None
 
 
@@ -49,7 +49,7 @@ class PipelineStateManager:
         self._callbacks.append(cb)
 
     def update(self, **kwargs: Any) -> None:
-        self._state = dataclasses.replace(self._state, *kwargs)
+        self._state = dataclasses.replace(self._state, **kwargs)
         for cb in self._callbacks:
             cb(self.current)
 

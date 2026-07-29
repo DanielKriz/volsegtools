@@ -385,7 +385,7 @@ def run(
     with console.status("Processing...") as status:
 
         def update_status(state):
-            status.update(f"Processing... {state.current_stage} ")
+            status.update(f"Processing... {state.stage} ")
 
         try:
             pipeline.add_state_change_callback(update_status)

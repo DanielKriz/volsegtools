@@ -88,15 +88,10 @@ class ProcessingPipeline(ProcessingPipeline):
 
         self._callbacks = []
 
-        self._state = PipelineState(
-            current_stage=PipelineStageKind.NOT_STARTED,
-            msg="The pipeline has not yet started",
-        )
-
-        self.state__ = PipelineStateManager(
+        self.state = PipelineStateManager(
             self,
             PipelineState(
-                current_stage=PipelineStageKind.NOT_STARTED,
+                stage=PipelineStageKind.NOT_STARTED,
                 msg="The pipeline has not yet started",
             ),
         )
@@ -105,7 +100,7 @@ class ProcessingPipeline(ProcessingPipeline):
             timer=Timer(),
             working_store=self.working_store,
             output_dir=self._output_dir,
-            state=self.state__,
+            state=self.state,
             size_threshold=size_threshold,
         )
 
@@ -119,31 +114,23 @@ class ProcessingPipeline(ProcessingPipeline):
             def wrapper(self, *args, **kwargs):
                 vst_logger.info(kind)
                 self.context.timer.push_stage(str(kind))
-                self._state.current_stage = PipelineStageKind(kind)
-
-                for cb in self._callbacks:
-                    cb(self._state)
-
+                self.state.update(stage=PipelineStageKind(kind))
                 return func(self, *args, **kwargs)
 
             return wrapper
 
         return inner
 
-    @property
-    def state(self):
-        return self._state
-
     def add_state_change_callback(self, cb):
-        self._callbacks.append(cb)
+        self.state.add_callback(cb)
 
     @property
     def started(self):
-        return self._state.current_stage != PipelineStageKind.NOT_STARTED
+        return self.state.current != PipelineStageKind.NOT_STARTED
 
     @property
     def done(self):
-        return self._state.current_stage == PipelineStageKind.FINISHED
+        return self.state.current == PipelineStageKind.FINISHED
 
     def sync_process(
         self,
@@ -231,7 +218,7 @@ class ProcessingPipeline(ProcessingPipeline):
 
         for path in paths:
             converter = self._volume_converter_map["".join(path.suffixes)]
-            self._state.msg = f"Converting '{path}'"
+            self.state.update(msg=f"Converting '{path}'")
             volumes += await converter.convert_volume(path, self.context)
             self.context.timer.push_event(f"Finished converting {path}")
 
@@ -249,7 +236,7 @@ class ProcessingPipeline(ProcessingPipeline):
 
         for path in paths:
             converter = self._segmentation_converter_map["".join(path.suffixes)]
-            self._state.msg = f"Converting '{path}'"
+            self.state.update(msg=f"Converting '{path}'")
             segmentations += await converter.convert_segmentation(path, self.context)
 
         return segmentations
@@ -273,7 +260,7 @@ class ProcessingPipeline(ProcessingPipeline):
     async def downsample(self, data_set: DataSet) -> list[DataSet]:
         resulting_data_sets: dict[int, DataSet] = {}
 
-        self._state.msg = f"Downsampling '{data_set.metadata.id}'"
+        self.state.update(msg=f"Downsampling '{data_set.metadata.id}'")
 
         if True:
             resulting_data_sets[0] = data_set
