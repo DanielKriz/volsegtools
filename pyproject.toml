@@ -47,6 +47,7 @@ dev = [
     "mypy>=1.19.1",
     "pre-commit>=4.3.0",
     "pytest>=8.4.2",
+    "pytest-cov>=7.1.0",
     "ruff>=0.16.0",
 ]
 
@@ -135,6 +136,28 @@ line-ending = "auto"
 skip-magic-trailing-comma = false
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
+
+# -----------------------------------------------------------------------------
+# Pytest Configuration
+# -----------------------------------------------------------------------------
+
+[tool.coverage.run]
+branch = true
+source_pkgs = [ "volsegtools" ]
+relative_files = true
+data_file = "coverage/internal"
+
+[tool.coverage.report]
+show_missing = true
+show_context = true
+skip_covered = true
+skip_empty = true
+
+[tool.coverage.xml]
+output = "coverage/coverage.xml"
+
+[tool.coverage.html]
+directory = "coverage/html"
 
 # -----------------------------------------------------------------------------
 # Bumpver Tool Configuration
