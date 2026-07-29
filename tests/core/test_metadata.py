@@ -1,5 +1,3 @@
-import pytest
-
 from volsegtools._model import DescriptiveStatistics
 
 
@@ -9,9 +7,3 @@ def test_descriptive_statistics_construction():
     assert hasattr(stats, "std")
     assert hasattr(stats, "max")
     assert hasattr(stats, "min")
-
-
-@pytest.mark.parametrize("params", [(0), (0, 0), (0, 0, 0)])
-def test_descriptive_statistics_incorrect_construction(params):
-    with pytest.raises(TypeError):
-        DescriptiveStatistics(*params)

@@ -33,7 +33,7 @@ def test_import_core():
         pytest.fail("No exception should be fired")
 
 
-def test_import_downsapler():
+def test_import_downsampling():
     try:
         pass
     except Exception:
@@ -47,7 +47,14 @@ def test_import_model():
         pytest.fail("No exception should be fired")
 
 
-def test_import_preprocessor():
+def test_import_storage():
+    try:
+        pass
+    except Exception:
+        pytest.fail("No exception should be fired")
+
+
+def test_import_processing():
     try:
         pass
     except Exception:
