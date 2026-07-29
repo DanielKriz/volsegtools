@@ -5,6 +5,7 @@ import logging
 import dask.array as da
 import numpy as np
 
+from volsegtools._downsampling.common import calculate_steps
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage.channel import Channel
@@ -51,8 +52,7 @@ class PoolingDownsamplingStrategy(DownsamplingStrategy[Channel]):
         }
 
         resolution = 1
-        print("BLOCK SIZE:", self.block_size)
-        while lattice.nbytes > context.size_threshold:
+        for _ in range(calculate_steps(data, context.size_threshold, self.block_size)):
             log_msg = "... downsampling '{}' for resolution number {}"
             vst_logger.info(log_msg.format(data.data_set.metadata.id, resolution))
 
