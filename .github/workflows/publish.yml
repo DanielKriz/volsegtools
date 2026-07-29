@@ -3,7 +3,7 @@ name: Volsegtools publish package workflow
 # Run this action only if a new version (with a tag) comes out.
 on:
   push:
-    tags: ["[0-9].[0-9]+.[0-9]+"]
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
 
 jobs:
   checks:
