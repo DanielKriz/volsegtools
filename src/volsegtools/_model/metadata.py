@@ -2,18 +2,18 @@ from pydantic import Field
 
 import pydantic
 
-from volsegtools._core import DataKind, Vector3
+from volsegtools._core import AxisValues, DataKind
 
 
 class DataSetInfo(pydantic.BaseModel):
     filename: str = "Unknown File"
     resolution: int = -1
-    axis_order: Vector3 = Field(default_factory=Vector3)
-    voxel_size: Vector3 = Field(default_factory=Vector3)
-    origin: Vector3 = Field(default_factory=Vector3)
+    axis_order: AxisValues = Field(default_factory=AxisValues)
+    voxel_size: AxisValues = Field(default_factory=AxisValues)
+    origin: AxisValues = Field(default_factory=AxisValues)
     id: str = "Unknown"
     kind: DataKind = DataKind.VOLUME
-    lattice_shape: Vector3 = Field(default_factory=Vector3)
+    lattice_shape: AxisValues = Field(default_factory=AxisValues)
 
 
 class TimeFrameInfo(pydantic.BaseModel):

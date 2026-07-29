@@ -4,7 +4,7 @@ import logging
 
 import nibabel as nib
 
-from volsegtools._core import DataKind, Vector3
+from volsegtools._core import AxisValues, DataKind
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.numpy_backend import NumPyBackend
 from volsegtools._storage import DataSet
@@ -47,12 +47,12 @@ class NiiConverter(Converter):
         data_set_info = DataSetInfo(
             filename=input_path.name,
             resolution=0,
-            axis_order=Vector3(0, 1, 2),
-            voxel_size=Vector3(10, 10, 10),
-            origin=Vector3(0, 0, 0),
+            axis_order=AxisValues(0, 1, 2),
+            voxel_size=AxisValues(10, 10, 10),
+            origin=AxisValues(0, 0, 0),
             id=input_path.name,
             kind=DataKind.SEGMENTATION_VOLUME,
-            lattice_shape=Vector3(data.shape[0], data.shape[1], data.shape[2]),
+            lattice_shape=AxisValues(data.shape[0], data.shape[1], data.shape[2]),
         )
         data_set = DataSet(context.working_store, data_set_info)
         frame = data_set.add_time_frame()

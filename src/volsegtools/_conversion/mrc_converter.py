@@ -6,7 +6,7 @@ import dask.array as da
 import mrcfile
 import numpy as np
 
-from volsegtools._core import DataKind, Vector3
+from volsegtools._core import AxisValues, DataKind
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
@@ -77,7 +77,7 @@ class MRCConverter(Converter):
 
     @staticmethod
     def _collect_data_set_metadata(file, mrc_header, kind) -> DataSetInfo:
-        lattice_shape = Vector3(
+        lattice_shape = AxisValues(
             int(mrc_header.nx),
             int(mrc_header.ny),
             int(mrc_header.nz),
@@ -90,19 +90,19 @@ class MRCConverter(Converter):
         }
 
         start = (mrc_header.nxstart, mrc_header.nystart, mrc_header.nzstart)
-        start = Vector3(
+        start = AxisValues(
             start[axis_order_map[0]],
             start[axis_order_map[1]],
             start[axis_order_map[2]],
         )
 
-        original_voxel_size = Vector3(
+        original_voxel_size = AxisValues(
             float(mrc_header.cella.x),
             float(mrc_header.cella.y),
             float(mrc_header.cella.z),
         )
 
-        origin = Vector3(
+        origin = AxisValues(
             float(start.x * original_voxel_size.x),
             float(start.y * original_voxel_size.y),
             float(start.z * original_voxel_size.z),
@@ -114,7 +114,7 @@ class MRCConverter(Converter):
         return DataSetInfo(
             filename=str(file),
             resolution=0,
-            axis_order=Vector3(0, 1, 2),  # data should have normalized order
+            axis_order=AxisValues(0, 1, 2),  # data should have normalized order
             voxel_size=original_voxel_size,
             origin=origin,
             id=filename,

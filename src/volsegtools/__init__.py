@@ -26,6 +26,7 @@ from ._conversion import (
     VRMLConverter,
 )
 from ._core import (
+    AxisValues,
     Bounds,
     Bytes,
     ChunkingMode,
@@ -35,7 +36,6 @@ from ._core import (
     Timer,
     TimerReporter,
     UnitKind,
-    Vector3,
     WorkingStore,
     to_angstrom,
     to_bytes,
@@ -102,6 +102,7 @@ logger = logging.getLogger(__name__)
 
 __all__ = [
     "AveragePooling",
+    "AxisValues",
     "BCIFSerializer",
     "Bounds",
     "Bytes",
@@ -162,7 +163,6 @@ __all__ = [
     "UnitKind",
     "UnsupportedCompressionError",
     "VRMLConverter",
-    "Vector3",
     "WorkingStore",
     "ZipBundler",
     # Built-in

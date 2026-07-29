@@ -8,7 +8,7 @@ import dask.array as da
 import h5py as hdf
 import numpy as np
 
-from volsegtools._core import DataKind, Vector3, unit_from_str
+from volsegtools._core import AxisValues, DataKind, unit_from_str
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
@@ -111,7 +111,7 @@ class ImarisConverter(Converter):
         return suffix in self.supported_suffixes
 
     @staticmethod
-    def calculate_voxel_size(input_info) -> Vector3:
+    def calculate_voxel_size(input_info) -> AxisValues:
         """Calculates voxel size from info of some Imaris Bitplane file.
 
         The voxel size is not provided in the form of some attribute, but it
@@ -124,7 +124,7 @@ class ImarisConverter(Converter):
         """
         # FIXME: This has to be refactored to work with multiple files
         info = next(iter(input_info.values()))
-        return Vector3(
+        return AxisValues(
             100 * ((info["ExtMax0"] - info["ExtMin0"]) / info["X"]),
             100 * ((info["ExtMax1"] - info["ExtMin1"]) / info["Y"]),
             100 * ((info["ExtMax2"] - info["ExtMin2"]) / info["Z"]),
@@ -156,12 +156,14 @@ class ImarisConverter(Converter):
         info = DataSetInfo(
             filename=input_path.name,
             resolution=0,
-            axis_order=Vector3(0, 1, 2),
+            axis_order=AxisValues(0, 1, 2),
             voxel_size=voxel_size,
-            origin=Vector3(metadata["ExtMin0"], metadata["ExtMin1"], metadata["ExtMin2"]),
+            origin=AxisValues(
+                metadata["ExtMin0"], metadata["ExtMin1"], metadata["ExtMin2"]
+            ),
             id=input_path.name,
             kind=DataKind.VOLUME,
-            lattice_shape=Vector3(
+            lattice_shape=AxisValues(
                 shape[0],
                 shape[1],
                 shape[2],

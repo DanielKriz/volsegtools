@@ -5,7 +5,7 @@ import logging
 import dask.array as da
 import pyometiff as ome_tiff
 
-from volsegtools._core import DataKind, Vector3
+from volsegtools._core import AxisValues, DataKind
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
@@ -52,16 +52,16 @@ class TIFFConverter(Converter):
         data_set_info = DataSetInfo(
             filename=input_path.stem,
             resolution=0,
-            axis_order=Vector3(0, 1, 2),
-            voxel_size=Vector3(
+            axis_order=AxisValues(0, 1, 2),
+            voxel_size=AxisValues(
                 metadata["PhysicalSizeX"] * 100,
                 metadata["PhysicalSizeY"] * 100,
                 metadata["PhysicalSizeZ"] * 100,
             ),
-            origin=Vector3(0, 0, 0),
+            origin=AxisValues(0, 0, 0),
             id=input_path.stem,
             kind=DataKind.VOLUME,
-            lattice_shape=Vector3(
+            lattice_shape=AxisValues(
                 metadata["SizeX"],
                 metadata["SizeY"],
                 metadata["SizeZ"],

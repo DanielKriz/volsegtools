@@ -3,7 +3,7 @@ from pathlib import Path
 import ome_zarr.io
 import ome_zarr.reader
 
-from volsegtools._core import DataKind, Vector3
+from volsegtools._core import AxisValues, DataKind
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
@@ -50,15 +50,15 @@ class NGFFConverter(Converter):
         info = DataSetInfo(
             filename=input_path.name,
             resolution=0,
-            axis_order=Vector3(0, 1, 2),
-            voxel_size=Vector3(
+            axis_order=AxisValues(0, 1, 2),
+            voxel_size=AxisValues(
                 100 * voxel_size_info[axis_order["x"]],
                 100 * voxel_size_info[axis_order["y"]],
                 100 * voxel_size_info[axis_order["z"]],
             ),
             id=input_path.name,
             kind=DataKind.VOLUME,
-            lattice_shape=Vector3(
+            lattice_shape=AxisValues(
                 data_arr.shape[axis_order["x"]],
                 data_arr.shape[axis_order["y"]],
                 data_arr.shape[axis_order["z"]],

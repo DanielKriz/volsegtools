@@ -5,7 +5,7 @@ import logging
 import ciftools.serialization
 import dask.array as da
 
-from volsegtools._core import DataKind, Vector3
+from volsegtools._core import AxisValues, DataKind
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
@@ -54,24 +54,24 @@ class CIFConverter(Converter):
             data_set_info = DataSetInfo(
                 filename=input_path.name,
                 resolution=0,
-                axis_order=Vector3(
+                axis_order=AxisValues(
                     metadata["axis_order[0]"].get_float(0),
                     metadata["axis_order[1]"].get_float(0),
                     metadata["axis_order[2]"].get_float(0),
                 ),
-                voxel_size=Vector3(
+                voxel_size=AxisValues(
                     metadata["spacegroup_cell_size[0]"].get_float(0),
                     metadata["spacegroup_cell_size[1]"].get_float(0),
                     metadata["spacegroup_cell_size[2]"].get_float(0),
                 ),
-                origin=Vector3(
+                origin=AxisValues(
                     metadata["origin[0]"].get_float(0),
                     metadata["origin[1]"].get_float(0),
                     metadata["origin[2]"].get_float(0),
                 ),
                 id=input_path.stem,
                 kind=DataKind.VOLUME,
-                lattice_shape=Vector3(
+                lattice_shape=AxisValues(
                     data.shape[0],
                     data.shape[1],
                     data.shape[2],

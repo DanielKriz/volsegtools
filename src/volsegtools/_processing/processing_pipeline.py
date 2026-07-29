@@ -5,7 +5,7 @@ import itertools
 import logging
 
 from volsegtools._conversion.converter_map import ConverterMap
-from volsegtools._core import Bytes, DataKind, Timer, Vector3, WorkingStore
+from volsegtools._core import AxisValues, Bytes, DataKind, Timer, WorkingStore
 from volsegtools._downsampling.null import Null
 from volsegtools._model import (
     PipelineStageKind,
@@ -277,7 +277,7 @@ class ProcessingPipeline(ProcessingPipeline):
                     resulting_data_sets[resolution] = DataSet(self.context.working_store)
                     resulting_data_sets[resolution].update_metadata(data_set)
                     resulting_data_sets[resolution].metadata.resolution = resolution
-                    resulting_data_sets[resolution].metadata.lattice_shape = Vector3(
+                    resulting_data_sets[resolution].metadata.lattice_shape = AxisValues(
                         downsampled_data.shape[0],
                         downsampled_data.shape[1],
                         downsampled_data.shape[2],
