@@ -14,5 +14,5 @@ def calculate_approx_downsampled_sizes(
     return sizes
 
 
-def calculate_steps(channel: Channel, size_threhold: int) -> int:
-    return len(calculate_approx_downsampled_sizes(channel, size_threhold))
+def calculate_steps(channel: Channel, size_threhold: int, factor: int = 2) -> int:
+    return len(calculate_approx_downsampled_sizes(channel, size_threhold, factor))
