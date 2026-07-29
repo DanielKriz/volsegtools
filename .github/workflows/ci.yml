@@ -1,0 +1,11 @@
+name: Volsegtools CI workflow
+
+# Runs on each push or PR
+on:
+  pull_request:
+  push:
+    branches: "**"
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml

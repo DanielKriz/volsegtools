@@ -1,0 +1,52 @@
+name: Volsegtools Static Analysis
+
+# Can only be called from other workflows
+on:
+  workflow_call:
+
+jobs:
+  check:
+    name: Run static analysis checks
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install analysis tools
+        run: pipx install ruff
+      - name: Lint code with Ruff
+        run: ruff check --diff --output-format=github
+      - name: Check code formatting with Ruff
+        run: ruff format --diff
+
+  test:
+    name: Test python package
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+      - name: Test with pytest
+        run: >
+          uv run pytest
+          --junitxml=coverage/test_results.xml
+          --cov=volsegtools
+          --cov-report=term-missing
+          --cov-report=xml
+          --cov-report=html
+      - name: Test CLI startup
+        run: uv run molstar-preprocessor --help
