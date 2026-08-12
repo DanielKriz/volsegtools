@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Self
 
-import collections
-
 import zarr.errors
 
 from volsegtools._conversion.converter_map import ConverterMap
@@ -30,7 +28,7 @@ class ProcessingPipelineBuilder:
         self._downsampling_strategy: DownsamplingStrategy = Null()
         self._post_processing_steps: list[PostProcessingStep] = []
         self._post_conversion_steps: list[PostConversionStep] = []
-        self._serializer_map = collections.defaultdict(None)
+        self._serializer_map: dict[DataKind, Serializer] = {}
         self._volume_converter_map = ConverterMap()
         self._segmentation_converter_map = ConverterMap()
         self._bundler = None
@@ -128,12 +126,16 @@ class ProcessingPipelineBuilder:
             segmentation_converter_map=self._segmentation_converter_map,
             post_processing_steps=self._post_processing_steps,
             post_conversion_steps=self._post_conversion_steps,
-            volume_serializer=self._serializer_map[DataKind.VOLUME],
-            segmentation_mask_serializer=self._serializer_map[DataKind.SEGMENTATION_MASK],
-            segmentation_volume_serializer=self._serializer_map[
+            volume_serializer=self._serializer_map.get(DataKind.VOLUME),
+            segmentation_mask_serializer=self._serializer_map.get(
+                DataKind.SEGMENTATION_MASK
+            ),
+            segmentation_volume_serializer=self._serializer_map.get(
                 DataKind.SEGMENTATION_VOLUME
-            ],
-            segmentation_mesh_serializer=self._serializer_map[DataKind.SEGMENTATION_MESH],
+            ),
+            segmentation_mesh_serializer=self._serializer_map.get(
+                DataKind.SEGMENTATION_MESH
+            ),
             bundler=self._bundler,
             work_dir=self._work_dir,
             output_dir=self._output_dir,
