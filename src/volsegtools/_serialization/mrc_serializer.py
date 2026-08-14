@@ -40,18 +40,18 @@ class MRCSerializer(Serializer):
                 mrc.header.ny = data_set.metadata.lattice_shape.y
                 mrc.header.nz = data_set.metadata.lattice_shape.z
 
-                mrc.header.cella.x = data_set.metadata.voxel_size.x
-                mrc.header.cella.y = data_set.metadata.voxel_size.y
-                mrc.header.cella.z = data_set.metadata.voxel_size.z
+                mrc.header.cella.x = data_set.metadata.cell_size.x
+                mrc.header.cella.y = data_set.metadata.cell_size.y
+                mrc.header.cella.z = data_set.metadata.cell_size.z
 
                 mrc.header.nxstart = (
-                    data_set.metadata.origin.x / data_set.metadata.voxel_size.x
+                    data_set.metadata.origin.x / data_set.metadata.cell_size.x
                 )
                 mrc.header.nystart = (
-                    data_set.metadata.origin.y / data_set.metadata.voxel_size.y
+                    data_set.metadata.origin.y / data_set.metadata.cell_size.y
                 )
                 mrc.header.nzstart = (
-                    data_set.metadata.origin.z / data_set.metadata.voxel_size.z
+                    data_set.metadata.origin.z / data_set.metadata.cell_size.z
                 )
                 data = channel.handle.get_lattice(DaskBackend)
                 data = data.astype("float32")

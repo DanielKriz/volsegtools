@@ -156,19 +156,19 @@ class VolumeData3DInfoDescNew(CategoryDesc):
             ),
             Field.numbers(
                 name="spacegroup_cell_size[0]",
-                value=lambda d, i: data_set.metadata.voxel_size.x,
+                value=lambda d, i: data_set.metadata.cell_size.x,
                 encoder=volume_server_encoder,
                 dtype="f8",
             ),
             Field.numbers(
                 name="spacegroup_cell_size[1]",
-                value=lambda d, i: data_set.metadata.voxel_size.y,
+                value=lambda d, i: data_set.metadata.cell_size.y,
                 encoder=volume_server_encoder,
                 dtype="f8",
             ),
             Field.numbers(
                 name="spacegroup_cell_size[2]",
-                value=lambda d, i: data_set.metadata.voxel_size.z,
+                value=lambda d, i: data_set.metadata.cell_size.z,
                 encoder=volume_server_encoder,
                 dtype="f8",
             ),

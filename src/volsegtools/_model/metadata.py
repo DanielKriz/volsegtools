@@ -9,7 +9,7 @@ class DataSetInfo(pydantic.BaseModel):
     filename: str = "Unknown File"
     resolution: int = -1
     axis_order: AxisValues = Field(default_factory=AxisValues)
-    voxel_size: AxisValues = Field(default_factory=AxisValues)
+    cell_size: AxisValues = Field(default_factory=AxisValues)
     origin: AxisValues = Field(default_factory=AxisValues)
     id: str = "Unknown"
     kind: DataKind = DataKind.VOLUME

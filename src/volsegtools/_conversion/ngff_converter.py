@@ -45,16 +45,16 @@ class NGFFConverter(Converter):
         reordering = tuple(current_order.find(ax) for ax in "XYZ")
 
         # The 0 is for the 0th resolution
-        voxel_size_info = metadata["coordinateTransformations"][0][0]["scale"]
+        cell_size_info = metadata["coordinateTransformations"][0][0]["scale"]
 
         info = DataSetInfo(
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
-            voxel_size=AxisValues(
-                100 * voxel_size_info[axis_order["x"]],
-                100 * voxel_size_info[axis_order["y"]],
-                100 * voxel_size_info[axis_order["z"]],
+            cell_size=AxisValues(
+                100 * cell_size_info[axis_order["x"]],
+                100 * cell_size_info[axis_order["y"]],
+                100 * cell_size_info[axis_order["z"]],
             ),
             id=input_path.name,
             kind=DataKind.VOLUME,

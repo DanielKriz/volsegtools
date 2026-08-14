@@ -59,7 +59,7 @@ class CIFConverter(Converter):
                     metadata["axis_order[1]"].get_float(0),
                     metadata["axis_order[2]"].get_float(0),
                 ),
-                voxel_size=AxisValues(
+                cell_size=AxisValues(
                     metadata["spacegroup_cell_size[0]"].get_float(0),
                     metadata["spacegroup_cell_size[1]"].get_float(0),
                     metadata["spacegroup_cell_size[2]"].get_float(0),

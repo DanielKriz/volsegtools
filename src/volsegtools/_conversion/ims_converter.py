@@ -111,10 +111,10 @@ class ImarisConverter(Converter):
         return suffix in self.supported_suffixes
 
     @staticmethod
-    def calculate_voxel_size(input_info) -> AxisValues:
-        """Calculates voxel size from info of some Imaris Bitplane file.
+    def calculate_cell_size(input_info) -> AxisValues:
+        """Calculates cell size from info of some Imaris Bitplane file.
 
-        The voxel size is not provided in the form of some attribute, but it
+        The cell size is not provided in the form of some attribute, but it
         has to be calculated from the metadata as follows:
 
         1. We take the origin (minimum) of the data extent.
@@ -145,7 +145,7 @@ class ImarisConverter(Converter):
 
         dataset_info = {}
         file.visititems(_find_image_info(dataset_info))
-        voxel_size = ImarisConverter.calculate_voxel_size(dataset_info)
+        cell_size = ImarisConverter.calculate_cell_size(dataset_info)
 
         channels = []
         file.visititems(_find_all_channels(channels, dataset_info))
@@ -157,7 +157,7 @@ class ImarisConverter(Converter):
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
-            voxel_size=voxel_size,
+            cell_size=cell_size,
             origin=AxisValues(
                 metadata["ExtMin0"], metadata["ExtMin1"], metadata["ExtMin2"]
             ),

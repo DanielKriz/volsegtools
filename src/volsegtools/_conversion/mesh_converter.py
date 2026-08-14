@@ -41,7 +41,7 @@ class MeshConverter(Converter):
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
-            voxel_size=AxisValues(0, 0, 0),
+            cell_size=AxisValues(0, 0, 0),
             origin=AxisValues(0, 0, 0),
             id=input_path.name,
             kind=DataKind.SEGMENTATION_MESH,

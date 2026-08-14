@@ -96,16 +96,16 @@ class MRCConverter(Converter):
             start[axis_order_map[2]],
         )
 
-        original_voxel_size = AxisValues(
+        original_cell_size = AxisValues(
             float(mrc_header.cella.x),
             float(mrc_header.cella.y),
             float(mrc_header.cella.z),
         )
 
         origin = AxisValues(
-            float(start.x * original_voxel_size.x),
-            float(start.y * original_voxel_size.y),
-            float(start.z * original_voxel_size.z),
+            float(start.x * original_cell_size.x),
+            float(start.y * original_cell_size.y),
+            float(start.z * original_cell_size.z),
         )
 
         # We have to completely remove the suffixes to get the id.
@@ -115,7 +115,7 @@ class MRCConverter(Converter):
             filename=str(file),
             resolution=0,
             axis_order=AxisValues(0, 1, 2),  # data should have normalized order
-            voxel_size=original_voxel_size,
+            cell_size=original_cell_size,
             origin=origin,
             id=filename,
             kind=kind,

@@ -53,7 +53,7 @@ class TIFFConverter(Converter):
             filename=input_path.stem,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
-            voxel_size=AxisValues(
+            cell_size=AxisValues(
                 metadata["PhysicalSizeX"] * 100,
                 metadata["PhysicalSizeY"] * 100,
                 metadata["PhysicalSizeZ"] * 100,

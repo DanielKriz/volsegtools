@@ -48,7 +48,7 @@ class NiiConverter(Converter):
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
-            voxel_size=AxisValues(10, 10, 10),
+            cell_size=AxisValues(10, 10, 10),
             origin=AxisValues(0, 0, 0),
             id=input_path.name,
             kind=DataKind.SEGMENTATION_VOLUME,
