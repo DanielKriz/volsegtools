@@ -125,9 +125,9 @@ class ImarisConverter(Converter):
         # FIXME: This has to be refactored to work with multiple files
         info = next(iter(input_info.values()))
         return AxisValues(
-            100 * ((info["ExtMax0"] - info["ExtMin0"]) / info["X"]),
-            100 * ((info["ExtMax1"] - info["ExtMin1"]) / info["Y"]),
-            100 * ((info["ExtMax2"] - info["ExtMin2"]) / info["Z"]),
+            (info["ExtMax0"] - info["ExtMin0"]),
+            (info["ExtMax1"] - info["ExtMin1"]),
+            (info["ExtMax2"] - info["ExtMin2"]),
         )
 
     async def convert_volume(
@@ -156,7 +156,7 @@ class ImarisConverter(Converter):
         info = DataSetInfo(
             filename=input_path.name,
             resolution=0,
-            axis_order=AxisValues(0, 1, 2),
+            axis_order=AxisValues(2, 1, 0),
             cell_size=cell_size,
             origin=AxisValues(
                 metadata["ExtMin0"], metadata["ExtMin1"], metadata["ExtMin2"]
@@ -195,6 +195,11 @@ class ImarisConverter(Converter):
 
             dask_data = da.from_array(channel_info.data)
             dask_data = dask_data.transpose((2, 1, 0))
+            dask_data = dask_data[
+                : metadata["X"],
+                : metadata["Y"],
+                : metadata["Z"],
+            ]
             dask_data = dask_data.rechunk("auto")
 
             # NOTE it might happen that different type would appear

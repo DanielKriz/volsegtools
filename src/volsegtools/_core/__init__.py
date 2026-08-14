@@ -5,7 +5,7 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
-from .axis_values import AxisValues
+from .axis_values import AxisValues, create_reorder_permutation
 from .bounds import Bounds
 from .bytes import Bytes
 from .chunking_mode import ChunkingMode
@@ -31,6 +31,7 @@ __all__ = [
     "TimerReporter",
     "UnitKind",
     "WorkingStore",
+    "create_reorder_permutation",
     "to_angstrom",
     "to_bytes",
     "to_micrometer",

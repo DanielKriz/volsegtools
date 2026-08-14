@@ -13,6 +13,10 @@ from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
 
+# this library does not have idiomatic support for python loggers, so it is
+# poluting our logs.
+logging.getLogger("pyometiff").disabled = True
+
 
 class TIFFConverter(Converter):
     @property
@@ -33,30 +37,35 @@ class TIFFConverter(Converter):
     ) -> list[DataSet]:
         vst_logger.info(f"... converting '{input_path}'")
 
-        reader = ome_tiff.OMETIFFReader(fpath=input_path)
-        # the last one are XML metadata in which we are not interested here
-        data_array, metadata, _ = reader.read()
-        array = da.from_array(data_array)
+        logging.disable(logging.CRITICAL)
+        try:
+            reader = ome_tiff.OMETIFFReader(fpath=input_path)
+            # the last one are XML metadata in which we are not interested here
+            raw_data, metadata, _ = reader.read()
+        finally:
+            logging.disable(logging.NOTSET)
+        data = da.from_array(raw_data)
 
-        axis_order_map = dict(
-            enumerate(
-                filter(lambda x: x in ["X", "Y", "Z"], metadata["DimOrder BF Array"])
-            )
-        )
+        # The data might contain time frames and channels; however, it is not
+        # a rule and it might happen that either T or C is missing. Thus, we
+        # have to add missing dimensions to preserve the same creation logic
+        # of the dataset.
+        for _ in range(5 - data.ndim):
+            data = data[None, ...]
 
-        current_order = f"{axis_order_map[0]}{axis_order_map[1]}{axis_order_map[2]}"
+        data = data.transpose(tuple("TCXYZ".index(ax) for ax in metadata["DimOrder"]))
 
-        target_order = "XYZ"
-        permutation = tuple(current_order.find(axis) for axis in target_order)
+        axes = filter(lambda x: x in ["X", "Y", "Z"], metadata["DimOrder BF Array"])
+        axis_order = tuple("XYZ".index(ax) for ax in axes)
 
         data_set_info = DataSetInfo(
             filename=input_path.stem,
             resolution=0,
-            axis_order=AxisValues(0, 1, 2),
+            axis_order=AxisValues(*axis_order),
             cell_size=AxisValues(
-                metadata["PhysicalSizeX"] * 100,
-                metadata["PhysicalSizeY"] * 100,
-                metadata["PhysicalSizeZ"] * 100,
+                metadata["PhysicalSizeX"] * metadata["SizeX"],
+                metadata["PhysicalSizeY"] * metadata["SizeY"],
+                metadata["PhysicalSizeZ"] * metadata["SizeZ"],
             ),
             origin=AxisValues(0, 0, 0),
             id=input_path.stem,
@@ -69,20 +78,11 @@ class TIFFConverter(Converter):
         )
 
         data_set = DataSet(context.working_store, data_set_info)
-        if data_array.ndim == 5:
-            # There are multiple frames
-            raise NotImplementedError()
-        if data_array.ndim == 4:
+        for time_frame_data in data:
             frame = data_set.add_time_frame()
-            for idx, channel_data in enumerate(array):
-                transposed = channel_data.transpose(permutation)
+            for idx, channel_data in enumerate(time_frame_data):
                 channel = frame.add_channel(idx)
-                channel.set_data(transposed, DaskBackend)
-        else:
-            frame = data_set.add_time_frame()
-            transposed = array.transpose(permutation)
-            channel = frame.add_channel(0)
-            channel.set_data(transposed, DaskBackend)
+                channel.set_data(channel_data, DaskBackend)
 
         return [data_set]
 

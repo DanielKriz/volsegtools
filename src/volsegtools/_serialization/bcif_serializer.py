@@ -8,8 +8,9 @@ import ciftools
 import ciftools.serialization
 import numpy as np
 
+from volsegtools._core.axis_values import AxisValues
 from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools._processing import NumPyBackend
+from volsegtools._processing import DaskBackend
 from volsegtools._storage import Channel, DataSet
 from volsegtools.abc import Serializer
 
@@ -31,12 +32,19 @@ class BCIFSerializer(Serializer):
             writer.start_data_block("SERVER")
             writer.write_category(DensityServerResultDesc, [np.arange(0)])
 
+            data = channel.handle.get_lattice(DaskBackend)
+            data = data.transpose(data_set.metadata.axis_order.to_tuple(dtype=int))
+
+            # This is slight hack, because we have to propagate the lattice shape
+            # value to the VolumeData3DDesc.
+            channel.data_set.metadata.lattice_shape = AxisValues(*data.shape)
+
+            data = np.ravel(data.compute(), order="F")
+
             writer.start_data_block("VOLUME")
             writer.write_category(VolumeData3DInfoDescNew, [channel])
 
-            data = channel.handle.get_lattice(NumPyBackend)
-
-            writer.write_category(VolumeData3DDesc, [np.ravel(data, order="F")])
+            writer.write_category(VolumeData3DDesc, [data])
 
             file_name = (
                 f"{data_set.metadata.id}"
@@ -272,6 +280,6 @@ class VolumeData3DDesc(CategoryDesc):
                 name="values",
                 array=lambda volume: volume,
                 encoder=volume_server_encoder,
-                dtype="f8",
+                dtype=data.dtype,
             ),
         ]

@@ -4,9 +4,9 @@ import logging
 
 import dask.array as da
 import mrcfile
-import numpy as np
 
 from volsegtools._core import AxisValues, DataKind
+from volsegtools._core.axis_values import create_reorder_permutation
 from volsegtools._model import DataSetInfo, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
@@ -42,12 +42,19 @@ class MRCConverter(Converter):
         if mrc.data is None or mrc.header is None:
             raise RuntimeError("Failed to read data from MAP file")
 
+        order = (
+            int(mrc.header.maps) - 1,
+            int(mrc.header.mapr) - 1,
+            int(mrc.header.mapc) - 1,
+        )
+
         array = da.from_array(mrc.data, chunks=(256, 256, 256))
-        array = MRCConverter._normalize_axis_order(array, mrc.header)
+        array = array.transpose(create_reorder_permutation(order))
 
         data_set_info = MRCConverter._collect_data_set_metadata(
             input_path,
             mrc.header,
+            array,
             DataKind.VOLUME,
         )
         mrc.close()
@@ -76,36 +83,26 @@ class MRCConverter(Converter):
         raise NotImplementedError
 
     @staticmethod
-    def _collect_data_set_metadata(file, mrc_header, kind) -> DataSetInfo:
-        lattice_shape = AxisValues(
-            int(mrc_header.nx),
-            int(mrc_header.ny),
-            int(mrc_header.nz),
+    def _collect_data_set_metadata(file, mrc_header, array, kind) -> DataSetInfo:
+
+        original_order = AxisValues(
+            int(mrc_header.maps) - 1,
+            int(mrc_header.mapr) - 1,
+            int(mrc_header.mapc) - 1,
         )
 
-        axis_order_map = {
-            mrc_header.mapc - 1: 0,
-            mrc_header.mapr - 1: 1,
-            mrc_header.maps - 1: 2,
-        }
+        lattice_shape = AxisValues(*array.shape)
 
-        start = (mrc_header.nxstart, mrc_header.nystart, mrc_header.nzstart)
-        start = AxisValues(
-            start[axis_order_map[0]],
-            start[axis_order_map[1]],
-            start[axis_order_map[2]],
-        )
-
-        original_cell_size = AxisValues(
+        cell_size = AxisValues(
             float(mrc_header.cella.x),
             float(mrc_header.cella.y),
             float(mrc_header.cella.z),
         )
 
         origin = AxisValues(
-            float(start.x * original_cell_size.x),
-            float(start.y * original_cell_size.y),
-            float(start.z * original_cell_size.z),
+            float(mrc_header.origin.x),
+            float(mrc_header.origin.y),
+            float(mrc_header.origin.z),
         )
 
         # We have to completely remove the suffixes to get the id.
@@ -114,43 +111,10 @@ class MRCConverter(Converter):
         return DataSetInfo(
             filename=str(file),
             resolution=0,
-            axis_order=AxisValues(0, 1, 2),  # data should have normalized order
-            cell_size=original_cell_size,
+            axis_order=original_order,
+            cell_size=cell_size,
             origin=origin,
             id=filename,
             kind=kind,
             lattice_shape=lattice_shape,
         )
-
-    @staticmethod
-    def _normalize_axis_order(data: da.Array, header: np.recarray) -> da.Array:
-        """Normalizes the order of axes in the data to (x, y, z).
-
-        Due to the fact that we use column order we have to transpose
-        the array in the end.
-
-        Parameters
-        ----------
-        data: da.Array
-            MCR file data with any order of axes.
-        header: np.recarray
-            The of the file from which comes the data.
-
-        Returns
-        -------
-        da.Array
-            Array with normalized order of axes. It is the view to the input
-            array.
-        """
-        correct_order = (0, 1, 2)
-
-        current_order = tuple(
-            int(axis) - 1 for axis in [header.mapc, header.mapr, header.maps]
-        )
-
-        if tuple(current_order) != correct_order:
-            da.moveaxis(data, current_order, correct_order)
-
-        data.transpose()
-
-        return data
