@@ -1,10 +1,6 @@
 from typing import Any
 
-import math
-
-import dask
 import dask.array as da
-import dask.config
 import zarr
 
 from volsegtools._model.metadata import DescriptiveStatistics
@@ -44,13 +40,18 @@ class DaskBackend(ComputationBackend):
     def store_to_zarr(array: da.Array, target_zarr: ZarrObject) -> None:
         if isinstance(target_zarr, zarr.Group):
             raise RuntimeError("Cannot store dask array to group")
-        target_chunks = target_zarr.chunks
+
+        if hasattr(target_zarr, "shards") and target_zarr.shards is not None:
+            target_chunks = target_zarr.shards
+        else:
+            target_chunks = target_zarr.chunks
+
         aligned_dask = array.rechunk(target_chunks)
-        chunk_bytes = math.prod(target_chunks) * array.dtype.itemsize
-        with dask.config.set({"array.chunk-size": chunk_bytes}):
-            da.to_zarr(
-                arr=aligned_dask,
-                url=target_zarr,
-                overwrite=True,
-                compute=True,
-            )
+
+        da.store(
+            aligned_dask,
+            target_zarr,
+            overwrite=True,
+            lock=False,
+            compute=True,
+        )
