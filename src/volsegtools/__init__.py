@@ -27,7 +27,6 @@ from ._conversion import (
 )
 from ._core import (
     AxisValues,
-    Bounds,
     Bytes,
     ChunkingMode,
     DataKind,
@@ -104,7 +103,6 @@ __all__ = [
     "AveragePooling",
     "AxisValues",
     "BCIFSerializer",
-    "Bounds",
     "Bytes",
     "CIFConverter",
     "Channel",

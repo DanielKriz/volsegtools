@@ -6,7 +6,6 @@ import from the `volsegtools` namespace.
 """
 
 from .axis_values import AxisValues, create_reorder_permutation
-from .bounds import Bounds
 from .bytes import Bytes
 from .chunking_mode import ChunkingMode
 from .computation_backend import ComputationBackend
@@ -19,7 +18,6 @@ from .working_store import WorkingStore
 
 __all__ = [
     "AxisValues",
-    "Bounds",
     "Bytes",
     "ChunkingMode",
     "ComputationBackend",
