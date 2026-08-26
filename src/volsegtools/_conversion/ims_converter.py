@@ -107,9 +107,6 @@ class ImarisConverter(Converter):
     def supports_compression(self) -> bool:
         return False
 
-    def is_suffix_supported(self, suffix: str):
-        return suffix in self.supported_suffixes
-
     @staticmethod
     def calculate_cell_size(input_info) -> AxisValues:
         """Calculates cell size from info of some Imaris Bitplane file.

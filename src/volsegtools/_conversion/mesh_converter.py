@@ -22,9 +22,6 @@ class MeshConverter(Converter):
     def supports_compression(self) -> bool:
         return False
 
-    def is_suffix_supported(self, suffix: str):
-        return suffix in self.supported_suffixes
-
     async def convert_volume(self, input_path: Path) -> list[DataSet]:
         # TODO: we could include some algorithm for conversion of mesh to volume
         raise RuntimeError("Cannot convert mesh to volume")

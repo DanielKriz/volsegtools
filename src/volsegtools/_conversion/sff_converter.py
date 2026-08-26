@@ -23,9 +23,6 @@ class SFFConverter(Converter):
     def supports_compression(self) -> bool:
         return False
 
-    def is_suffix_supported(self, suffix: str):
-        return suffix in self.supported_suffixes
-
     async def convert_volume(
         self,
         input_path: Path,

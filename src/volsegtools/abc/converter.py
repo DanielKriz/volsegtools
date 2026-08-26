@@ -10,6 +10,52 @@ class Converter(Protocol):
     structure that is then going to be used further in the processing.
     """
 
+    @property
+    def supported_suffixes(self) -> list[str]:
+        """Returns the list of supported file suffixes.
+
+        Some converters might support multiple formats, or the formats commonly
+        has several different suffixes (e.g., MRC can be found as .map, .mrc
+        or .ccp4).
+
+        Returns
+        -------
+        list[str]:
+            List of supported file suffixes.
+        """
+        ...
+
+    @property
+    def supports_compression(self) -> bool:
+        """Returns the list of supported file suffixes.
+
+        Some converters might support multiple formats, or the formats commonly
+        has several different suffixes (e.g., MRC can be found as .map, .mrc
+        or .ccp4).
+
+        Returns
+        -------
+        list[str]:
+            List of supported file suffixes.
+        """
+        ...
+
+    def is_suffix_supported(self, suffix: str) -> bool:
+        """Checks whether given file suffix is supported by this converter.
+
+        Attributes
+        ----------
+        suffix: str
+            Suffix of a file that we want to know if it is supported by this
+            converter.
+
+        Returns
+        -------
+        bool:
+            Whether the provided suffix is supported or not.
+        """
+        return suffix in self.supported_suffixes
+
     async def convert_volume(
         self,
         input_path: Path,
