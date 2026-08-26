@@ -70,7 +70,8 @@ class Converter(Protocol):
 
         Returns
         -------
-        Lazy reference to the binary blob data.
+        list[DataSet]:
+            List of datasets in internal format.
         """
         ...
 
@@ -85,6 +86,11 @@ class Converter(Protocol):
         ----------
         input_path: Path
             Path to the transformation target.
+
+        Returns
+        -------
+        list[DataSet]:
+            List of datasets in internal format.
         """
         ...
 
@@ -102,6 +108,11 @@ class Converter(Protocol):
         internal_data: Data
             Reference to the internal representation of the output. It is
             going to be changed by this method.
+
+        Returns
+        -------
+        list[DataSet]:
+            List of datasets in internal format.
         """
         ...
 
@@ -119,5 +130,10 @@ class Converter(Protocol):
         internal_data: Data
             Reference to the internal representation of the output. It is
             going to be changed by this method.
+
+        Returns
+        -------
+        list[DataSet]:
+            List of datasets in internal format.
         """
         ...
