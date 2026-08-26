@@ -9,6 +9,14 @@ from volsegtools.typing import ZarrObject
 
 
 class MeshBackend(ComputationBackend):
+    """Computation backend based on TriMesh library.
+
+    The data is stored in zarr in three separate arrays:
+        1. The vertices
+        2. The indices of faces
+        3. The normals of those faces.
+    """
+
     @staticmethod
     def get_name() -> str:
         return "mesh"

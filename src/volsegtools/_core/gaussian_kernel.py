@@ -4,7 +4,7 @@ from volsegtools._core.kernel import ConvolutionKernel
 
 
 class Gaussian3DKernel(ConvolutionKernel):
-    """Generate a 3D Gaussian kernel."""
+    """Gaussian 3D kernel."""
 
     def __init__(self, size: int, sigma: float):
         self._size = size

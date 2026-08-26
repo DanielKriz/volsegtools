@@ -9,6 +9,19 @@ from volsegtools.typing import ZarrObject
 
 
 class DaskBackend(ComputationBackend):
+    """Computation backend based on the dask library.
+
+    This backend should be used if there is an access to (even multiple)
+    multi-core CPU. As it is balancing the load between them leveraging modern
+    approaches in the parallel programming.
+
+    Attributes
+    ----------
+    DEFAULT_CHUNKS: tuple[int, int, int]
+        Loading from zarr is done using this default chunking. It should be
+        reasonable size for most generic use-cases.
+    """
+
     DEFAULT_CHUNKS = (256, 256, 256)
 
     @staticmethod

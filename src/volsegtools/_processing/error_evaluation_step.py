@@ -23,20 +23,53 @@ vst_logger = logging.getLogger("volsegtools")
 
 
 class ErrorFunction(Protocol):
+    """Used for assessment of error between two data."""
+
     def evaluate(
         self,
         new,
         old,
-    ) -> float: ...
+    ) -> float:
+        """Evaluates the error function over the data.
+
+        Attributes
+        ----------
+        new:
+            The most current version of the data.
+        old:
+            The version of the data agains which we are comparing.
+        """
+        ...
 
     def __call__(self, new, old) -> float:
+        """Evaluates the error function over the data.
+
+        See :meth:`~volsegtoos.ErrorFunction.evaluate`.
+
+        """
         return self.evaluate(new, old)
 
     @property
-    def name(self) -> str: ...
+    def name(self) -> str:
+        """Name of the error function.
+
+        Returns
+        -------
+        str:
+            Name of the error function.
+        """
+        ...
 
 
 class HFEN(ErrorFunction):
+    """High-Frequency Error Notion.
+
+    It is great for finding out how much of the high-frequency features was
+    destroyed.
+
+    This metric is based on paper: https://ieeexplore.ieee.org/document/5617283
+    """
+
     def evaluate(
         self,
         new,
@@ -78,27 +111,12 @@ class HFEN(ErrorFunction):
         return "HFEN"
 
 
-class VFM(ErrorFunction):
-    def evaluate(
-        self,
-        new,
-        old,
-    ) -> float:
-        threshold = 0.0
-
-        original_empty_count = (old < threshold).sum()
-        upscaled_empty_count = (new < threshold).sum()
-
-        value = (upscaled_empty_count / original_empty_count).compute()
-        print(value)
-        return value
-
-    @property
-    def name(self) -> str:
-        return "VFM"
-
-
 class SSIM(ErrorFunction):
+    """Structural Similarity Index Metric.
+
+    This one is great for evaluation of the data's surface.
+    """
+
     def evaluate(
         self,
         new,
@@ -201,17 +219,6 @@ class PSNR(ErrorFunction):
         return "PSNR"
 
 
-def mse(original, reconstructed):
-    mse = da.mean((original - reconstructed) ** 2)
-    return mse.compute()
-
-
-def rmse(original, reconstructed):
-    mse = da.mean((original - reconstructed) ** 2)
-    rmse = da.sqrt(mse)
-    return rmse.compute()
-
-
 class ErrorEvaluationStep(PostProcessingStep):
     def __init__(
         self,
@@ -232,8 +239,6 @@ class ErrorEvaluationStep(PostProcessingStep):
                     self.error_fn = PSNR()
                 case "ssim":
                     self.error_fn = SSIM()
-                case "vfm":
-                    self.error_fn = VFM()
                 case "hfen":
                     self.error_fn = HFEN()
         else:
@@ -374,8 +379,6 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
                     self.error_functions.append(PSNR())
                 case "ssim":
                     self.error_functions.append(SSIM())
-                case "vfm":
-                    self.error_functions.append(VFM())
                 case "hfen":
                     self.error_functions.append(HFEN())
 
