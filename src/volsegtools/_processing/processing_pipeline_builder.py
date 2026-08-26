@@ -111,6 +111,11 @@ class ProcessingPipelineBuilder:
 
     def build(self) -> ProcessingPipeline:
         """Builds the resulting preprocessor."""
+        if (
+            self._segmentation_converter_map.is_empty()
+            and self._volume_converter_map.is_empty()
+        ):
+            raise RuntimeError("segmentation or volume converter has to be set!")
 
         if all(x is None for x in self._serializer_map.values()):
             raise RuntimeError("Atleast one serializer must set")
