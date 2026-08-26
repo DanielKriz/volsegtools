@@ -1,7 +1,7 @@
-import pydantic
-import numpy as np
 from numpy.typing import DTypeLike
 
+import numpy as np
+import pydantic
 
 AxesOrderTuple = tuple[int, int, int]
 AxesTuple = tuple[DTypeLike, DTypeLike, DTypeLike]
@@ -14,11 +14,12 @@ class AxisValues:
     It is used for type-checked readable assignment of some arbitrary value to
     axes. It might represent cell size or lattice dimensions.
     """
+
     x: float = 0
     y: float = 0
     z: float = 0
 
-    def to_tuple(self, dtype: DTypeLike=float) -> AxesTuple:
+    def to_tuple(self, dtype: DTypeLike = float) -> AxesTuple:
         """Transforms current axes values to a typed tuple.
 
         Some libraries require tuple as their input, instead of doing manual
@@ -35,13 +36,12 @@ class AxisValues:
             The tuple containing values of this axes value instance casted to
             dtype.
         """
-        dtype = np.dtype(dtype).type
+        dtype = np.dtype(dtype)
         return (dtype.type(self.x), dtype.type(self.y), dtype.type(self.z))
 
 
 def create_reorder_permutation(
-    current_order: AxesOrderTuple,
-    required_order: AxesOrderTuple=(0, 1, 2)
+    current_order: AxesOrderTuple, required_order: AxesOrderTuple = (0, 1, 2)
 ):
     """Creates reordering permutation for lattice transposition.
 
