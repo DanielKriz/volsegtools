@@ -88,6 +88,8 @@ class ProcessingPipelineBuilder:
         preprocessor. Also, the output of the preprocessor is going to be
         saved at this location.
         """
+        if not file_path.is_dir:
+            raise RuntimeError("Output directory has to be a directory!")
 
         self._work_dir = file_path
         return self
@@ -97,6 +99,9 @@ class ProcessingPipelineBuilder:
         return self
 
     def set_output_dir(self, file_path: Path) -> Self:
+        if not file_path.is_dir:
+            raise RuntimeError("Output directory has to be a directory!")
+
         self._output_dir = file_path
         return self
 
