@@ -214,7 +214,7 @@ class ProcessingPipeline(ProcessingPipeline):
             raise RuntimeError("No volume converter map was set!")
 
         if self._volume_converter_map.is_empty():
-            raise RuntimeError("There are no valid volume conveters!")
+            raise RuntimeError("There are no valid volume converters!")
 
         for path in paths:
             converter = self._volume_converter_map["".join(path.suffixes)]
@@ -232,7 +232,7 @@ class ProcessingPipeline(ProcessingPipeline):
             raise RuntimeError("No volume converter map was set!")
 
         if self._segmentation_converter_map.is_empty():
-            raise RuntimeError("There are no valid volume conveters!")
+            raise RuntimeError("There are no segmentation converters!")
 
         for path in paths:
             converter = self._segmentation_converter_map["".join(path.suffixes)]
