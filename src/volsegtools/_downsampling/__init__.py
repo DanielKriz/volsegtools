@@ -4,6 +4,7 @@ Contains downsampling related classes and functions.
 Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
+
 from .common import (
     calculate_approx_downsampled_sizes,
     calculate_steps,
@@ -31,8 +32,6 @@ from .smoothing import (
 )
 
 __all__ = [
-    "calculate_approx_downsampled_sizes",
-    "calculate_steps",
     "AveragePooling",
     "InterpolationBased",
     "MaxPooling",
@@ -46,4 +45,6 @@ __all__ = [
     "TricubicInterpolation",
     "TrilinearInterpolation",
     "TriquinticInterpolation",
+    "calculate_approx_downsampled_sizes",
+    "calculate_steps",
 ]

@@ -42,8 +42,6 @@ from ._core import (
     unit_from_str,
 )
 from ._downsampling import (
-    calculate_approx_downsampled_sizes,
-    calculate_steps,
     AveragePooling,
     InterpolationBased,
     MaxPooling,
@@ -57,6 +55,8 @@ from ._downsampling import (
     TricubicInterpolation,
     TrilinearInterpolation,
     TriquinticInterpolation,
+    calculate_approx_downsampled_sizes,
+    calculate_steps,
 )
 from ._model import (
     ChannelInfo,
