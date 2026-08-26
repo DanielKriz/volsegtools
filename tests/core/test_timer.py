@@ -1,5 +1,6 @@
-import volsegtools as vst
 import json
+
+import volsegtools as vst
 
 
 def test_standard_reporter(capsys):
@@ -31,14 +32,15 @@ def test_json_reporter(tmp_path):
 
     output_file = tmp_path / "json_report.json"
 
+    timer.print_report(
+        vst.JSONTimerReporter(
+            output_path=output_file,
+            label="input_file_name",
+            method="some_method",
+        )
+    )
 
-    timer.print_report(vst.JSONTimerReporter(
-        output_path=output_file,
-        label="input_file_name",
-        method="some_method",
-    ))
-
-    with open(output_file, "r") as file:
+    with open(output_file) as file:
         data = json.load(file)
 
     assert data[0]["kind"] == "stage"

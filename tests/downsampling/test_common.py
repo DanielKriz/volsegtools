@@ -1,9 +1,12 @@
-import volsegtools as vst
 import pytest
+
+import volsegtools as vst
+
 
 class HandleStub:
     def __init__(self, nbytes):
         self.nbytes = nbytes
+
 
 class ChannelStub:
     def __init__(self, nbytes):
@@ -11,11 +14,12 @@ class ChannelStub:
 
 
 def test_calculate_approx_downsampled_sizes():
-    assert vst.calculate_approx_downsampled_sizes(
-            ChannelStub(64_000),
-            10,
-            2
-        ) == [8_000, 1_000, 125, 15.625]
+    assert vst.calculate_approx_downsampled_sizes(ChannelStub(64_000), 10, 2) == [
+        8_000,
+        1_000,
+        125,
+        15.625,
+    ]
 
 
 def test_calculate_steps():
@@ -32,11 +36,10 @@ def test_calculate_steps():
     ],
 )
 def test_effect_of_threshold_on_sizes(threshold, expected_levels):
-    assert vst.calculate_approx_downsampled_sizes(
-            ChannelStub(64_000),
-            threshold,
-            2
-        ) == expected_levels
+    assert (
+        vst.calculate_approx_downsampled_sizes(ChannelStub(64_000), threshold, 2)
+        == expected_levels
+    )
 
 
 @pytest.mark.parametrize(
@@ -49,11 +52,7 @@ def test_effect_of_threshold_on_sizes(threshold, expected_levels):
     ],
 )
 def test_effect_of_threshold_on_steps(threshold, expected_levels):
-    assert vst.calculate_steps(
-            ChannelStub(64_000),
-            threshold,
-            2
-        ) == expected_levels
+    assert vst.calculate_steps(ChannelStub(64_000), threshold, 2) == expected_levels
 
 
 @pytest.mark.parametrize("factor", [0, 1, -1])

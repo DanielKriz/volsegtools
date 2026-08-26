@@ -1,6 +1,7 @@
-import volsegtools as vst
-import pytest
 import numpy as np
+import pytest
+
+import volsegtools as vst
 
 
 @pytest.mark.parametrize(
