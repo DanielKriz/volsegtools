@@ -208,6 +208,9 @@ class ProcessingPipeline(ProcessingPipeline):
 
     @pipeline_stage("Volume Conversion")
     async def convert_volumes(self, paths: list[Path]) -> list[DataSet]:
+        if len(paths) == 0:
+            return []
+
         volumes = []
 
         if self._volume_converter_map is None:
@@ -226,6 +229,9 @@ class ProcessingPipeline(ProcessingPipeline):
 
     @pipeline_stage("Segmentation Conversion")
     async def convert_segmentations(self, paths: list[Path]) -> list[DataSet]:
+        if len(paths) == 0:
+            return []
+
         segmentations = []
 
         if self._segmentation_converter_map is None:
@@ -243,10 +249,16 @@ class ProcessingPipeline(ProcessingPipeline):
 
     @pipeline_stage("Metadata Collection")
     async def collect_metadata(self, paths: list[Path]):
+        if len(paths) == 0:
+            return []
+
         return []
 
     @pipeline_stage("Annotation Collection")
     async def collect_annotation(self, paths: list[Path]):
+        if len(paths) == 0:
+            return []
+
         return []
 
     @pipeline_stage("Post-Conversion Steps")
