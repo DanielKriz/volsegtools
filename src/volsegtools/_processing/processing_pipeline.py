@@ -270,6 +270,9 @@ class ProcessingPipeline(ProcessingPipeline):
 
     @pipeline_stage("Downsampling")
     async def downsample(self, data_set: DataSet) -> list[DataSet]:
+        if self._downsampling_strategy is None:
+            raise RuntimeError("There is not downsampling strategy to use")
+
         resulting_data_sets: dict[int, DataSet] = {}
 
         self.state.update(msg=f"Downsampling '{data_set.metadata.id}'")
