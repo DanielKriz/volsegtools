@@ -53,6 +53,11 @@ dependencies = [
 dev = [
     "pytest"
 ]
+gui = [
+    "aenum>=3.1.17",
+    "pyqt6>=6.11.0",
+    "pyside6>=6.11.2",
+]
 
 [dependency-groups]
 dev = [
@@ -66,6 +71,9 @@ dev = [
 
 [project.scripts]
 molstar-preprocessor = 'volsegtools._cli:app'
+
+[project.gui-scripts]
+vst-preprocessor-gui = "volsegtools._gui:app"
 
 # -----------------------------------------------------------------------------
 # Hatchling Tool configuration
