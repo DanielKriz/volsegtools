@@ -23,8 +23,6 @@ class ProcessingPipelineBuilder:
     def __init__(self) -> None:
         self._work_dir: Path | None = None
         self._output_dir: Path | None = None
-        self._volume_converter: Converter | None = None
-        self._segmentation_converter: Converter | None = None
         self._downsampling_strategy: DownsamplingStrategy = Null()
         self._post_processing_steps: list[PostProcessingStep] = []
         self._post_conversion_steps: list[PostConversionStep] = []
