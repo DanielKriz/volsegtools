@@ -4,6 +4,8 @@ import re
 
 
 class Bytes(int):
+    """Represents a number as a number of bytes."""
+
     VALUE_PATTERN: ClassVar[re.Pattern] = re.compile(
         r"^\s*(?P<value>\d+(?:\.\d+)?)\s*(?P<unit>[kmgt]?i?b)?\s*$",
         re.IGNORECASE,
@@ -42,4 +44,5 @@ class Bytes(int):
 
     @classmethod
     def parse(cls, value: int | str) -> Self:
+        """Explicit class method for creation of bytes."""
         return cls(value)
