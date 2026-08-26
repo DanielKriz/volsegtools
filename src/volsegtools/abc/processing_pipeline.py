@@ -7,10 +7,6 @@ from volsegtools._storage import DataSet
 class ProcessingPipeline(Protocol):
     """Processes given data set."""
 
-    class Progress:
-        percent_done: int
-        current_file: Path
-
     async def convert_volumes(self, paths: list[Path]) -> list[DataSet]:
         """Converts collection of volumes into standardized data handles."""
         ...
