@@ -37,7 +37,6 @@ from ._core import (
     UnitKind,
     WorkingStore,
     to_angstrom,
-    to_bytes,
     to_micrometer,
     unit_from_str,
 )
@@ -172,7 +171,6 @@ __all__ = [
     "info_from_file_path",
     "logger",
     "to_angstrom",
-    "to_bytes",
     "to_micrometer",
     "unit_from_str",
 ]

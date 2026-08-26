@@ -27,5 +27,9 @@ def to_micrometer(angstroms):
     return angstroms / 10000
 
 
-def to_bytes(megabytes: int):
-    return megabytes * 10**6
+    Returns
+    -------
+    float:
+        The same amount in micrometers.
+    """
+    return angstroms / 10_000
