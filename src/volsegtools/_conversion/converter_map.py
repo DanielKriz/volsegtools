@@ -9,6 +9,8 @@ class UnsupportedCompressionError(Exception):
 
 
 class ConverterMap:
+    """"""
+
     def __init__(self) -> None:
         self._suffix_to_converter_map: dict[str, Converter] = {}
 
@@ -32,6 +34,8 @@ class ConverterMap:
                 self._suffix_to_converter_map[suffix + ".bz2"] = converter
 
         if not suffixes:
+            if len(converter.supported_suffixes) == 0:
+                raise RuntimeError("Converter does not have any supported suffixes!")
             self.set_converter(converter, converter.supported_suffixes)
 
     def is_empty(self) -> bool:
