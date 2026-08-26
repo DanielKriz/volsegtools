@@ -402,7 +402,7 @@ def run(
                 shutil.rmtree(local_store_path)
 
     if show_time:
-        pipeline.context.timer.print_report(vst.TimerReporter())
+        pipeline.context.timer.print_report(vst.StandardReporter())
     if time_report_path:
         pipeline.context.timer.print_report(
             vst.JSONTimerReporter(

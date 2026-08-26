@@ -1,13 +1,28 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import datetime
 import json
 import logging
+import math
 import time
 import uuid
 
 vst_logger = logging.getLogger("volsegtools")
+
+
+class TimerReporter(Protocol):
+    """Used for reporting of the timer data."""
+
+    def report(self, timer_data: dict) -> None:
+        """Reports the timer data in some fashion.
+
+        Parameters
+        ----------
+        timer_data: dict
+            The measurement data from the timer that should be reported.
+        """
+        ...
 
 
 class Timer:
@@ -126,7 +141,9 @@ class Timer:
         reporter.report(self.serialize(True))
 
 
-class TimerReporter:
+class StandardReporter(TimerReporter):
+    """Reporter to the stdout."""
+
     STAGE_FMT = "({:6.3f}%) Stage: '{}' ({:0.3f}s / {:0.3f}s / {:0.3f}s)"
     EVENT_FMT = "({:6.3f}% / {:6.3f}%) Event: '{}' ({:0.3f}s / {:0.3f}s / {:0.3f}s)"
 
@@ -179,7 +196,7 @@ class TimerReporter:
         )
 
 
-class JSONTimerReporter:
+class JSONTimerReporter(TimerReporter):
     def __init__(self, output_path: Path, label: str, **kwargs):
         self.label = label
         self.output_path = output_path
