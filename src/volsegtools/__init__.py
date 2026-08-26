@@ -41,6 +41,8 @@ from ._core import (
     unit_from_str,
 )
 from ._downsampling import (
+    calculate_approx_downsampled_sizes,
+    calculate_steps,
     AveragePooling,
     InterpolationBased,
     MaxPooling,
@@ -136,6 +138,8 @@ __all__ = [
     "Null",
     "OBJSerializer",
     "PLYSerializer",
+    "calculate_steps",
+    "calculate_approx_downsampled_sizes",
     "PoolingDownsamplingStrategy",
     "ProcessingPipeline",
     "ProcessingPipelineBuilder",
