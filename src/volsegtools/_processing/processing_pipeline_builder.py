@@ -106,6 +106,9 @@ class ProcessingPipelineBuilder:
         return self
 
     def set_downsampling_size_threshold(self, threshold: Bytes) -> Self:
+        if threshold <= 0:
+            raise RuntimeError("Size threshold has be bigger than 0!")
+
         self._threshold = threshold
         return self
 
