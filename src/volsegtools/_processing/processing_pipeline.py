@@ -1,4 +1,6 @@
+from collections.abc import Callable
 from pathlib import Path
+from typing import TypeVar
 
 import asyncio
 import itertools
@@ -17,21 +19,39 @@ from volsegtools._processing.dask_backend import DaskBackend
 from volsegtools._storage import DataSet
 from volsegtools.abc import (
     Bundler,
+    DownsamplingStrategy,
     PostConversionStep,
     PostProcessingStep,
-    ProcessingPipeline,
     Serializer,
 )
 
+import volsegtools.abc
+
 vst_logger = logging.getLogger("volsegtools")
 
+T = TypeVar("T")
 
-def _flatten(list_of_lists: list[list]) -> list:
+
+def _flatten(list_of_lists: list[list[T]]) -> list[T]:
     # Source - https://stackoverflow.com/a/952952
     return [x for xs in list_of_lists for x in xs]
 
 
-class ProcessingPipeline(ProcessingPipeline):
+class ProcessingPipeline(volsegtools.abc.ProcessingPipeline):
+    """Processing pipeline for downsampling or conversion.
+
+    Attributes
+    ----------
+    DEFAULT_WORK_DIR: Path
+
+    DEFAULT_SIZE_THRESHOLD: Bytes
+
+    working_store: WorkingStore
+
+    state: PipelineStateManager
+
+    """
+
     DEFAULT_WORK_DIR = Path(".vst_work_dir")
     DEFAULT_SIZE_THRESHOLD = Bytes("5MiB")
 
@@ -40,7 +60,7 @@ class ProcessingPipeline(ProcessingPipeline):
     # instances.
     def __init__(
         self,
-        downsampling_strategy=Null(),  # noqa: B008
+        downsampling_strategy: DownsamplingStrategy | None = Null(),  # noqa: B008
         volume_converter_map: ConverterMap | None = None,
         segmentation_converter_map: ConverterMap | None = None,
         volume_serializer: Serializer | None = None,
@@ -53,7 +73,7 @@ class ProcessingPipeline(ProcessingPipeline):
         work_dir: Path | None = None,
         output_dir: Path | None = None,
         keep_original: bool = False,
-        size_threshold: int = DEFAULT_SIZE_THRESHOLD,
+        size_threshold: Bytes = DEFAULT_SIZE_THRESHOLD,
     ):
         # The conversion and bundling are required stages
         if post_conversion_steps is None:
@@ -78,7 +98,7 @@ class ProcessingPipeline(ProcessingPipeline):
             self._work_dir = ProcessingPipeline.DEFAULT_WORK_DIR
         else:
             self._work_dir = work_dir
-        self.working_store = WorkingStore(work_dir)
+        self.working_store = WorkingStore(self._work_dir)
 
         self._post_processing_steps = post_processing_steps
         self._post_conversion_steps = post_conversion_steps
@@ -106,10 +126,31 @@ class ProcessingPipeline(ProcessingPipeline):
 
     @property
     def keep_original(self) -> bool:
+        """Check whether original resolution should be kept.
+
+        Returns
+        -------
+        bool:
+            Whether original resolutions should be kept.
+        """
         return self._keep_original
 
     @staticmethod
     def pipeline_stage(kind: PipelineStageKind | str):
+        """Decorator denoting a pipeline stage.
+
+        This makes it possible to denote a method as a stage, which means that
+        some common state updates are done. That is: change is logged by the
+        logger, new stage added to the timer and the general state shall be
+        updated.
+
+        Parameters
+        ----------
+        kind: PipelineStageKind | str
+            Kind of the stage. It can be string to support stages that are not
+            standardized by the enumeration.
+        """
+
         def inner(func):
             def wrapper(self, *args, **kwargs):
                 vst_logger.info(kind)
@@ -121,15 +162,36 @@ class ProcessingPipeline(ProcessingPipeline):
 
         return inner
 
-    def add_state_change_callback(self, cb):
+    def add_state_change_callback(self, cb: Callable) -> None:
+        """Adds a new callback to the state observation.
+
+        Parameters
+        ----------
+        cb: Callable
+            Callback that should be called on each state change.
+        """
         self.state.add_callback(cb)
 
     @property
-    def started(self):
+    def started(self) -> bool:
+        """Checks whether this pipeline has started
+
+        Returns
+        -------
+        bool:
+            Whether the pipeline has started processing.
+        """
         return self.state.current != PipelineStageKind.NOT_STARTED
 
     @property
-    def done(self):
+    def done(self) -> bool:
+        """Checks whether this pipeline has finished its work.
+
+        Returns
+        -------
+        bool:
+            Whether the pipeline has finished working.
+        """
         return self.state.current == PipelineStageKind.FINISHED
 
     def sync_process(
@@ -139,14 +201,11 @@ class ProcessingPipeline(ProcessingPipeline):
         metadata: list[Path] | None = None,
         annotations: list[Path] | None = None,
     ) -> list[Path]:
-        if annotations is None:
-            annotations = []
-        if metadata is None:
-            metadata = []
-        if segmentations is None:
-            segmentations = []
-        if volumes is None:
-            volumes = []
+        volumes = volumes or []
+        segmentations = segmentations or []
+        metadata = metadata or []
+        annotations = annotations or []
+
         return asyncio.run(self.process(volumes, segmentations, metadata, annotations))
 
     async def process(
@@ -156,14 +215,11 @@ class ProcessingPipeline(ProcessingPipeline):
         metadata: list[Path] | None = None,
         annotations: list[Path] | None = None,
     ) -> list[Path]:
-        if annotations is None:
-            annotations = []
-        if metadata is None:
-            metadata = []
-        if segmentations is None:
-            segmentations = []
-        if volumes is None:
-            volumes = []
+        volumes = volumes or []
+        segmentations = segmentations or []
+        metadata = metadata or []
+        annotations = annotations or []
+
         converted_volumes = await self.convert_volumes(volumes)
         converted_segmentations = await self.convert_segmentations(segmentations)
         collected_metadata = await self.collect_metadata(metadata)
@@ -284,6 +340,7 @@ class ProcessingPipeline(ProcessingPipeline):
 
         for channel in data_set.flat_channel_iter():
             frame = channel.parent.metadata.id
+
             for resolution, downsampled_data in enumerate(
                 self._downsampling_strategy.execute(channel, self.context),
                 start=1,  # 0 is reserved for the original data resolution
@@ -310,7 +367,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return list(resulting_data_sets.values())
 
     @pipeline_stage("Post-Processing Steps")
-    async def apply_post_processing_steps(self, data_set) -> list[DataSet]:
+    async def apply_post_processing_steps(self, data_set: list[DataSet]) -> list[DataSet]:
         processed_data = data_set
         for step in self._post_processing_steps:
             processed_data = await step.execute(processed_data, self.context)
@@ -331,7 +388,7 @@ class ProcessingPipeline(ProcessingPipeline):
         )
 
     @pipeline_stage("Bundling")
-    async def bundle(self, files: list[Path]):
+    async def bundle(self, files: list[Path]) -> list[Path]:
         if self._bundler is None:
             raise RuntimeError("Cannot bundle without any bundler!")
         return self._bundler.bundle(files, self._output_dir, self.context)
