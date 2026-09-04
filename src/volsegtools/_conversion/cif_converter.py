@@ -38,7 +38,7 @@ class CIFConverter(Converter):
 
         data_set = None
         for block in cif_data.data_blocks:
-            if block.header != "VOLUME":
+            if block.header != "VOLUME" and block.header != "EM":
                 continue
 
             metadata = block.categories["volume_data_3d_info"]
