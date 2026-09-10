@@ -110,7 +110,10 @@ class ProcessingPipelineBuilder:
         self._output_dir = file_path
         return self
 
-    def set_downsampling_size_threshold(self, threshold: Bytes) -> Self:
+    def set_downsampling_size_threshold(self, threshold: Bytes | str | int) -> Self:
+        if not isinstance(threshold, Bytes):
+            threshold = Bytes(threshold)
+
         self._threshold = threshold
         return self
 
