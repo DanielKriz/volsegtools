@@ -18,6 +18,25 @@ def calculate_approx_downsampled_sizes(
     return sizes
 
 
+def calculate_dimensions(
+    channel: Channel | tuple[int, ...], factor: int = 2
+) -> list[tuple[int, ...]]:
+
+    def is_valid(shape):
+        return all(x > 0 for x in shape)
+
+    shape = channel.handle.shape if isinstance(channel, Channel) else channel
+
+    dimensions = []
+    while True:
+        shape = tuple(x // factor for x in shape)
+        if is_valid(shape):
+            dimensions.append(shape)
+        else:
+            break
+    return dimensions
+
+
 def calculate_steps(channel: Channel | int, threhold: int, factor: int = 2) -> int:
     nbytes = channel.handle.nbytes if isinstance(channel, Channel) else channel
     return len(calculate_approx_downsampled_sizes(nbytes, threhold, factor))
