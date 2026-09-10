@@ -45,6 +45,7 @@ from ._core import (
 from ._downsampling import (
     calculate_approx_downsampled_sizes,
     calculate_steps,
+    calculate_min_size_from_resolutions,
     AveragePooling,
     InterpolationBased,
     MaxPooling,
@@ -105,6 +106,7 @@ logger = logging.getLogger(__name__)
 __all__ = [
     "calculate_approx_downsampled_sizes",
     "calculate_steps",
+    "calculate_min_size_from_resolutions",
     "AveragePooling",
     "AxisValues",
     "BCIFSerializer",
