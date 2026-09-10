@@ -5,6 +5,10 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
+from .common import (
+    calculate_approx_downsampled_sizes,
+    calculate_steps,
+)
 from .continuous_interpolation import (
     InterpolationBased,
     TricubicInterpolation,
@@ -28,6 +32,8 @@ from .smoothing import (
 )
 
 __all__ = [
+    "calculate_approx_downsampled_sizes",
+    "calculate_steps",
     "AveragePooling",
     "InterpolationBased",
     "MaxPooling",
