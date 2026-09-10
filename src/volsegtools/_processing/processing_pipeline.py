@@ -14,7 +14,7 @@ from volsegtools._model import (
 )
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import (
     Bundler,
     PostConversionStep,
@@ -207,7 +207,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return serialized_files
 
     @pipeline_stage("Volume Conversion")
-    async def convert_volumes(self, paths: list[Path]) -> list[DataSet]:
+    async def convert_volumes(self, paths: list[Path]) -> list[Dataset]:
         volumes = []
 
         if self._volume_converter_map is None:
@@ -225,7 +225,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return volumes
 
     @pipeline_stage("Segmentation Conversion")
-    async def convert_segmentations(self, paths: list[Path]) -> list[DataSet]:
+    async def convert_segmentations(self, paths: list[Path]) -> list[Dataset]:
         segmentations = []
 
         if self._segmentation_converter_map is None:
@@ -257,8 +257,8 @@ class ProcessingPipeline(ProcessingPipeline):
             await step(volumes, segmentations, metadata, annotations, self.context)
 
     @pipeline_stage("Downsampling")
-    async def downsample(self, data_set: DataSet) -> list[DataSet]:
-        resulting_data_sets: dict[int, DataSet] = {}
+    async def downsample(self, data_set: Dataset) -> list[Dataset]:
+        resulting_data_sets: dict[int, Dataset] = {}
 
         self.state.update(msg=f"Downsampling '{data_set.metadata.id}'")
 
@@ -274,7 +274,7 @@ class ProcessingPipeline(ProcessingPipeline):
                 start=1,  # 0 is reserved for the original data resolution
             ):
                 if resolution not in resulting_data_sets:
-                    resulting_data_sets[resolution] = DataSet(self.context.working_store)
+                    resulting_data_sets[resolution] = Dataset(self.context.working_store)
                     resulting_data_sets[resolution].update_metadata(data_set)
                     resulting_data_sets[resolution].metadata.resolution = resolution
                     resulting_data_sets[resolution].metadata.lattice_shape = AxisValues(
@@ -295,7 +295,7 @@ class ProcessingPipeline(ProcessingPipeline):
         return list(resulting_data_sets.values())
 
     @pipeline_stage("Post-Processing Steps")
-    async def apply_post_processing_steps(self, data_set) -> list[DataSet]:
+    async def apply_post_processing_steps(self, data_set) -> list[Dataset]:
         processed_data = data_set
         for step in self._post_processing_steps:
             processed_data = await step.execute(processed_data, self.context)

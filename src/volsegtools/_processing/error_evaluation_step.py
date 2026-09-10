@@ -16,7 +16,7 @@ import scipy
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage.data_set import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import PostProcessingStep
 
 vst_logger = logging.getLogger("volsegtools")
@@ -271,9 +271,9 @@ class ErrorEvaluationStep(PostProcessingStep):
 
     async def execute(
         self,
-        data_sets: list[DataSet],
+        data_sets: list[Dataset],
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info(
             f"Started 'Error Evaluation - {self.error_fn.name}' post-processing step"
         )
@@ -411,9 +411,9 @@ class ErrorEvaluationMultiStep(PostProcessingStep):
 
     async def execute(
         self,
-        data_sets: list[DataSet],
+        data_sets: list[Dataset],
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info("Started 'Error Evaluation Multi' post-processing step")
         resolution_to_data = {}
         for _, group in itertools.groupby(data_sets, lambda x: x.metadata.id):

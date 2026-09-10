@@ -4,9 +4,9 @@ import ome_zarr.io
 import ome_zarr.reader
 
 from volsegtools._core import AxisValues, DataKind
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 
@@ -26,7 +26,7 @@ class NGFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         nodes = ome_zarr.reader.Reader(ome_zarr.io.ZarrLocation(input_path))()
         data_node = next(nodes)
         metadata = data_node.metadata
@@ -47,7 +47,7 @@ class NGFFConverter(Converter):
         # The 0 is for the 0th resolution
         cell_size_info = metadata["coordinateTransformations"][0][0]["scale"]
 
-        info = DataSetInfo(
+        info = DatasetMetadata(
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
@@ -64,7 +64,7 @@ class NGFFConverter(Converter):
                 data_arr.shape[axis_order["z"]],
             ),
         )
-        data_set = DataSet(context.working_store, info)
+        data_set = Dataset(context.working_store, info)
 
         # If we have time frames then we have to iterate over them
         time_frames = data_arr if data_arr.ndim > 4 else [data_arr]
@@ -83,7 +83,7 @@ class NGFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         raise await self.convert_volume(input_path, context)
 
     async def collect_annotations(self, input_path, context) -> None:

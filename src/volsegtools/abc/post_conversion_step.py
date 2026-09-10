@@ -1,25 +1,25 @@
 from typing import Any, Protocol
 
 from volsegtools._model import PipelineContext
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 
 
 class PostConversionStep(Protocol):
     async def execute(
         self,
-        volumes: list[DataSet],
-        segmentations: list[DataSet],
+        volumes: list[Dataset],
+        segmentations: list[Dataset],
         metadata: list[Any],
         annotations: list[Any],
         context: PipelineContext,
-    ) -> list[DataSet]: ...
+    ) -> list[Dataset]: ...
 
     async def __call__(
         self,
-        volumes: list[DataSet],
-        segmentations: list[DataSet],
+        volumes: list[Dataset],
+        segmentations: list[Dataset],
         metadata: list[Any],
         annotations: list[Any],
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         return await self.execute(volumes, segmentations, metadata, annotations, context)

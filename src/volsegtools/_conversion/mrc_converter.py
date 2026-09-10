@@ -7,9 +7,9 @@ import mrcfile
 
 from volsegtools._core import AxisValues, DataKind
 from volsegtools._core.axis_values import create_reorder_permutation
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
@@ -35,7 +35,7 @@ class MRCConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info(f"... converting '{input_path}'")
 
         mrc = mrcfile.mmap(input_path, "r")
@@ -59,7 +59,7 @@ class MRCConverter(Converter):
         )
         mrc.close()
 
-        data_set = DataSet(context.working_store, data_set_info)
+        data_set = Dataset(context.working_store, data_set_info)
         frame = data_set.add_time_frame()
 
         channel = frame.add_channel(0)
@@ -70,7 +70,7 @@ class MRCConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         data_sets = await self.convert_volume(input_path, context)
         for ds in data_sets:
             ds.metadata.kind = DataKind.SEGMENTATION_VOLUME
@@ -83,7 +83,7 @@ class MRCConverter(Converter):
         raise NotImplementedError
 
     @staticmethod
-    def _collect_data_set_metadata(file, mrc_header, array, kind) -> DataSetInfo:
+    def _collect_data_set_metadata(file, mrc_header, array, kind) -> DatasetMetadata:
 
         original_order = AxisValues(
             int(mrc_header.maps) - 1,
@@ -108,7 +108,7 @@ class MRCConverter(Converter):
         # We have to completely remove the suffixes to get the id.
         filename = Path(str(file).strip("".join(file.suffixes))).stem
 
-        return DataSetInfo(
+        return DatasetMetadata(
             filename=str(file),
             resolution=0,
             axis_order=original_order,

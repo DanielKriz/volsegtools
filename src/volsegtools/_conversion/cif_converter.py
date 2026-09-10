@@ -6,9 +6,9 @@ import ciftools.serialization
 import dask.array as da
 
 from volsegtools._core import AxisValues, DataKind
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
@@ -30,7 +30,7 @@ class CIFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info(f"... converting '{input_path}'")
 
         with Path.open(input_path, "rb") as file:
@@ -51,7 +51,7 @@ class CIFConverter(Converter):
                 )
             )
             data = da.from_array(data)
-            data_set_info = DataSetInfo(
+            data_set_info = DatasetMetadata(
                 filename=input_path.name,
                 resolution=0,
                 axis_order=AxisValues(
@@ -78,7 +78,7 @@ class CIFConverter(Converter):
                 ),
             )
 
-            data_set = DataSet(context.working_store, data_set_info)
+            data_set = Dataset(context.working_store, data_set_info)
             frame = data_set.add_time_frame()
             channel = frame.add_channel(0)
             channel.set_data(data, DaskBackend)
@@ -89,7 +89,7 @@ class CIFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         data_sets = await self.convert_volume(input_path, context)
         for ds in data_sets:
             ds.metadata.kind = DataKind.SEGMENTATION_VOLUME

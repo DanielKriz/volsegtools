@@ -9,9 +9,9 @@ import h5py as hdf
 import numpy as np
 
 from volsegtools._core import AxisValues, DataKind, unit_from_str
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
@@ -134,7 +134,7 @@ class ImarisConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         if not input_path.exists():
             raise RuntimeError(
                 f"You have to provide a valid file, {input_path} does not exists"
@@ -153,7 +153,7 @@ class ImarisConverter(Converter):
         metadata = channels[0].metadata
         shape = channels[0].data.shape
 
-        info = DataSetInfo(
+        info = DatasetMetadata(
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(2, 1, 0),
@@ -170,7 +170,7 @@ class ImarisConverter(Converter):
             ),
         )
 
-        data_set = DataSet(context.working_store, info)
+        data_set = Dataset(context.working_store, info)
 
         encountered_channel_ids = []
 
@@ -215,7 +215,7 @@ class ImarisConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         return await self.convert_volume(input_path, context)
 
     async def collect_annotations(self, input_path, context) -> None:

@@ -5,10 +5,10 @@ import logging
 import sfftkrw as sff
 
 from volsegtools._core import AxisValues, DataKind
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.mesh_backend import MeshBackend
 from volsegtools._processing.numpy_backend import NumPyBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
@@ -30,14 +30,14 @@ class SFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         raise RuntimeError("SFF does not support normal volumes")
 
     async def convert_segmentation(
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info(f"... converting '{input_path}'")
 
         seg = sff.SFFSegmentation.from_file(str(input_path))
@@ -48,7 +48,7 @@ class SFFConverter(Converter):
         # in a single file...
         lshape = seg.lattice_list[0].data_array.shape
 
-        data_set_info = DataSetInfo(
+        data_set_info = DatasetMetadata(
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
@@ -58,7 +58,7 @@ class SFFConverter(Converter):
             kind=DataKind.SEGMENTATION_MASK,
             lattice_shape=AxisValues(lshape[0], lshape[1], lshape[2]),
         )
-        data_set = DataSet(context.working_store, data_set_info)
+        data_set = Dataset(context.working_store, data_set_info)
         frame = data_set.add_time_frame()
 
         for idx, lattice in enumerate(seg.lattice_list):

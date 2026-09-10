@@ -5,7 +5,7 @@ import pydantic
 from volsegtools._core import AxisValues, DataKind
 
 
-class DataSetInfo(pydantic.BaseModel):
+class DatasetMetadata(pydantic.BaseModel):
     filename: str = "Unknown File"
     resolution: int = -1
     axis_order: AxisValues = Field(default_factory=AxisValues)
@@ -16,7 +16,7 @@ class DataSetInfo(pydantic.BaseModel):
     lattice_shape: AxisValues = Field(default_factory=AxisValues)
 
 
-class TimeFrameInfo(pydantic.BaseModel):
+class TimeFrameMetadata(pydantic.BaseModel):
     id: int = -1
 
 
@@ -32,10 +32,10 @@ class DescriptiveStatistics:
     min: float = 0.0
 
 
-class ChannelInfo(pydantic.BaseModel):
+class ChannelMetadata(pydantic.BaseModel):
     id: int = -1
     statistics: DescriptiveStatistics = Field(default_factory=DescriptiveStatistics)
 
 
-class MeshInfo(pydantic.BaseModel):
+class MeshMetadata(pydantic.BaseModel):
     id: int

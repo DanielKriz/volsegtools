@@ -7,7 +7,7 @@ import re
 
 import pydantic
 
-from volsegtools._model import DataSetInfo
+from volsegtools._model import DatasetMetadata
 from volsegtools._storage.time_frame import TimeFrame
 
 if TYPE_CHECKING:
@@ -17,15 +17,15 @@ if TYPE_CHECKING:
     from volsegtools._storage.channel import Channel
 
 
-class DataSet:
-    def __init__(self, store: WorkingStore, metadata: DataSetInfo | None = None):
+class Dataset:
+    def __init__(self, store: WorkingStore, metadata: DatasetMetadata | None = None):
         self.store = store
         if metadata:
             self._metadata_is_set = True
             self.metadata = metadata
         else:
             self._metadata_is_set = False
-            self.metadata = DataSetInfo()
+            self.metadata = DatasetMetadata()
         self.time_frames = []
         self._last_time_frame_num = 0
 
@@ -69,7 +69,7 @@ class DataSet:
             self._metadata_is_set = True
 
     def __str__(self) -> str:
-        return f"DataSet({self.metadata}, {self.time_frames})"
+        return f"Dataset({self.metadata}, {self.time_frames})"
 
     def __repr__(self) -> str:
         return self.__str__()

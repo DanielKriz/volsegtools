@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from volsegtools._model import MeshInfo
+from volsegtools._model import MeshMetadata
 from volsegtools._storage.data_handle import DataHandle
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class Mesh:
     def __init__(self, parent: TimeFrame, id: int):
         self.parent = parent
-        self.metadata = MeshInfo(id=id)
+        self.metadata = MeshMetadata(id=id)
 
     def set_data(self, mesh_data: trimesh.Trimesh, backend: ComputationBackend):
         self.handle = DataHandle(

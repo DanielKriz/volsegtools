@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Protocol
 
 from volsegtools._model import PipelineContext
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 
 
 class Serializer(Protocol):
@@ -10,7 +10,7 @@ class Serializer(Protocol):
 
     async def serialize(
         self,
-        data_set: DataSet,
+        data_set: Dataset,
         output_path: Path,
         context: PipelineContext,
     ) -> list[Path]: ...

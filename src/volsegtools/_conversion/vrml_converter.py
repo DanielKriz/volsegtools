@@ -8,7 +8,7 @@ import vrmlxpy as vrml
 
 from volsegtools._conversion.mesh_converter import MeshConverter
 from volsegtools._model import PipelineContext
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 
@@ -68,14 +68,14 @@ class VRMLConverter(Converter):
     def is_suffix_supported(self, suffix: str):
         return suffix in self.supported_suffixes
 
-    async def convert_volume(self, input_path: Path, context) -> list[DataSet]:
+    async def convert_volume(self, input_path: Path, context) -> list[Dataset]:
         raise RuntimeError("This converter does not support volumes!")
 
     async def convert_segmentation(
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         with (
             tempfile.NamedTemporaryFile() as tmp_config,
             tempfile.NamedTemporaryFile() as tmp_synonyms,

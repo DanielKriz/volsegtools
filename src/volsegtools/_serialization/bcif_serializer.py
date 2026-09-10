@@ -11,14 +11,14 @@ import numpy as np
 from volsegtools._core.axis_values import AxisValues
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import DaskBackend
-from volsegtools._storage import Channel, DataSet
+from volsegtools._storage import Channel, Dataset
 from volsegtools.abc import Serializer
 
 
 class BCIFSerializer(Serializer):
     async def serialize(
         self,
-        data_set: DataSet,
+        data_set: Dataset,
         output_path: Path,
         context: PipelineContext,
     ) -> list[Path]:

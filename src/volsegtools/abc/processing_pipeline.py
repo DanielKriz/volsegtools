@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Protocol
 
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 
 
 class ProcessingPipeline(Protocol):
@@ -11,11 +11,11 @@ class ProcessingPipeline(Protocol):
         percent_done: int
         current_file: Path
 
-    async def convert_volumes(self, paths: list[Path]) -> list[DataSet]:
+    async def convert_volumes(self, paths: list[Path]) -> list[Dataset]:
         """Converts collection of volumes into standardized data handles."""
         ...
 
-    async def convert_segmentations(self, paths: list[Path]) -> list[DataSet]:
+    async def convert_segmentations(self, paths: list[Path]) -> list[Dataset]:
         """Converts collection of segmentations into a standardized data
         handles."""
         ...
@@ -41,13 +41,13 @@ class ProcessingPipeline(Protocol):
         """
         ...
 
-    async def downsample(self, data_set: DataSet) -> list[Any]:
+    async def downsample(self, data_set: Dataset) -> list[Any]:
         """Downsamples given data."""
         ...
 
     async def apply_post_processing_steps(
         self,
-        data_set: DataSet,
+        data_set: Dataset,
     ) -> list[Any]:
         """Applies post processing steps on the downsampled data.
 
@@ -57,7 +57,7 @@ class ProcessingPipeline(Protocol):
         """
         ...
 
-    async def serialize(self, data_set: DataSet) -> list[Path]:
+    async def serialize(self, data_set: Dataset) -> list[Path]:
         """Serializes given data into files."""
         ...
 

@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Protocol
 
 from volsegtools._model import PipelineContext
-from volsegtools._storage.data_set import DataSet
+from volsegtools._storage import Dataset
 
 
 class Converter(Protocol):
@@ -14,7 +14,7 @@ class Converter(Protocol):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         """Transforms volumetric data into a zarr array.
 
         Parameters
@@ -32,7 +32,7 @@ class Converter(Protocol):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         """Transforms the segmentation data into a zarr array.
 
         Parameters
@@ -46,7 +46,7 @@ class Converter(Protocol):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         """Collects metadata from a file.
 
         Parameters
@@ -63,7 +63,7 @@ class Converter(Protocol):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         """Collects annotations from a file.
 
         Parameters

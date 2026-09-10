@@ -6,9 +6,9 @@ import dask.array as da
 import pyometiff as ome_tiff
 
 from volsegtools._core import AxisValues, DataKind
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
@@ -34,7 +34,7 @@ class TIFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info(f"... converting '{input_path}'")
 
         logging.disable(logging.CRITICAL)
@@ -58,7 +58,7 @@ class TIFFConverter(Converter):
         axes = filter(lambda x: x in ["X", "Y", "Z"], metadata["DimOrder BF Array"])
         axis_order = tuple("XYZ".index(ax) for ax in axes)
 
-        data_set_info = DataSetInfo(
+        data_set_info = DatasetMetadata(
             filename=input_path.stem,
             resolution=0,
             axis_order=AxisValues(*axis_order),
@@ -77,7 +77,7 @@ class TIFFConverter(Converter):
             ),
         )
 
-        data_set = DataSet(context.working_store, data_set_info)
+        data_set = Dataset(context.working_store, data_set_info)
         for time_frame_data in data:
             frame = data_set.add_time_frame()
             for idx, channel_data in enumerate(time_frame_data):
@@ -90,7 +90,7 @@ class TIFFConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         raise NotImplementedError()
 
     async def collect_annotations(self, input_path, context) -> None:

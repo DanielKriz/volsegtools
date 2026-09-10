@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from volsegtools._model import TimeFrameInfo
+from volsegtools._model import TimeFrameMetadata
 from volsegtools._storage.channel import Channel
 from volsegtools._storage.mesh import Mesh
 
 if TYPE_CHECKING:
-    from .volsegtools._storage.data_set import DataSet
+    from .volsegtools._storage import Dataset
 
 
 class TimeFrame:
-    def __init__(self, parent: DataSet, id):
+    def __init__(self, parent: Dataset, id):
         self.parent = parent
         self.channels = []
         self.meshes = []
-        self.metadata = TimeFrameInfo(id=id)
+        self.metadata = TimeFrameMetadata(id=id)
 
     @property
     def data_set(self):

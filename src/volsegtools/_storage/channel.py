@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from volsegtools._model import ChannelInfo
+from volsegtools._model import ChannelMetadata
 from volsegtools._storage.data_handle import DataHandle
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Channel:
     def __init__(self, parent: TimeFrame, id: int):
         self.parent = parent
-        self.metadata = ChannelInfo(id=id)
+        self.metadata = ChannelMetadata(id=id)
         self._handle: DataHandle | None = None
 
     @property

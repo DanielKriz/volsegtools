@@ -9,7 +9,7 @@ import mrcfile
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import DaskBackend
-from volsegtools._storage.data_set import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Serializer
 
 vst_logger = logging.getLogger("volsegtools")
@@ -18,7 +18,7 @@ vst_logger = logging.getLogger("volsegtools")
 class MRCSerializer(Serializer):
     async def serialize(
         self,
-        data_set: DataSet,
+        data_set: Dataset,
         output_path: Path,
         context: PipelineContext,
     ) -> list[Path]:

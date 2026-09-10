@@ -4,7 +4,7 @@ import logging
 import zipfile
 
 from volsegtools._model.pipeline_state import PipelineContext
-from volsegtools._storage.data_set import info_from_file_path
+from volsegtools._storage import info_from_file_path
 from volsegtools.abc.bundler import Bundler
 
 vst_logger = logging.getLogger("volsegtools")

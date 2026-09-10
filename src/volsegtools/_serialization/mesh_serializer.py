@@ -4,7 +4,7 @@ import logging
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing import MeshBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Serializer
 
 vst_logger = logging.getLogger("volsegtools")
@@ -37,7 +37,7 @@ class MeshSerializer(Serializer):
 
     async def serialize(
         self,
-        data_set: DataSet,
+        data_set: Dataset,
         output_path: Path,
         context: PipelineContext,
     ) -> list[Path]:

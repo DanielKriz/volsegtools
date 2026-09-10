@@ -6,7 +6,7 @@ import logging
 
 from volsegtools._model.pipeline_state import PipelineContext
 from volsegtools._processing.dask_backend import DaskBackend
-from volsegtools._storage.data_set import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc.post_processing_step import PostProcessingStep
 
 vst_logger = logging.getLogger("volsegtools")
@@ -90,9 +90,9 @@ class SizeEvaluationStep(PostProcessingStep):
 
     async def execute(
         self,
-        data_sets: list[DataSet],
+        data_sets: list[Dataset],
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info("Started 'Size Evaluation' post-processing step")
 
         for ds in data_sets:

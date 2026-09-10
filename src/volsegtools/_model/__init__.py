@@ -7,11 +7,11 @@ import from the `volsegtools` namespace.
 """
 
 from .metadata import (
-    ChannelInfo,
-    DataSetInfo,
+    ChannelMetadata,
+    DatasetMetadata,
     DescriptiveStatistics,
-    MeshInfo,
-    TimeFrameInfo,
+    MeshMetadata,
+    TimeFrameMetadata,
 )
 from .pipeline_state import (
     PipelineContext,
@@ -22,14 +22,14 @@ from .pipeline_state import (
 from .storing_parameters import StoringParameters
 
 __all__ = [
-    "ChannelInfo",
-    "DataSetInfo",
+    "ChannelMetadata",
+    "DatasetMetadata",
     "DescriptiveStatistics",
-    "MeshInfo",
+    "MeshMetadata",
     "PipelineContext",
     "PipelineStageKind",
     "PipelineState",
     "PipelineStateManager",
     "StoringParameters",
-    "TimeFrameInfo",
+    "TimeFrameMetadata",
 ]

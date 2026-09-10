@@ -5,9 +5,9 @@ import logging
 import nibabel as nib
 
 from volsegtools._core import AxisValues, DataKind
-from volsegtools._model import DataSetInfo, PipelineContext
+from volsegtools._model import DatasetMetadata, PipelineContext
 from volsegtools._processing.numpy_backend import NumPyBackend
-from volsegtools._storage import DataSet
+from volsegtools._storage import Dataset
 from volsegtools.abc import Converter
 
 vst_logger = logging.getLogger("volsegtools")
@@ -31,20 +31,20 @@ class NiiConverter(Converter):
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         raise RuntimeError("Cannot convert mesh to volume")
 
     async def convert_segmentation(
         self,
         input_path: Path,
         context: PipelineContext,
-    ) -> list[DataSet]:
+    ) -> list[Dataset]:
         vst_logger.info(f"... converting '{input_path}'")
 
         nibabel_img = nib.load(str(input_path))
         data = nibabel_img.get_fdata()
 
-        data_set_info = DataSetInfo(
+        data_set_info = DatasetMetadata(
             filename=input_path.name,
             resolution=0,
             axis_order=AxisValues(0, 1, 2),
@@ -54,7 +54,7 @@ class NiiConverter(Converter):
             kind=DataKind.SEGMENTATION_VOLUME,
             lattice_shape=AxisValues(data.shape[0], data.shape[1], data.shape[2]),
         )
-        data_set = DataSet(context.working_store, data_set_info)
+        data_set = Dataset(context.working_store, data_set_info)
         frame = data_set.add_time_frame()
         channel = frame.add_channel(0)
         channel.set_data(data, NumPyBackend)
