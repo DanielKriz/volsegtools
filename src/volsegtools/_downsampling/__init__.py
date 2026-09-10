@@ -8,6 +8,7 @@ import from the `volsegtools` namespace.
 from .common import (
     calculate_approx_downsampled_sizes,
     calculate_steps,
+    calculate_min_size_from_resolutions,
 )
 from .continuous_interpolation import (
     InterpolationBased,
@@ -34,6 +35,7 @@ from .smoothing import (
 __all__ = [
     "calculate_approx_downsampled_sizes",
     "calculate_steps",
+    "calculate_min_size_from_resolutions",
     "AveragePooling",
     "InterpolationBased",
     "MaxPooling",
