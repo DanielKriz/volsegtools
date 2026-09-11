@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import logging
 import numpy as np
 import zarr
 import zarr.storage
@@ -7,12 +8,19 @@ import zarr.storage
 from volsegtools._core.chunking_mode import ChunkingMode
 from volsegtools._core.data_kind import DataKind
 
+vst_logger = logging.getLogger("volsegtools")
 
 # TODO: Rename to 'Workspace'
 # TODO: There is huge chance, that we do not need this...
 class WorkingStore:
-    def __init__(self, store_path: Path):
-        self.data_store = zarr.storage.LocalStore(root=store_path)
+    def __init__(self, store_path: Path | None = None):
+        if store_path:
+            vst_logger.debug(f"Creating a local store at: {store_path}")
+            self.data_store = zarr.storage.LocalStore(root=store_path)
+        else:
+            self.data_store = zarr.storage.MemoryStore()
+            vst_logger.debug(f"Creating a memory store as: {self.data_store}")
+
         self.root_group = zarr.open_group(store=self.data_store, mode="a")
 
         self.volume_dtype = np.float64
