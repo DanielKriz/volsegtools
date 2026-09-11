@@ -43,9 +43,6 @@ from ._core import (
     unit_from_str,
 )
 from ._downsampling import (
-    calculate_approx_downsampled_sizes,
-    calculate_steps,
-    calculate_min_size_from_resolutions,
     AveragePooling,
     InterpolationBased,
     MaxPooling,
@@ -59,6 +56,10 @@ from ._downsampling import (
     TricubicInterpolation,
     TrilinearInterpolation,
     TriquinticInterpolation,
+    calculate_approx_downsampled_sizes,
+    calculate_dimensions,
+    calculate_min_size_from_resolutions,
+    calculate_steps,
 )
 from ._model import (
     ChannelMetadata,
@@ -104,9 +105,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    "calculate_approx_downsampled_sizes",
-    "calculate_steps",
-    "calculate_min_size_from_resolutions",
     "AveragePooling",
     "AxisValues",
     "BCIFSerializer",
@@ -175,6 +173,10 @@ __all__ = [
     "__version__",
     # Namespace Shortcuts
     "abc",
+    "calculate_approx_downsampled_sizes",
+    "calculate_dimensions",
+    "calculate_min_size_from_resolutions",
+    "calculate_steps",
     "create_builder",
     "create_file_name",
     "info_from_file_path",
