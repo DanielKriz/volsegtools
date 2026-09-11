@@ -2,6 +2,9 @@ from typing import ClassVar, Self
 
 import re
 
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import CoreSchema, core_schema
+
 
 class Bytes(int):
     VALUE_PATTERN: ClassVar[re.Pattern] = re.compile(
@@ -43,3 +46,19 @@ class Bytes(int):
     @classmethod
     def parse(cls, value: int | str) -> Self:
         return cls(value)
+
+    # Thanks to this pydantic treats Bytes as int, which is correct behavior.
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: type,
+        handler: GetCoreSchemaHandler,
+    ) -> CoreSchema:
+        return core_schema.no_info_after_validator_function(
+            cls,
+            handler(int),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                int,
+                return_schema=core_schema.int_schema(),
+            ),
+        )

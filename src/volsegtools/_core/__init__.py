@@ -5,7 +5,7 @@ Please note that this module is private. Everything should be possible to
 import from the `volsegtools` namespace.
 """
 
-from .axis_values import AxisValues, create_reorder_permutation
+from .axis_values import AxisValues, AxisValuesAsInt, create_reorder_permutation
 from .bounds import Bounds
 from .bytes import Bytes
 from .chunking_mode import ChunkingMode
@@ -14,11 +14,12 @@ from .data_kind import DataKind
 from .gaussian_kernel import Gaussian3DKernel
 from .kernel import ConvolutionKernel
 from .timer import JSONTimerReporter, Timer, TimerReporter
-from .unit_kind import UnitKind, to_angstrom, to_bytes, to_micrometer, unit_from_str
+from .unit_kind import Unit, UnitKind, to_angstrom, to_bytes, to_micrometer, unit_from_str
 from .working_store import WorkingStore
 
 __all__ = [
     "AxisValues",
+    "AxisValuesAsInt",
     "Bounds",
     "Bytes",
     "ChunkingMode",
@@ -29,6 +30,7 @@ __all__ = [
     "JSONTimerReporter",
     "Timer",
     "TimerReporter",
+    "Unit",
     "UnitKind",
     "WorkingStore",
     "create_reorder_permutation",

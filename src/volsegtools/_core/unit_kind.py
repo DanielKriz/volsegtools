@@ -1,4 +1,8 @@
+from typing import Annotated
+
 import enum
+
+import pydantic
 
 
 class UnitKind(enum.IntEnum):
@@ -7,6 +11,15 @@ class UnitKind(enum.IntEnum):
     UNKNOWN = 0
     MICRO_METER = 1
     ANGSTROM = 2
+
+
+Unit = Annotated[
+    UnitKind,
+    pydantic.PlainSerializer(
+        lambda v: v.name.lower(),
+        return_type=str,
+    ),
+]
 
 
 def unit_from_str(string):
